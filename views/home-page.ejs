@@ -1,0 +1,53 @@
+<html>
+<head>
+<script src="static/javascript/jquery-3.1.1.js"></script>
+</head>
+<body>
+<p>abc</p>
+<p>abc2</p>
+<input type="text" name="text" id="send">
+<input type="button" id="submit">
+<div id="result"></div>
+<script>
+    var ws = null;
+    $('#submit').click(function () {
+        var textToSend = $('#send').val();
+        send(textToSend);
+    });
+
+    initConnection();
+
+    function initConnection(){
+        function createWebSocket(path) {
+            var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+            return new WebSocket(protocolPrefix + '//' + location.host + path, 'echo-protocol');
+        }
+        ws = createWebSocket(location.pathname);
+        ws.addEventListener("message", function(e) {
+            receive(e);
+        });
+        ws.addEventListener('close', function () {
+            $('#result').prepend($('<p/>').html('closed'));
+        });
+        ws.addEventListener('error', function () {
+            $('#result').prepend($('<p/>').html('error'));
+        });
+    }
+    function receive(data){
+        var msg = data.data;
+        $('#result').prepend($('<p/>').html(msg));
+    }
+    function send(data){
+        if(ws.readyState != ws.OPEN){
+            initConnection();
+            ws.addEventListener('open', function (e) {
+                e.target.removeEventListener(e.type, arguments.callee);
+                ws.send(data);
+            });
+        }else{
+            ws.send(data);
+        }
+    }
+</script>
+</body>
+</html>

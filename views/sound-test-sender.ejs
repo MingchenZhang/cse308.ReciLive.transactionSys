@@ -1,0 +1,77 @@
+<html>
+<head>
+    <script src="static/javascript/jquery-3.1.1.js"></script>
+    <script src="static/javascript/resampler.js"></script>
+</head>
+<body>
+<div id="list">
+
+</div>
+<script>
+    transmitionRate = 22000;
+    consumeRate = 16384;
+
+    function createWebSocket(path) {
+        var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+        return new WebSocket(protocolPrefix + '//' + location.host + path, 'echo-protocol');
+    }
+    var ws = createWebSocket(location.pathname);
+    ws.addEventListener("open", function(e) {
+        startStream(ws);
+    });
+
+    function startStream(websocket) {
+        if (!navigator.getUserMedia)
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({
+                    audio: true
+                },
+                function(stream) {
+                    start_microphone(stream);
+                },
+                function(e) {
+                    alert('Error capturing audio.');
+                }
+            );
+        } else {
+            alert('getUserMedia not supported in this browser.');
+        }
+
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        var audioCtx = new AudioContext();
+        console.log('sample rate: '+audioCtx.sampleRate);
+        var resampler = new Resampler(audioCtx.sampleRate, transmitionRate, 1, Math.ceil(consumeRate*transmitionRate/audioCtx.sampleRate)+1);
+
+        function start_microphone(stream) {
+            var microphone_stream = audioCtx.createMediaStreamSource(stream);
+            //microphone_stream.connect(audioCtx.destination);
+            var scriptProc = logStream(audioCtx);
+            microphone_stream.connect(scriptProc);
+            //scriptProc.connect(audioCtx.destination);
+            scriptProc.connect(audioCtx.createMediaStreamDestination());
+        }
+
+        function logStream(audioCtx) {
+            var script_processor_node = audioCtx.createScriptProcessor(consumeRate, 1, 1);
+            script_processor_node.onaudioprocess = function(audioProcessingEvent) {
+                var inputBuffer = audioProcessingEvent.inputBuffer;
+                var outputBuffer = audioProcessingEvent.outputBuffer;
+
+                var inputData = inputBuffer.getChannelData(0);
+                var inputData = resampler.resampler(inputData, consumeRate);
+
+                var input = inputData.buffer;
+                websocket.send(input);
+
+                console.log(inputData[0]);
+                $('#list').prepend('<p>'+inputData[0]+'</p>');
+            };
+            return script_processor_node;
+        }
+    }
+</script>
+</body>
+</html>
