@@ -42,21 +42,31 @@ function TransactionSystem(path) {
         modules[moduleName] = module;
     };
 
-    this.newTransaction = function (module, description, createdBy, createdAt, payload) {
+    this.newTransaction = function (module, description, payload) {
         var attemptInterval = 200;
         function sendAttempt(err){
-            var transaction = {
-                index: transactions[transactions.length-1].index+1,
-                module: module,
-                description: description,
-                payload: payload
-            };
-            return $.ajax({
-                url: 'transaction_post',
-                type: 'post',
-                data: JSON.stringify(transaction),
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
+            return new Promise(function (resolve, reject) {
+                var index = transactions[transactions.length-1].index+1;
+                var transaction = {
+                    index: index,
+                    module: module,
+                    description: description,
+                    payload: payload
+                };
+                return $.ajax({
+                    url: 'transaction_post',
+                    type: 'post',
+                    data: JSON.stringify(transaction),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                }).done(function (result) {
+                    if(result.status == 'ok')
+                        return resolve({index: index});
+                    else
+                        return reject(result);
+                }).fail(function (err) {
+                    return reject(err);
+                });
             });
         }
         function failDelay(err){
