@@ -13,9 +13,12 @@ var WSHandle = require('./modules/websocket');
 var Tools = require('./tools.js');
 
 
-var s = {
-    wsHandler: new WSHandle.WSHandler()
+global.s = {
+    wsHandler: new WSHandle.WSHandler(),
+    mongodb:  Mongodb.MongoClient,
+    dbPath: process.env.ENV_VARIABLE||'mongodb://localhost:27017/test'
 };
+s.transactionRecord = require('./database/transaction_record.js');
 
 var startupPromises = []; // wait for all initialization to finish
 
