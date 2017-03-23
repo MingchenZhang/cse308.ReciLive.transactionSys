@@ -3,6 +3,7 @@
     <script src="/static/javascript/jquery-3.1.1.js"></script>
     <script src="/static/javascript/bluebird.js"></script>
     <script src="/static/javascript/transaction_system.js"></script>
+    <script src="/static/javascript/chat_module.js"></script>
 </head>
 <body>
 <p>transaction test</p>
@@ -12,6 +13,7 @@
 <div id="result"></div>
 <script>
     transactionSystem = new TransactionSystem('/');
+    chatModule = new Chat(transactionSystem, $('#result'));
 </script>
 </body>
 </html>
