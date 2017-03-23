@@ -2,8 +2,9 @@ var When = require('when');
 var s = global.s;
 
 var transactionDB = {};
+var sessionDB = {};
 exports.initDatabase = function (readyList) {
-    var convDBPath = s.dbPath
+    var convDBPath = s.dbPath;
     var convDBReady = When.defer();
     readyList.push(convDBReady.promise);
     console.log('try to connect to ' + convDBPath);
@@ -15,12 +16,12 @@ exports.initDatabase = function (readyList) {
         } else {
             console.log('MongodbClient connection to ' + convDBPath + ' has been established');
             transactionDB.transactionColl = db.collection('transaction');
-
+            sessionDB.sessionColl = db.collection('session');
             convDBReady.resolve();
         }
     });
 
-}
+};
 
 
 exports.addTransaction = function (sessionID, index, module, description, payload) {
@@ -43,15 +44,35 @@ exports.getTransactionCursor = function (sessionID, index) {
     return transactionDB.transactionColl.find({sessionID: sessionID, index: {$gte: index}}).sort({index: 1});
 };
 
-experts.getLastTransactionIndex = function (sessionID) {
+exports.getLastTransactionIndex = function (sessionID) {
     return transactionDB.transactionColl.findOne({sessionID: sessionID}).sort({index: -1}).limit(1).then((doc)=> {
         return doc.index;
     });
 };
 
-experts.dropTransactionSession = function (sessionID) {
+exports.dropTransactionSession = function (sessionID) {
     transactionDB.transactionColl.deleteMany({sessionID: sessionID}).catch(function (err) {
             console.error(err);
         }
     );
+};
+
+exports.addSession = function (sessionID, studentGoogleIDList, instructorID) {
+    var doc ={
+        sessionID:sessionID,
+        studentGoogleIDList: studentGoogleIDList,
+        instrctorID:instructorID
+    }
+    return sessionID.sessionColl.insertOne(doc).catch(function (err) {
+        console.error(err);
+        throw err;
+    });
+};
+
+exports.getSession = function () {
+    return sessionDB.sessionColl.find().toArray();
+};
+
+exports.deleteSession = function(Session){
+    return sessionDB.sessionColl.deleteOne({sessionID:sessionID});
 };
