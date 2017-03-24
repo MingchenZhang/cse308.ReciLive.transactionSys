@@ -31,8 +31,5 @@ exports.getRoute = function (s) {
         next();
     }, Classroom.getRoute(s));
 
-    router.post('/transaction_post', function (req, res, next) {
-
-    });
     return router;
 };
