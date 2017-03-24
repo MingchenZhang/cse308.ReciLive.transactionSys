@@ -20,18 +20,19 @@ exports.initDatabase = function (readyList) {
             convDBReady.resolve();
         }
     });
-
 };
 
 
-exports.addTransaction = function (sessionID, index, module, description, payload) {
+exports.addTransaction = function (sessionID, index, module, description, payload,createdBy) {
 
     var doc = {
         sessionID: sessionID,
         index: index,
         module: module,
         description: description,
-        payload: payload
+        payload: payload,
+        createdAt:new Date(),
+        createdBy:createdBy
     };
 
     return transactionDB.transactionColl.insertOne(doc).catch(function (err) {
@@ -57,11 +58,14 @@ exports.dropTransactionSession = function (sessionID) {
     );
 };
 
-exports.addSession = function (sessionID, studentGoogleIDList, instructorID) {
-    var doc ={
-        sessionID:sessionID,
-        studentGoogleIDList: studentGoogleIDList,
-        instrctorID:instructorID
+exports.addSession = function (sessionID, privilege, name, startDate, endDate, status) {
+    var doc = {
+        sessionID: sessionID,
+        privilege: privilege,
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        status: status
     }
     return sessionID.sessionColl.insertOne(doc).catch(function (err) {
         console.error(err);
@@ -73,6 +77,6 @@ exports.getSession = function () {
     return sessionDB.sessionColl.find().toArray();
 };
 
-exports.deleteSession = function(Session){
-    return sessionDB.sessionColl.deleteOne({sessionID:sessionID});
+exports.deleteSession = function (Session) {
+    return sessionDB.sessionColl.deleteOne({sessionID: sessionID});
 };

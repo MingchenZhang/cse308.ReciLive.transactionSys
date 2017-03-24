@@ -2,10 +2,9 @@ var Express = require('express');
 var BodyParser = require('body-parser');
 var When = require('when');
 var Classroom = require('classroom');
-
+var DataHandler = require('../database/transaction_record.js');
 exports.getRoute = function (s) {
     var router = Express.Router();
-
     var urlParser = BodyParser.urlencoded({extended: false, limit: '10kb'});
 
     router.get('/dispatch_classroom', function (req, res, next) {
@@ -19,8 +18,9 @@ exports.getRoute = function (s) {
             //correct class number
             classNumber = req.classNumber;
             console.log("get class room number: " + classNumber);
-            classroomList[classNumber] = {studentList = req.studentGoogleID, IDTokenCash = [], instructorID = req.instructorID
-        }
+            classroomList[classNumber] = {
+                studentList: req.studentGoogleID, instructorID: req.instructorID
+            }
             console.log(" the number of students is: " + req.studentGoogleID.length);
             console.log(" the instructor id is " + req.instructorID);
         }
@@ -31,5 +31,8 @@ exports.getRoute = function (s) {
         next();
     }, Classroom.getRoute(s));
 
+    router.post('/transaction_post', function (req, res, next) {
+
+    });
     return router;
 };

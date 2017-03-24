@@ -12,7 +12,6 @@ var WSWebSocket = require("ws").Server;
 var WSHandle = require('./modules/websocket');
 var Tools = require('./tools.js');
 
-
 global.s = {
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb.MongoClient,
@@ -20,6 +19,7 @@ global.s = {
     googleLoginTool: require('./modules/google_login'),
 };
 s.transactionRecord = require('./database/transaction_record.js');
+s.transactionRecord.initDatabase();
 
 var startupPromises = []; // wait for all initialization to finish
 
