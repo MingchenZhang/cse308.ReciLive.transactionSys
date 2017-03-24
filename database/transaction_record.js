@@ -47,7 +47,8 @@ exports.getTransactionCursor = function (sessionID, index) {
 
 exports.getLastTransactionIndex = function (sessionID) {
     return transactionDB.transactionColl.findOne({sessionID: sessionID}).sort({index: -1}).limit(1).then((doc)=> {
-        return doc.index;
+        if(doc) return doc.index;
+        else return -1;
     });
 };
 
