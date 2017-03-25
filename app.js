@@ -57,10 +57,10 @@ if (process.env.HTTPS_PORT) {
 }
 
 wsServer = new WSWebSocket({server: httpServer});
-wsServer.on('connection', s.wsHandler.handler);
+wsServer.on('connection', s.wsHandler.handle);
 if (process.env.HTTPS_PORT) {
     wsServer = new WSWebSocket({server: httpsServer});
-    wsServer.on('connection', s.wsHandler.handler);
+    wsServer.on('connection', s.wsHandler.handle);
 }
 
 // start up server

@@ -2,7 +2,7 @@ var Express = require('express');
 var BodyParser = require('body-parser');
 var When = require('when');
 var Classroom = require('classroom');
-var DataHandler = require('../database/transaction_record.js');
+var Checker = require('./parameterChecker');
 
 var s = global.s;
 
@@ -11,7 +11,8 @@ exports.getRoute = function (s) {
     var urlParser = BodyParser.urlencoded({extended: false, limit: '10kb'});
 
     router.get('/dispatch_classroom', function (req, res, next) {
-        return s.sessionManager.addSession({
+        if(!Checker.dispatchRquest(req)) return req.send({status:"error",reason:5});
+        s.sessionManager.addSession({
             sessionID: req.classNumber,
             privilege: req.privilege,
             name: req.name,
@@ -19,9 +20,9 @@ exports.getRoute = function (s) {
             endDate: req.endDate,
             status: req.status
         }).then(()=> {
-            return {status: "ok"}
+            req.send({status: "ok"});
         }).catch((err)=> {
-            return {status: "error", reason: err.reason};
+            req.send({status: "error", reason: err.reason});
         });
 
     });

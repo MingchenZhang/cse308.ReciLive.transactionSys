@@ -19,15 +19,22 @@ exports.session = function () {
         self.endDate = param.endDate;
         self.status = param.status;
 
-        if(self.sessionID>=0) return When.reject({reason:"reinitialization of session:"+self.sessionID});
+        if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
+
+        function wsHandle() {
+
+        }
 
         return s.transactionRecord.addSession({
-            sessionID:self.sessionID,
-            privilege:self.privilege,
-            name:self.name,
-            startDate:self.startDate,
-            endDate:self.endDate,
-            status:self.status
+            sessionID: self.sessionID,
+            privilege: self.privilege,
+            name: self.name,
+            startDate: self.startDate,
+            endDate: self.endDate,
+            status: self.status
+        }).then((value)=> {
+            s.wsHandler.addRoute("/room/" + self.sessionID, wsHandle);
+            return value;
         });
     };
     this.resumeSession = function (param) {
@@ -38,10 +45,20 @@ exports.session = function () {
         var endDate = param.endDate;
         var status = param.status;
 
-        if(self.sessionID>=0) return When.reject({reason:"reinitialization of session:"+self.sessionID});
+        if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
+
+        function wsHandle() {
+
+        }
 
         return s.transactionRecord.getLastTransactionIndex({sessionID: self.sessionID})
-            .then((index)=>{ lastTransactionIndex = index; });
+            .then((index)=> {
+                lastTransactionIndex = index;
+            })
+            .then((value)=> {
+                s.wsHandler.addRoute("/room/" + self.sessionID, wsHandle);
+                return value;
+            });
     };
 
     this.addTransaction = function (transaction) {
@@ -51,24 +68,25 @@ exports.session = function () {
         var payload = param.payload;
         var createdBy = param.createdBy;
 
-        if(index != lastTransactionIndex+1) return When.reject({reason: 1});
+        if (index != lastTransactionIndex + 1) return When.reject({reason: 1});
 
-        if(self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)
+        if (self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)
             return When.reject({reason: 2});
 
         return s.transactionRecord.addTransaction(transaction);
     };
 
     this.listTransaction = function (startAt, sendNext) {
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve, reject)=> {
             var cursor = s.transactionRecord.getTransactionCursor({sessionID: self.sessionID, startAt: startAt});
-            function getMore(){
-                cursor.next((err, result)=>{
-                    if(err) reject(err);
-                    if(result) {
+
+            function getMore() {
+                cursor.next((err, result)=> {
+                    if (err) reject(err);
+                    if (result) {
                         sendNext(result);
                         getMore();
-                    }else resolve();
+                    } else resolve();
                 });
             }
         });
@@ -76,7 +94,11 @@ exports.session = function () {
     this.close = function () {
         var finish = [
             s.transactionRecord.deleteSession({sessionID: self.sessionID}),
-            s.transactionRecord.dropTransactionSession({sessionID: self.sessionID})
+            s.transactionRecord.dropTransactionSession({sessionID: self.sessionID}),
+            new When.Promise((resolve, reject)=>{
+                s.wsHandler.removeRoute("/room/"+self.sessionID);
+                resolve();
+            })
         ];
         return When.all(finish);
     };

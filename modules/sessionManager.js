@@ -1,4 +1,5 @@
 //classroom list
+var Session = require("./session");
 var classroomList = {};
 var s = global.s;
 
@@ -14,8 +15,8 @@ exports.initSession = function () {
 };
 
 exports.addSessionDummy = function () {
-    classroomList[1] = {"sessionID": 1, "privilege": {123: "all", 234: "all", 345: "all"}, name:"dummy Session name"};
-    return s.transactionRecord.addSession(1,{123: "all", 234: "all", 345: "all"},"dummy Session name","","",'');
+    classroomList[1] = {"sessionID": 1, "privilege": {123: "all", 234: "all", 345: "all"}, name: "dummy Session name"};
+    return s.transactionRecord.addSession(1, {123: "all", 234: "all", 345: "all"}, "dummy Session name", "", "", '');
 };
 
 exports.addSession = function (param) {
@@ -28,17 +29,11 @@ exports.addSession = function (param) {
 
     if (classroomList[sessionID]) {
         console.error("try to add a exist session" + sessionItem.sessionID);
-        return new When.reject({reason:3});
+        return new When.reject({reason: 3});
     }
-    classroomList[sessionID] = {
-        sessionID: sessionID,
-        privilege: privilege,
-        name:name,
-        startDate:startDate,
-        endDate:endDate,
-        status:status,
-    };
-   return s.transactionRecord.addSession(sessionID,privilege,name,startDate,endDate,status);
+    classroomList[sessionID] = new Session.session();
+    classroomList[sessionID].newSession({sessionID, privilege, name, startDate, endDate, status});
+    return s.transactionRecord.addSession(sessionID, privilege, name, startDate, endDate, status);
 };
 //deletesSession return a promise
 exports.deleteSession = function (param) {

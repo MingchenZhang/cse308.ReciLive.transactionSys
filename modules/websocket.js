@@ -1,12 +1,14 @@
 exports.WSHandler = function () {
     var subhandlerMap = {};
 
-    this.handler = function (ws) {
+    this.handle = function (ws) {
         var location = url.parse(ws.upgradeReq.url, true);
 
         var handler = subhandlerMap[location];
-        if(handler != undefined){
+        if (handler != undefined) {
             return handler(ws);
+        } else {
+            console.error("handler not defined on path: " + location);
         }
     };
 
