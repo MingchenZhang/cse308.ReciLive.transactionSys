@@ -21,6 +21,9 @@ global.s = {
 s.transactionRecord = require('./database/transaction_record.js');
 s.transactionRecord.initDatabase();
 
+s.sessionManager = require('./modules/sessionManager');
+s.sessionManager.initSession();
+
 var startupPromises = []; // wait for all initialization to finish
 
 var app = Express();

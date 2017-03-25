@@ -15,6 +15,7 @@ exports.initSession = function () {
 
 exports.addSessionDummy = function () {
     classroomList[1] = {"sessionID": 1, "privilege": {123: "all", 234: "all", 345: "all"}, name:"dummy Session name"};
+    return s.transactionRecord.addSession(1,{123: "all", 234: "all", 345: "all"},"dummy Session name","","",'');
 };
 
 exports.addSession = function (param) {
