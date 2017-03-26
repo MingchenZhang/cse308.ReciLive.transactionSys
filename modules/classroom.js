@@ -4,7 +4,7 @@ var When = require('when');
 
 //
 exports.getRoute = function (s) {
-    var router = Express.Router();
+    var router = Express.Router({mergeParams: true});
 
     var urlParser = BodyParser.urlencoded({extended: false, limit: '10kb'});
 

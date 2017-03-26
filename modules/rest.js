@@ -27,7 +27,7 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.all('/room/:classroomNumber', function (req, res, next) {
+    router.use('/room/:classroomNumber', function (req, res, next) {
         req.classroomNumber = parseInt(req.params.classroomNumber);
         req.classroomSession = s.sessionManager.getSession(req.classroomNumber);
         if(!req.userLoginInfo) return res.status(401).send("please login first");
@@ -41,6 +41,14 @@ exports.getRoute = function (s) {
             res.status(400).send("classroom not found");
         }
     }, Classroom.getRoute(s));
+
+    router.post('/give_cookie', jsonParser, function (req, res, next) {
+        for (var key in req.body) {
+            if (!req.body.hasOwnProperty(key)) continue;
+            res.cookie(key, req.body[key], {});
+        }
+        res.send({status:"ok"});
+    });
 
     return router;
 };

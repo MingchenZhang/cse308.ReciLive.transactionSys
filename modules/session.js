@@ -4,12 +4,14 @@ var s = global.s;
 exports.session = function () {
     var self = this;
     var lastTransactionIndex = -1;
-    this.sessionID = -1;
-    this.privilege = null;
-    this.name = null;
-    this.startDate = null;
-    this.endDate = null;
-    this.status = null;
+    self.sessionID = -1;
+    self.privilege = null;
+    self.name = null;
+    self.startDate = null;
+    self.endDate = null;
+    self.status = null;
+
+    var clients = {};
 
     this.newSession = function (param) {
         if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
@@ -21,10 +23,6 @@ exports.session = function () {
         self.endDate = param.endDate;
         self.status = param.status;
 
-        function wsHandle() {
-
-        }
-
         return s.transactionRecord.addSession({
             sessionID: self.sessionID,
             privilege: self.privilege,
@@ -33,7 +31,8 @@ exports.session = function () {
             endDate: self.endDate,
             status: self.status
         }).then((value)=> {
-            s.wsHandler.addRoute("/room/" + self.sessionID, wsHandle);
+            s.wsHandler.addRoute("/room/" + self.sessionID + "/transaction", self.wsHandleTransaction);
+            s.wsHandler.addRoute("/room/" + self.sessionID + "/sound", self.wsHandleSound);
             return value;
         });
     };
@@ -41,22 +40,19 @@ exports.session = function () {
         if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
 
         self.sessionID = param.sessionID;
-        var privilege = param.privilege;
-        var name = param.name;
-        var startDate = param.startDate;
-        var endDate = param.endDate;
-        var status = param.status;
-
-        function wsHandle() {
-
-        }
+        self.privilege = param.privilege;
+        self.name = param.name;
+        self.startDate = param.startDate;
+        self.endDate = param.endDate;
+        self.status = param.status;
 
         return s.transactionRecord.getLastTransactionIndex({sessionID: self.sessionID})
             .then((index)=> {
                 lastTransactionIndex = index;
             })
             .then((value)=> {
-                s.wsHandler.addRoute("/room/" + self.sessionID, wsHandle);
+                s.wsHandler.addRoute("/room/" + self.sessionID + "/transaction", self.wsHandleTransaction);
+                s.wsHandler.addRoute("/room/" + self.sessionID + "/sound", self.wsHandleSound);
                 if(!s.inProduction){
                     console.log("new session resumed");
                     console.log(param);
@@ -64,6 +60,19 @@ exports.session = function () {
                 }
                 return value;
             });
+    };
+
+    this.wsHandleTransaction = function (ws) {
+        ws.on('message', function (message) {
+
+        });
+        ws.on('close', function () {
+
+        });
+    };
+
+    this.wsHandleSound = function (ws) {
+
     };
 
     this.addTransaction = function (transaction) {

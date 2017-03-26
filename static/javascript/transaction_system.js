@@ -8,10 +8,13 @@ function TransactionSystem(path) {
 
     function init(){
         connection = wsConnection(path, sendStart, receive, false);
+        var ready, fail;
         latestReady = new Promise(function (resolve, reject) {
-            latestReady.ready = resolve;
-            latestReady.fail = reject;
+            ready = resolve;
+            fail = reject;
         });
+        latestReady.ready = ready;
+        latestReady.fail = fail;
     }
     function sendStart(){
         connection.send(JSON.stringify({type: "initialization", startAt: transactions[transactions.length-1].index+1}));

@@ -35,7 +35,7 @@ exports.addSession = function (param) {
     var status = param.status;
 
     if (classroomList[sessionID]) {
-        console.error("try to add a exist session" + sessionItem.sessionID);
+        console.error("try to add a exist session" + sessionID);
         return new When.reject({reason: 3});
     }
     classroomList[sessionID] = new Session.session();
