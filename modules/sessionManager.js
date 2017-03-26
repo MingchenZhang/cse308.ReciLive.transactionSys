@@ -1,19 +1,23 @@
 //classroom list
 var Session = require("./session");
+var When = require('when');
 var classroomList = {};
 var s = global.s;
 
 exports.initSession = function () {
     let sessionListPromise = s.transactionRecord.getSession();
+    var sessionInitPromise = [];
     return sessionListPromise.then((sessionList)=> {
         if (sessionList) {
             sessionList.forEach(function (sessionItem) {
                 console.log("import session in to session list:" + sessionItem.sessionID);
-                if (classroomList[sessionItem.sessionID]) console.err("overwrite exist session" + sessionItem.sessionID);
-                classroomList[sessionItem.sessionID] = sessionItem;
+                classroomList[sessionItem.sessionID] = new Session.session();
+                sessionInitPromise.push(
+                    classroomList[sessionItem.sessionID].resumeSession(sessionItem)
+                );
             })
         }
-    });
+    }).then(When.all(sessionInitPromise));
 
 };
 
@@ -35,8 +39,7 @@ exports.addSession = function (param) {
         return new When.reject({reason: 3});
     }
     classroomList[sessionID] = new Session.session();
-    classroomList[sessionID].newSession({sessionID, privilege, name, startDate, endDate, status});
-    return s.transactionRecord.addSession(sessionID, privilege, name, startDate, endDate, status);
+    return classroomList[sessionID].newSession({sessionID, privilege, name, startDate, endDate, status});
 };
 //deletesSession return a promise
 exports.deleteSession = function (param) {

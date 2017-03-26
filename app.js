@@ -15,22 +15,25 @@ var readyList = [];
 global.s = {
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb.MongoClient,
-    dbPath: process.env.ENV_VARIABLE || 'mongodb://localhost:27017/test',
+    dbPath: process.env.ENV_VARIABLE || 'mongodb://localhost:27017/',
     googleLoginTool: require('./modules/google_login'),
+    inProduction: process.env.NODE_ENV === 'production',
 };
 s.transactionRecord = require('./database/transaction_record.js');
 s.transactionRecord.initDatabase(readyList);
 
 s.sessionManager = require('./modules/sessionManager');
 
-
-var startupPromises = []; // wait for all initialization to finish
-
 var app = Express();
 
 app.use('/static', Express.static(__dirname + '/static'));
-app.use(CookieParser);
+app.use(CookieParser());
 app.set('view engine', 'ejs');
+app.use((req, res, next)=> {
+    if(s.inProduction) return next();
+    console.log("visited: " + req.originalUrl);
+    next();
+});
 app.use(function (req, res, next) {
     req.userLoginInfo = null;
     res.locals.userLoginInfo = null;
@@ -45,8 +48,16 @@ app.use(function (req, res, next) {
     } else next();
 });
 app.use('/', require('./modules/rest').getRoute(s));
-app.get('/', function (req, res, next) {
-    res.render('home-page');
+
+// ---------------error handling section ---------------
+// 404 error
+app.all('*', function (req, res, next) {
+    res.status(404).send("404 NOT FOUND");
+});
+// default error handling
+app.use(function (err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).send("500 SERVER ERROR");
 });
 
 // create server
@@ -66,14 +77,15 @@ if (process.env.HTTPS_PORT) {
 }
 
 // start up server
-When.all(readyList).then(function () {
-    s.sessionManager.initSession();
-    var httpPort = process.env.HTTP_PORT || 3000;
-    var httpsPort = process.env.HTTPS_PORT;
-    httpServer.listen(httpPort);
-    if (httpsPort) {
-        httpsServer.listen(httpsPort);
-        console.log('https ready on ' + httpsPort);
-    }
-    console.log('http ready on ' + httpPort);
-});
+When.all(readyList)
+    .then(s.sessionManager.initSession)
+    .then(function () {
+        var httpPort = process.env.HTTP_PORT || 3000;
+        var httpsPort = process.env.HTTPS_PORT;
+        httpServer.listen(httpPort);
+        if (httpsPort) {
+            httpsServer.listen(httpsPort);
+            console.log('https ready on ' + httpsPort);
+        }
+        console.log('http ready on ' + httpPort);
+    });

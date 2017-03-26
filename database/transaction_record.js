@@ -56,7 +56,7 @@ exports.getTransactionCursor = function (param) {
 
 exports.getLastTransactionIndex = function (param) {
     var sessionID = param.sessionID;
-    return transactionDB.transactionColl.findOne({sessionID: sessionID}).sort({index: -1}).limit(1).then((doc)=> {
+    return transactionDB.transactionColl.findOne({sessionID: sessionID}, {sort:[['index', -1]]}).then((doc)=> {
         if(doc) return doc.index;
         else return -1;
     });
@@ -86,7 +86,7 @@ exports.addSession = function (param) {
         endDate: endDate,
         status: status
     };
-    return sessionID.sessionColl.insertOne(doc).catch(function (err) {
+    return sessionDB.sessionColl.insertOne(doc).catch(function (err) {
         console.error(err);
         throw err;
     });

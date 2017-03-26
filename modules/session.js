@@ -12,14 +12,14 @@ exports.session = function () {
     this.status = null;
 
     this.newSession = function (param) {
+        if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
+
         self.sessionID = param.sessionID;
         self.privilege = param.privilege;
         self.name = param.name;
         self.startDate = param.startDate;
         self.endDate = param.endDate;
         self.status = param.status;
-
-        if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
 
         function wsHandle() {
 
@@ -38,14 +38,14 @@ exports.session = function () {
         });
     };
     this.resumeSession = function (param) {
+        if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
+
         self.sessionID = param.sessionID;
         var privilege = param.privilege;
         var name = param.name;
         var startDate = param.startDate;
         var endDate = param.endDate;
         var status = param.status;
-
-        if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
 
         function wsHandle() {
 
@@ -57,6 +57,11 @@ exports.session = function () {
             })
             .then((value)=> {
                 s.wsHandler.addRoute("/room/" + self.sessionID, wsHandle);
+                if(!s.inProduction){
+                    console.log("new session resumed");
+                    console.log(param);
+                    console.log("last index: " + lastTransactionIndex);
+                }
                 return value;
             });
     };
