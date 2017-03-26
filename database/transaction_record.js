@@ -4,7 +4,7 @@ var s = global.s;
 var transactionDB = {};
 var sessionDB = {};
 exports.initDatabase = function (readyList) {
-    var convDBPath = s.dbPath;
+    var convDBPath = s.dbPath+"transaction";
     var convDBReady = When.defer();
     readyList.push(convDBReady.promise);
     console.log('try to connect to ' + convDBPath);

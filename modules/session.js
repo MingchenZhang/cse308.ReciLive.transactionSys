@@ -95,11 +95,17 @@ exports.session = function () {
         var finish = [
             s.transactionRecord.deleteSession({sessionID: self.sessionID}),
             s.transactionRecord.dropTransactionSession({sessionID: self.sessionID}),
-            new When.Promise((resolve, reject)=>{
-                s.wsHandler.removeRoute("/room/"+self.sessionID);
+            new When.Promise((resolve, reject)=> {
+                s.wsHandler.removeRoute("/room/" + self.sessionID);
                 resolve();
             })
         ];
         return When.all(finish);
     };
+    this.userInSession = function (userID) {
+        return userID in self.privilege;
+    };
+    this.userEditable = function(userID, module){
+        return self.privilege[userID].indexOf(module)!=-1;
+    }
 };

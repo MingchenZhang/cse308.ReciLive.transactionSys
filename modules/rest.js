@@ -1,7 +1,7 @@
 var Express = require('express');
 var BodyParser = require('body-parser');
 var When = require('when');
-var Classroom = require('classroom');
+var Classroom = require('./classroom');
 var Checker = require('./parameterChecker');
 
 var s = global.s;
@@ -11,7 +11,7 @@ exports.getRoute = function (s) {
     var urlParser = BodyParser.urlencoded({extended: false, limit: '10kb'});
 
     router.get('/dispatch_classroom', function (req, res, next) {
-        if(!Checker.dispatchRquest(req)) return req.send({status:"error",reason:5});
+        if (!Checker.dispatchRquest(req)) return req.send({status: "error", reason: 5});
         s.sessionManager.addSession({
             sessionID: req.classNumber,
             privilege: req.privilege,
@@ -24,7 +24,6 @@ exports.getRoute = function (s) {
         }).catch((err)=> {
             req.send({status: "error", reason: err.reason});
         });
-
     });
 
     router.get('/dummy_classroom', function (req, res, next) {
@@ -37,7 +36,16 @@ exports.getRoute = function (s) {
 
     router.all('/room/:classroomNumber', function (req, res, next) {
         req.classroomNumber = req.params.classroomNumber;
-        next();
+        req.classroomSession = s.sessionManager.getSession();
+        if (req.classroomSession) {
+            if (req.classroomSession.userInSession(req.userLoginInfo.userID)){
+                next();
+            }else{
+                res.status(401);
+            }
+        } else {
+            res.status(400).send("classroom not found");
+        }
     }, Classroom.getRoute(s));
 
     return router;

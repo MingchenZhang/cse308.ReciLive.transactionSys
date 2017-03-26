@@ -10,7 +10,7 @@ exports.getRoute = function (s) {
 
     // classroom page
     router.get('/', function (req, res, next) {
-
+        res.render("transaction-test", {username: req.userLoginInfo.name});
     });
 
     router.post('/transaction_post', function (req, res, next) {

@@ -4,14 +4,17 @@ var classroomList = {};
 var s = global.s;
 
 exports.initSession = function () {
-    let sessionList = s.transactionRecord.getSession();
-    if (sessionList) {
-        sessionList.forEach(function (sessionItem) {
-            console.log("import session in to session list:" + sessionItem.sessionID);
-            if (classroomList[sessionItem.sessionID]) console.err("overwrite exist session" + sessionItem.sessionID);
-            classroomList[sessionItem.sessionID] = sessionItem;
-        })
-    }
+    let sessionListPromise = s.transactionRecord.getSession();
+    return sessionListPromise.then((sessionList)=> {
+        if (sessionList) {
+            sessionList.forEach(function (sessionItem) {
+                console.log("import session in to session list:" + sessionItem.sessionID);
+                if (classroomList[sessionItem.sessionID]) console.err("overwrite exist session" + sessionItem.sessionID);
+                classroomList[sessionItem.sessionID] = sessionItem;
+            })
+        }
+    });
+
 };
 
 exports.addSessionDummy = function () {
@@ -52,5 +55,7 @@ exports.addTransaction = function (param) {
     var description = param.description;
     var payload = param.payload;
     var createdBy = param.createdBy;
-
+};
+exports.getSession = function (sessionID) {
+    return classroomList[sessionID];
 };

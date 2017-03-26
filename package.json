@@ -13,6 +13,7 @@
     "helmet": "latest",
     "mongodb": "^2.2.24",
     "when": "^3.7.8",
-    "ws": "^2.2.1"
+    "ws": "^2.2.1",
+    "body-parser":"latest"
   }
 }

@@ -11,7 +11,7 @@ var WSWebSocket = require("ws").Server;
 
 var WSHandle = require('./modules/websocket');
 var Tools = require('./tools.js');
-
+var readyList = [];
 global.s = {
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb.MongoClient,
@@ -19,10 +19,10 @@ global.s = {
     googleLoginTool: require('./modules/google_login'),
 };
 s.transactionRecord = require('./database/transaction_record.js');
-s.transactionRecord.initDatabase();
+s.transactionRecord.initDatabase(readyList);
 
 s.sessionManager = require('./modules/sessionManager');
-s.sessionManager.initSession();
+
 
 var startupPromises = []; // wait for all initialization to finish
 
@@ -39,6 +39,8 @@ app.use(function (req, res, next) {
             req.userLoginInfo = userInfo;
             res.locals.userLoginInfo = userInfo;
             next();
+        }).catch((err)=> {
+            res.status(403).send("google login failure");
         });
     } else next();
 });
@@ -64,7 +66,8 @@ if (process.env.HTTPS_PORT) {
 }
 
 // start up server
-When.all(startupPromises).then(function () {
+When.all(readyList).then(function () {
+    s.sessionManager.initSession();
     var httpPort = process.env.HTTP_PORT || 3000;
     var httpsPort = process.env.HTTPS_PORT;
     httpServer.listen(httpPort);
