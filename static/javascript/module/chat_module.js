@@ -1,12 +1,13 @@
 function Chat(transactionSystem, showDiv) {
-    var moduleName = 'chat';
+    var self = this;
+    this.moduleName = 'chat';
     var chatList = [];
     var ignoreTransaction = {};
 
     this.newMessage = function (message) {
         var id = Math.random();
         ignoreTransaction[id] = true;
-        transactionSystem.newTransaction(moduleName, {
+        transactionSystem.newTransaction(self.moduleName, {
             type: 'message',
             id: id
         }, {message: message}).catch(function (err) {

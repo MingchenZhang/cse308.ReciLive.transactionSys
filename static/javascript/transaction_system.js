@@ -6,7 +6,7 @@ function TransactionSystem(path) {
     var latestReady = null;
     var modules = {};
 
-    function init(){
+    this.init = function () {
         connection = wsConnection(path, sendStart, receive, false);
         var ready, fail;
         latestReady = new Promise(function (resolve, reject) {
@@ -15,31 +15,32 @@ function TransactionSystem(path) {
         });
         latestReady.ready = ready;
         latestReady.fail = fail;
+        return latestReady;
+    };
+    function sendStart() {
+        connection.send(JSON.stringify({
+            type: "initialization",
+            startAt: transactions[transactions.length - 1].index + 1
+        }));
     }
-    function sendStart(){
-        connection.send(JSON.stringify({type: "initialization", startAt: transactions[transactions.length-1].index+1}));
-    }
-    function receive(e){
+
+    function receive(e) {
         var object = JSON.parse(e.data);
-        if(object.type == 'latest_send') {
+        if (object.type == 'latest_send') {
             latestReady.ready();
         }
-        if(object.index == transactions[transactions.length-1].index+1){
+        if (object.index == transactions[transactions.length - 1].index + 1) {
             transactions.push(object);
             modules[object.module].update(object.index,
                 object.description,
                 object.createdBy,
                 object.createdAt,
                 object.payload);
-        }else{
+        } else {
             console.error('transaction receive out of order');
             connection.reset();
         }
     }
-
-    this.startPromise = function () {
-        return latestReady;
-    };
 
     this.registerModule = function (moduleName, module) {
         modules[moduleName] = module;
@@ -47,9 +48,10 @@ function TransactionSystem(path) {
 
     this.newTransaction = function (module, description, payload) {
         var attemptInterval = 200;
-        function sendAttempt(err){
+
+        function sendAttempt(err) {
             return new Promise(function (resolve, reject) {
-                var index = transactions[transactions.length-1].index+1;
+                var index = transactions[transactions.length - 1].index + 1;
                 var transaction = {
                     index: index,
                     module: module,
@@ -63,7 +65,7 @@ function TransactionSystem(path) {
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
                 }).done(function (result) {
-                    if(result.status == 'ok')
+                    if (result.status == 'ok')
                         return resolve({index: index});
                     else
                         return reject(result);
@@ -72,11 +74,15 @@ function TransactionSystem(path) {
                 });
             });
         }
-        function failDelay(err){
-            return new Promise(function (resolve, reject) {setTimeout(reject.bind(null, err), attemptInterval);});
+
+        function failDelay(err) {
+            return new Promise(function (resolve, reject) {
+                setTimeout(reject.bind(null, err), attemptInterval);
+            });
         }
+
         var p = Promise.reject();
-        for(var i=0; i<10; i++){
+        for (var i = 0; i < 10; i++) {
             p = p.catch(sendAttempt).catch(failDelay);
         }
         p.catch(function (err) {
@@ -86,7 +92,6 @@ function TransactionSystem(path) {
         return p;
     };
 
-    init();
 }
 
 function transaction() {
@@ -102,7 +107,7 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
     var self = this;
     var ws;
 
-    this.connect = function() {
+    this.connect = function () {
         ws = createWebSocket(destination);
         ws.addEventListener("open", function (e) {
             onConnectCallback(e);
@@ -127,29 +132,32 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
     }
 
     this.send = function (data) {
-        if(ws.readyState != ws.OPEN){
+        if (ws.readyState != ws.OPEN) {
             this.connect();
-            if(resend){
+            if (resend) {
                 ws.addEventListener('open', function (e) {
                     // remove current event listener
                     e.target.removeEventListener(e.type, arguments.callee);
                     ws.send(data);
                 });
             }
-        }else{
+        } else {
             ws.send(data);
         }
     };
 
-    this.reset = function(){
+    this.reset = function () {
         ws.close();
 
     };
 }
 
 function module(transactionSystem) {
+
     this.update = function (index, description, createdBy, createdAt, payload) {
+
     };
     this.reset = function () {
+
     };
 }
