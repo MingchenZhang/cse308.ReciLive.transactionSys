@@ -26,7 +26,7 @@ function TransactionSystem(path) {
 
     function receive(e) {
         var object = JSON.parse(e.data);
-        if (object.type == 'latest_send') {
+        if(object.type == 'latest_sent') {
             latestReady.ready();
         }
         if (object.index == transactions[transactions.length - 1].index + 1) {
@@ -40,6 +40,7 @@ function TransactionSystem(path) {
             console.error('transaction receive out of order');
             connection.reset();
         }
+        // TODO: process error message
     }
 
     this.registerModule = function (moduleName, module) {

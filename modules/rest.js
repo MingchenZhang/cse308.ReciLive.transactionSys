@@ -12,7 +12,7 @@ exports.getRoute = function (s) {
     var jsonParser = BodyParser.json({limit: '10kb'});
 
     router.post(['/dispatch_classroom'], jsonParser, function (req, res, next) {
-        if (!Checker.dispatchRquest(req.body)) return res.send({status: "error", reason: 5});
+        if (!Checker.dispatchRequest(req.body)) return res.send({status: "error", reason: 5});
         s.sessionManager.addSession({
             sessionID: req.body.classNumber,
             privilege: req.body.privilege,

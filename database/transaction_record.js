@@ -29,16 +29,17 @@ exports.addTransaction = function (param) {
     var module = param.module;
     var description = param.description;
     var payload = param.payload;
+    var createdAt = param.createdAt;
     var createdBy = param.createdBy;
 
     var doc = {
         sessionID: sessionID,
-        index: index,
+        index: parseInt(index),
         module: module,
         description: description,
         payload: payload,
-        createdAt:new Date(),
-        createdBy:createdBy
+        createdAt:new Date(createdAt),
+        createdBy:s.mongodb.objectId(createdBy)
     };
 
     return transactionDB.transactionColl.insertOne(doc).catch(function (err) {

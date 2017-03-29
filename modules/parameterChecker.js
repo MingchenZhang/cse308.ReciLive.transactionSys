@@ -10,13 +10,22 @@ exports.privilegeObjectTest = function (privilege) {
     }
     return true;
 };
-exports.dispatchRquest = function (req) {
-    if (!exports.privilegeObjectTest(req.privilege) ||
-        !typeof req.classNumber == "int" ||
-        !typeof req.name == "string" ||
-        !typeof req.startDate == "string" ||
-        !typeof req.endDate == "string" ||
-        !typeof req.status == "string")
-        return false;
-    else return true;
-}
+exports.dispatchRequest = function (req) {
+    return (
+        exports.privilegeObjectTest(req.privilege) &&
+        typeof req.classNumber == "number" &&
+        typeof req.name == "string" &&
+        typeof req.startDate == "string" &&
+        typeof req.endDate == "string" &&
+        typeof req.status == "string"
+    );
+};
+
+exports.transactionPush = function (req) {
+    return (
+        exports.privilegeObjectTest(req.privilege) &&
+        typeof req.index == 'number' &&
+        typeof req.module == 'string' &&
+        typeof req.description == 'string'
+    );
+};

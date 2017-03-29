@@ -41,6 +41,7 @@ exports.addSession = function (param) {
     classroomList[sessionID] = new Session.session();
     return classroomList[sessionID].newSession({sessionID, privilege, name, startDate, endDate, status});
 };
+
 //deletesSession return a promise
 exports.deleteSession = function (param) {
     var sessionID = param.sessionID;
@@ -51,14 +52,7 @@ exports.deleteSession = function (param) {
         return s.transactionRecord.deleteSession(sessionID);
     }
 };
-exports.addTransaction = function (param) {
-    var sessionID = param.sessionID;
-    var index = param.index;
-    var module = param.module;
-    var description = param.description;
-    var payload = param.payload;
-    var createdBy = param.createdBy;
-};
+
 exports.getSession = function (sessionID) {
     return classroomList[sessionID];
 };

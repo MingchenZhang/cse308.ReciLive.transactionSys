@@ -1,4 +1,4 @@
-var Express = require('express');
+global.log = require('./modules/logging');var Express = require('express');
 var Http = require('http');
 var Https = require('https');
 var CookieParser = require('cookie-parser');
