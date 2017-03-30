@@ -1,2 +1,5 @@
 .idea/
 node_modules/
+archive.tar.gz
+deploy.retry
+hosts
