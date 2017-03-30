@@ -2,6 +2,7 @@ var Express = require('express');
 var BodyParser = require('body-parser');
 var When = require('when');
 var ParameterChecker = require('./parameterChecker');
+var MongoEscape = require('mongo-escape').escape;
 
 exports.getRoute = function (s) {
     var router = Express.Router({mergeParams: true});
@@ -16,8 +17,8 @@ exports.getRoute = function (s) {
     router.post('/transaction_post', jsonParser, function (req, res, next) {
         var index = req.body.index;
         var module = req.body.module;
-        var description = req.body.description;
-        var payload = req.body.payload;
+        var description = MongoEscape(req.body.description);
+        var payload = MongoEscape(req.body.payload);
 
         if(!ParameterChecker.transactionPush(req.body))
             return res.status(400).send({status: 'error', reason: 5});

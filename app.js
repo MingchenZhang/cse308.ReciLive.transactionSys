@@ -1,9 +1,10 @@
 const ChildProcess = require('child_process');
 const Os = require('os');
+var npmResult;
 if(Os.platform() == 'win32'){
-    var npmResult = ChildProcess.spawnSync('npm.cmd', ['install'], {stdio: 'inherit'});
+    npmResult = ChildProcess.spawnSync('npm.cmd', ['install'], {stdio: 'inherit'});
 }else{
-    var npmResult = ChildProcess.spawnSync('npm', ['install'], {stdio: 'inherit'});
+    npmResult = ChildProcess.spawnSync('npm', ['install'], {stdio: 'inherit'});
 }
 if(npmResult.status != 0){
     console.error('modules install failed, app.js cannot proceed. exiting...');

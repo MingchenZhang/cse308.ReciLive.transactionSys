@@ -16,6 +16,7 @@ exports.session = function () {
 
     var clients = [];
     var soundClients = [];
+    var soundSpeaker = [];
 
     this.newSession = function (param) {
         if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
@@ -146,10 +147,15 @@ exports.session = function () {
         soundClients.push(ws);
 
         ws.on('message', function (message) {
-
+            //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
+            soundClients.forEach((client)=>{
+                client.send(message);
+            });
         });
         ws.on('close', function () {
             log.debug('sound websocket to ' + ws.userLoginInfo.userID + ' closed');
+            soundClients.splice(soundClients.indexOf(ws), 1);
+            soundSpeaker.splice(soundSpeaker.indexOf(ws), 1);
         });
     };
 
@@ -168,7 +174,9 @@ exports.session = function () {
         transaction.sessionID = self.sessionID;
         transaction.createdAt = new Date();
 
-        log.debug('adding transaction:' + JSON.stringify(transaction));
+        log.debug(()=>'adding transaction:' + JSON.stringify(transaction));
+
+        understandTransaction(transaction);
 
         lastTransactionIndex++;
         clients.forEach((client)=> {
@@ -212,7 +220,7 @@ exports.session = function () {
             new When.Promise((resolve, reject)=> {
                 s.wsHandler.removeRoute("/room/" + self.sessionID);
                 resolve();
-            })
+            })// TODO: close all ws connection
         ];
         return When.all(finish);
     };
@@ -221,5 +229,17 @@ exports.session = function () {
     };
     this.userEditable = function (userID, module) {
         return self.privilege[userID].indexOf(module) != -1;
+    };
+
+    function understandTransaction(transaction){
+        if(transaction.module == 'sound_control' && transaction.description.speakerChange){
+            transaction.description.speakerChange.forEach((tuple)=>{
+                if(tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
+                else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
+            });
+        }else{
+            return false;
+        }
+        return true;
     }
 };
