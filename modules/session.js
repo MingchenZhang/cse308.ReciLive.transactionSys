@@ -14,8 +14,7 @@ exports.session = function () {
     self.endDate = null;
     self.status = null;
 
-    var clients = {};
-    var clientsInInit = {}; // element: last send index
+    var clients = [];
 
     this.newSession = function (param) {
         if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
@@ -57,7 +56,7 @@ exports.session = function () {
             .then((value)=> {
                 s.wsHandler.addRoute("/room/" + self.sessionID + "/transaction", self.wsHandleTransaction);
                 s.wsHandler.addRoute("/room/" + self.sessionID + "/sound", self.wsHandleSound);
-                if(!s.inProduction){
+                if (!s.inProduction) {
                     console.log("new session resumed");
                     console.log(param);
                     console.log("last index: " + lastTransactionIndex);
@@ -67,24 +66,24 @@ exports.session = function () {
     };
 
     this.wsHandleTransaction = function (ws) {
-        log.debug('start transaction wsHandler for '+self.sessionID);
+        log.debug('start transaction wsHandler for ' + self.sessionID);
         ws.roomSession = self;
-        clientsInInit[ws] = -1;
+        ws.initStatus = -1; // the index of the last transaction that this client holds
 
         function socketPanic(reason) {
-            ws.send(JSON.stringify({type:"error", reason: reason}));
-            delete clients[ws];
-            delete clientsInInit[ws];
+            ws.send(JSON.stringify({type: "error", reason: reason}));
+            clients.splice(clients.indexOf(ws), 1);
             ws.close();
         }
 
-        function sendToTheLatest(startAt){
+        function sendToTheLatest(startAt) {
             var resultEvent = new EventEmitter();
+
             function send(doc) {
-                if(doc) {
-                    assert(doc.index == clientsInInit[ws]+1);
+                if (doc) {
+                    assert(doc.index == ws.initStatus + 1);
                     ws.send(JSON.stringify({
-                        type:"transaction_push",
+                        type: "transaction_push",
                         index: doc.index,
                         module: doc.module,
                         description: doc.description,
@@ -92,45 +91,50 @@ exports.session = function () {
                         createdBy: doc.createdBy,
                         payload: doc.payload
                     }));
-                    clientsInInit[ws]++;
+                    ws.initStatus++;
                     return true;
-                }else{
-                    assert(clientsInInit[ws]<=lastTransactionIndex);
-                    if(clientsInInit[ws] == lastTransactionIndex){
-                        delete clientsInInit[ws];
-                        clients[ws] = true;
+                } else {
+                    assert(ws.initStatus <= lastTransactionIndex);
+                    if (ws.initStatus == lastTransactionIndex) {
+                        delete ws.initStatus;
+                        clients.push(ws);
                         resultEvent.emit('done');
-                    }else{
-                        if(!s.inProduction) console.log('missed latest transaction, requerying. ');
-                        sendToTheLatest(clientsInInit[ws]+1);
+                    } else {
+                        if (!s.inProduction) console.log('missed latest transaction, requerying. ');
+                        sendToTheLatest(ws.initStatus + 1);
                     }
                     return false;
                 }
             }
+
             self.listTransaction(startAt, send);
             return resultEvent;
         }
 
         ws.on('message', function (message) {
-            try{message = JSON.parse(message)}
-            catch(e){
-                if(!s.inProduction) console.error("receive abnormal message from websocket: " + message);
+            try {
+                message = JSON.parse(message)
+            }
+            catch (e) {
+                if (!s.inProduction) console.error("receive abnormal message from websocket: " + message);
                 return socketPanic(5);
             }
-            if(message.type == "initialization" && typeof message.startAt == "number"){
+            if (message.type == "initialization" && typeof message.startAt == "number") {
+                if (ws.initStatus != -1) return socketPanic(8);
+                ws.initStatus = message.startAt - 1;
                 sendToTheLatest(message.startAt).on('done', function () {
                     ws.send(JSON.stringify({
                         type: 'latest_sent'
                     }));
                 });
-            }else{
-                if(!s.inProduction) console.error("receive abnormal message format from websocket: " + message);
+            } else {
+                if (!s.inProduction) console.error("receive abnormal message format from websocket: " + message);
                 return socketPanic(5);
             }
         });
         ws.on('close', function () {
-            delete clients[ws];
-            delete clientsInInit[ws];
+            log.debug('websocket to ' + ws.userLoginInfo.userID + ' closed');
+            clients.splice(clients.indexOf(ws), 1);
             ws.close();
         });
     };
@@ -151,20 +155,23 @@ exports.session = function () {
         if (self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)
             return When.reject({reason: 2});
 
+        transaction.sessionID = self.sessionID;
         transaction.createdAt = new Date();
 
+        log.debug('adding transaction:' + JSON.stringify(transaction));
+
         lastTransactionIndex++;
-        for(var client in clients){
+        clients.forEach((client)=> {
             client.send(JSON.stringify({
                 type: 'transaction_push',
                 index,
                 module,
                 description,
-                createdAt,
+                createdAt: transaction.createdAt,
                 createdBy,
                 payload
             }));
-        }
+        });
 
         return s.transactionRecord.addTransaction(transaction);
     };
@@ -177,13 +184,15 @@ exports.session = function () {
                 cursor.next((err, result)=> {
                     if (err) reject(err);
                     if (result) {
-                        if(sendNext(result)) getMore();
+                        if (sendNext(result)) getMore();
                     } else {
                         sendNext(null);
                         resolve();
                     }
                 });
             }
+
+            getMore();
         });
     };
     this.close = function () {
@@ -200,7 +209,7 @@ exports.session = function () {
     this.userInSession = function (userID) {
         return userID in self.privilege;
     };
-    this.userEditable = function(userID, module){
-        return self.privilege[userID].indexOf(module)!=-1;
+    this.userEditable = function (userID, module) {
+        return self.privilege[userID].indexOf(module) != -1;
     }
 };

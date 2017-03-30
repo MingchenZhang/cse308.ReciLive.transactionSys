@@ -10,7 +10,7 @@ exports.getRoute = function (s) {
 
     // classroom page
     router.get('/', function (req, res, next) {
-        res.render("transaction-test", {username: req.userLoginInfo.name,classNumber:req.classroomNumber});
+        res.render("transaction-test", {username: req.userLoginInfo.name,classroomNumber:req.classroomNumber});
     });
 
     router.post('/transaction_post', jsonParser, function (req, res, next) {
@@ -19,8 +19,8 @@ exports.getRoute = function (s) {
         var description = req.body.description;
         var payload = req.body.payload;
 
-        if(!ParameterChecker.transactionPush(req))
-            res.status(400).send({status: 'error', reason: 5});
+        if(!ParameterChecker.transactionPush(req.body))
+            return res.status(400).send({status: 'error', reason: 5});
 
         var createdBy = req.userLoginInfo.userID;
 

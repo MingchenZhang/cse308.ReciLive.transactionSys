@@ -23,9 +23,8 @@ exports.dispatchRequest = function (req) {
 
 exports.transactionPush = function (req) {
     return (
-        exports.privilegeObjectTest(req.privilege) &&
         typeof req.index == 'number' &&
-        typeof req.module == 'string' &&
-        typeof req.description == 'string'
+        typeof req.module == 'string'
     );
+    // TODO: check object safety
 };

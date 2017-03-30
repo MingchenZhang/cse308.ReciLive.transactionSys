@@ -1,4 +1,4 @@
-function Chat(transactionSystem, showDiv) {
+function Chat(transactionSystem, showDiv, sendButton, sendText) {
     var self = this;
     this.moduleName = 'chat';
     var chatList = [];
@@ -10,7 +10,10 @@ function Chat(transactionSystem, showDiv) {
         transactionSystem.newTransaction(self.moduleName, {
             type: 'message',
             id: id
-        }, {message: message}).catch(function (err) {
+        }, {message: message}).then(function (result) {
+            chatList.push(message);
+            showDiv.prepend($('<p/>').html(message));
+        }).catch(function (err) {
             console.error('fail to new transaction');
             console.error(err);
             delete ignoreTransaction[id];
@@ -22,11 +25,16 @@ function Chat(transactionSystem, showDiv) {
             return;
         }
         chatList.push(payload.message);
-        showDiv.append($('<p/>').html(payload.message));
+        showDiv.prepend($('<p/>').html(payload.message));
     };
     this.reset = function () {
         ignoreTransaction = {};
         chatList = [];
         showDiv.empty();
     };
+
+    sendButton.click(function () {
+        console.log('sending:'+sendText.val());
+        self.newMessage(sendText.val());
+    });
 }

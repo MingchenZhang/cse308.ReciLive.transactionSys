@@ -14,7 +14,7 @@ var Tools = require('./tools.js');
 var readyList = [];
 global.s = {
     wsHandler: new WSHandle.WSHandler(),
-    mongodb: Mongodb.MongoClient,
+    mongodb: Mongodb,
     dbPath: process.env.ENV_VARIABLE || 'mongodb://localhost:27017/',
     googleLoginTool: require('./modules/google_login'),
     inProduction: process.env.NODE_ENV === 'production',
@@ -29,11 +29,12 @@ var app = Express();
 app.use('/static', Express.static(__dirname + '/static'));
 app.use(CookieParser());
 app.set('view engine', 'ejs');
-app.use((req, res, next)=> {
-    if(s.inProduction) return next();
-    console.log("visited: " + req.originalUrl);
-    next();
-});
+if(!s.inProduction){
+    app.use((req, res, next)=> {
+        log.debug("visited: " + req.originalUrl);
+        next();
+    });
+}
 app.use(function (req, res, next) {
     req.userLoginInfo = null;
     res.locals.userLoginInfo = null;
@@ -43,7 +44,7 @@ app.use(function (req, res, next) {
             res.locals.userLoginInfo = userInfo;
             next();
         }).catch((err)=> {
-            res.status(403).send("google login failure");
+            res.status(403).send("google login failed");
         });
     } else next();
 });

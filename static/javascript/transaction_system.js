@@ -7,7 +7,7 @@ function TransactionSystem(path) {
     var modules = {};
 
     this.init = function () {
-        connection = wsConnection(path, sendStart, receive, false);
+        connection = new wsConnection(path, sendStart, receive, false);
         var ready, fail;
         latestReady = new Promise(function (resolve, reject) {
             ready = resolve;
@@ -15,21 +15,21 @@ function TransactionSystem(path) {
         });
         latestReady.ready = ready;
         latestReady.fail = fail;
+        connection.connect();
         return latestReady;
     };
     function sendStart() {
         connection.send(JSON.stringify({
             type: "initialization",
-            startAt: transactions[transactions.length - 1].index + 1
+            startAt: (transactions.length > 0) ? transactions[transactions.length - 1].index + 1 : 0
         }));
     }
 
     function receive(e) {
         var object = JSON.parse(e.data);
-        if(object.type == 'latest_sent') {
+        if (object.type == 'latest_sent') {
             latestReady.ready();
-        }
-        if (object.index == transactions[transactions.length - 1].index + 1) {
+        }else if (object.index == ((transactions.length>0)?transactions[transactions.length - 1].index+1:0)) {
             transactions.push(object);
             modules[object.module].update(object.index,
                 object.description,
@@ -52,15 +52,15 @@ function TransactionSystem(path) {
 
         function sendAttempt(err) {
             return new Promise(function (resolve, reject) {
-                var index = transactions[transactions.length - 1].index + 1;
+                var index = ((transactions.length>0)?transactions[transactions.length - 1].index+1:0);
                 var transaction = {
                     index: index,
                     module: module,
                     description: description,
                     payload: payload
                 };
-                return $.ajax({
-                    url: 'transaction_post',
+                $.ajax({
+                    url: window.location.href+'/transaction_post',
                     type: 'post',
                     data: JSON.stringify(transaction),
                     contentType: "application/json; charset=utf-8",
@@ -78,11 +78,12 @@ function TransactionSystem(path) {
 
         function failDelay(err) {
             return new Promise(function (resolve, reject) {
+                console.error('failDelay captured error: '+err.toString());
                 setTimeout(reject.bind(null, err), attemptInterval);
             });
         }
 
-        var p = Promise.reject();
+        var p = Promise.reject(new Error('nothing is wrong'));
         for (var i = 0; i < 10; i++) {
             p = p.catch(sendAttempt).catch(failDelay);
         }
@@ -117,8 +118,8 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
             receiveCallback(e);
         });
         ws.addEventListener('close', function () {
-            console.log('connection to %s closed', destination);
-            self.connect();
+            console.log('connection to %s closed, reconnect in 1 second', destination);
+            setTimeout(()=>self.connect(), 1000);
         });
         ws.addEventListener('error', function () {
             console.log('connection to %s failed', destination);

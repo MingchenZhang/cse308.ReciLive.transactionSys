@@ -9,7 +9,7 @@ exports.initDatabase = function (readyList) {
     readyList.push(convDBReady.promise);
     console.log('try to connect to ' + convDBPath);
 
-    s.mongodb.connect(convDBPath, function (err, db) {
+    s.mongodb.MongoClient.connect(convDBPath, function (err, db) {
         if (err) {
             console.error('MongodbClient connection ' + convDBPath + ' failed');
             process.exit(1);
@@ -39,7 +39,7 @@ exports.addTransaction = function (param) {
         description: description,
         payload: payload,
         createdAt:new Date(createdAt),
-        createdBy:s.mongodb.objectId(createdBy)
+        createdBy:s.mongodb.ObjectId(createdBy)
     };
 
     return transactionDB.transactionColl.insertOne(doc).catch(function (err) {
