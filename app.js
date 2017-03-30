@@ -28,7 +28,7 @@ var readyList = [];
 global.s = {
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb,
-    dbPath: process.env.ENV_VARIABLE || 'mongodb://localhost:27017/',
+    dbPath: process.env.DB_PATH || 'mongodb://localhost:27017/',
     googleLoginTool: require('./modules/google_login'),
     inProduction: process.env.NODE_ENV === 'production',
 };
@@ -97,7 +97,7 @@ When.all(readyList)
     .then(function () {
         var httpPort = process.env.HTTP_PORT || 3000;
         var httpsPort = process.env.HTTPS_PORT;
-        httpServer.listen(httpPort);
+        httpServer.listen(httpPort, "0.0.0.0");
         if (httpsPort) {
             httpsServer.listen(httpsPort);
             console.log('https ready on ' + httpsPort);
