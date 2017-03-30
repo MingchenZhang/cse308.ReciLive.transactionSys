@@ -15,6 +15,7 @@ exports.session = function () {
     self.status = null;
 
     var clients = [];
+    var soundClients = [];
 
     this.newSession = function (param) {
         if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
@@ -133,14 +134,23 @@ exports.session = function () {
             }
         });
         ws.on('close', function () {
-            log.debug('websocket to ' + ws.userLoginInfo.userID + ' closed');
+            log.debug('transaction websocket to ' + ws.userLoginInfo.userID + ' closed');
             clients.splice(clients.indexOf(ws), 1);
             ws.close();
         });
     };
 
     this.wsHandleSound = function (ws) {
+        log.debug('start sound wsHandler for ' + self.sessionID);
+        ws.roomSession = self;
+        soundClients.push(ws);
 
+        ws.on('message', function (message) {
+
+        });
+        ws.on('close', function () {
+            log.debug('sound websocket to ' + ws.userLoginInfo.userID + ' closed');
+        });
     };
 
     this.addTransaction = function (transaction) {

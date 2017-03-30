@@ -1,3 +1,15 @@
+const ChildProcess = require('child_process');
+const Os = require('os');
+if(Os.platform() == 'win32'){
+    var npmResult = ChildProcess.spawnSync('npm.cmd', ['install'], {stdio: 'inherit'});
+}else{
+    var npmResult = ChildProcess.spawnSync('npm', ['install'], {stdio: 'inherit'});
+}
+if(npmResult.status != 0){
+    console.error('modules install failed, app.js cannot proceed. exiting...');
+    process.exit(1);
+}
+
 global.log = require('./modules/logging');var Express = require('express');
 var Http = require('http');
 var Https = require('https');
@@ -26,6 +38,7 @@ s.sessionManager = require('./modules/sessionManager');
 
 var app = Express();
 
+app.use(Helmet());
 app.use('/static', Express.static(__dirname + '/static'));
 app.use(CookieParser());
 app.set('view engine', 'ejs');
