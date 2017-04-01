@@ -1,24 +1,31 @@
 <html>
 <head>
     <script src="/static/javascript/jquery-3.1.1.js"></script>
-    <script src="/static/javascript/bluebird.js"></script>
+    <!--<script src="/static/javascript/bluebird.js"></script>-->
     <script src="/static/javascript/transaction_system.js"></script>
     <script src="/static/javascript/module/chat_module.js"></script>
+    <script src="/static/javascript/module/slide_module.js"></script>
 </head>
-<body>
+<input>
 <p>transaction test</p>
 <p><%= username %></p>
-<input type="text" name="text" id="send">
-<input type="button" id="submit">
+<input type="text" name="text" id="send"></input>
+<input type="button" id="submit">send text</input>
+<br>
+<input type="file" name="userPng" id = "sendSlide"></input>
+<input type="button" id="submitSlide">send slide</input>
 <div id="result"></div>
 <script>
     var path = "/room/<%= classroomNumber %>/transaction";
     transactionSystem = new TransactionSystem(path);
     chatModule = new Chat(transactionSystem, $('#result'), $('#submit'), $('#send'));
+    slideModule = new Slide(transactionSystem,$('#result'), $('#submitSlide'), $('#sendSlide'))
     transactionSystem.registerModule(chatModule.moduleName,chatModule);
+    transactionSystem.registerModule(slideModule.moduleName,slideModule);
     transactionSystem.init().then(()=>{
         console.log('ready');
     });
+
 </script>
 </body>
 </html>

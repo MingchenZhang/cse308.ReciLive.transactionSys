@@ -1,18 +1,22 @@
-function Slide(transactionSystem, showDiv, sendButton, sendText) {
+function Slide(transactionSystem, showDiv, sendButton, sendSlide) {
     var self = this;
     this.moduleName = 'slide';
+    self.currentSlide;
     var slideList = [];
     var ignoreTransaction = {};
-
-    this.newSlide = function (message) {
+    sendSlide.on('change', () => {
+        self.currentSlide = sendSlide.prop('files');
+    });
+    this.newSlide = function (slideImage) {
         var id = Math.random();
         ignoreTransaction[id] = true;
         transactionSystem.newTransaction(self.moduleName, {
             type: 'slide',
             id: id
-        }, {message: message}).then(function (result) {
-            chatList.push(message);
-            showDiv.prepend($('<p/>').html(message));
+        }, {slideImage: slideImage}).then(function (result) {
+            slideList.push(slideImage);
+            return showImage(slideImage, showDiv);
+
         }).catch(function (err) {
             console.error('fail to new transaction');
             console.error(err);
@@ -20,21 +24,28 @@ function Slide(transactionSystem, showDiv, sendButton, sendText) {
         });
     };
     this.update = function (index, description, createdBy, createdAt, payload) {
-        if(ignoreTransaction[description.id]){
+        if (ignoreTransaction[description.id]) {
             delete ignoreTransaction[description.id];
             return;
         }
-        chatList.push(payload.message);
-        showDiv.prepend($('<p/>').html(payload.message));
+        slideList.push(payload.slideImage);
+        showImage(payload.slideImage, showDiv);
     };
     this.reset = function () {
         ignoreTransaction = {};
-        chatList = [];
+        slideList = [];
         showDiv.empty();
     };
 
     sendButton.click(function () {
-        console.log('sending:'+sendText.val());
-        self.newMessage(sendText.val());
+        console.log('image:' + this.id);
+        self.newSlide(self.currentSlide);
     });
+function showImage(file, showDiv){
+    var img = new Image();
+    img.src = file;
+    showDiv.prepend(img);
+}
+
+
 }
