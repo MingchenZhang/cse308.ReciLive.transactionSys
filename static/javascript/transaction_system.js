@@ -21,7 +21,7 @@ function TransactionSystem(path) {
     function sendStart() {
         connection.send(JSON.stringify({
             type: "initialization",
-            startAt: (transactions.length > 0) ? transactions[transactions.length - 1].index + 1 : 0
+            startAt: ((transactions.length>0)?transactions.length:0)
         }));
     }
 
@@ -29,8 +29,9 @@ function TransactionSystem(path) {
         var object = JSON.parse(e.data);
         if (object.type == 'latest_sent') {
             latestReady.ready();
-        }else if (object.index == ((transactions.length>0)?transactions[transactions.length - 1].index+1:0)) {
-            transactions.push(object);
+        }else if (object.index == ((transactions.length>0)?transactions.length:0)) {
+            //transactions.push(object);
+            transactions[object.index] = object;
             modules[object.module].update(object.index,
                 object.description,
                 object.createdBy,
@@ -52,7 +53,7 @@ function TransactionSystem(path) {
 
         function sendAttempt(err) {
             return new Promise(function (resolve, reject) {
-                var index = ((transactions.length>0)?transactions[transactions.length - 1].index+1:0);
+                var index = ((transactions.length>0)?transactions.length:0);
                 var transaction = {
                     index: index,
                     module: module,
@@ -78,7 +79,10 @@ function TransactionSystem(path) {
 
         function failDelay(err) {
             return new Promise(function (resolve, reject) {
-                console.error('failDelay captured error: '+err.toString());
+                if(err.reason == 1)
+                    console.log('transaction conflict, retrying. ');
+                else
+                    console.error('failDelay captured error: '+err.toString());
                 setTimeout(reject.bind(null, err), attemptInterval);
             });
         }
@@ -108,8 +112,10 @@ function transaction() {
 function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
     var self = this;
     var ws;
+    var reconnectPending = false;
 
     this.connect = function () {
+        // console.error('connect called');
         ws = createWebSocket(destination);
         ws.addEventListener("open", function (e) {
             onConnectCallback(e);
@@ -118,13 +124,19 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
             receiveCallback(e);
         });
         ws.addEventListener('close', function () {
-            console.log('connection to %s closed, reconnect in 1 second', destination);
-            setTimeout(()=>self.connect(), 1000);
+            if(!reconnectPending){
+                console.log('connection to %s closed, reconnect in 1 second', destination);
+                setTimeout(()=>{self.connect(); reconnectPending = false;}, 1000);
+                reconnectPending = true;
+            }
         });
         ws.addEventListener('error', function () {
-            console.log('connection to %s failed', destination);
-            ws.close();
-            self.connect();
+            if(!reconnectPending) {
+                console.log('connection to %s failed, reconnect in 3 second', destination);
+                ws.close();
+                setTimeout(()=>{self.connect(); reconnectPending = false;}, 3000);
+                reconnectPending = true;
+            }
         });
     };
 
@@ -134,8 +146,12 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
     }
 
     this.send = function (data) {
-        if (ws.readyState != ws.OPEN) {
-            this.connect();
+        if (ws.readyState != ws.OPEN && ws.readyState != ws.CONNECTING) {
+            console.log('writing while websocket is not opened, reconnect in 0,5 second');
+            if(!reconnectPending) {
+                setTimeout(()=>{self.connect(); reconnectPending = false;}, 500);
+                reconnectPending = true;
+            }
             if (resend) {
                 ws.addEventListener('open', function (e) {
                     // remove current event listener

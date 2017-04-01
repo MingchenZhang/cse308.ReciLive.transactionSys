@@ -97,7 +97,7 @@ When.all(readyList)
     .then(function () {
         var httpPort = process.env.HTTP_PORT || 3000;
         var httpsPort = process.env.HTTPS_PORT;
-        httpServer.listen(httpPort, "0.0.0.0");
+        httpServer.listen(httpPort);
         if (httpsPort) {
             httpsServer.listen(httpsPort);
             console.log('https ready on ' + httpsPort);
