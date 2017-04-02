@@ -11,7 +11,7 @@ exports.getRoute = function (s) {
 
     // classroom page
     router.get('/', function (req, res, next) {
-        res.render("transaction-test", {username: req.userLoginInfo.name,classroomNumber:req.classroomNumber});
+        res.render("main_student", {username: req.userLoginInfo.name,classroomNumber:req.classroomNumber,slidesNumber:});
     });
 
     router.post('/transaction_post', jsonParser, function (req, res, next) {

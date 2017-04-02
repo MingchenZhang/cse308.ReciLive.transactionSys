@@ -11,7 +11,7 @@ if(npmResult.status != 0){
     process.exit(1);
 }
 
-global.log = require('./modules/logging');var Express = require('express');
+global.log = require('./static/modules/logging');var Express = require('express');
 var Http = require('http');
 var Https = require('https');
 var CookieParser = require('cookie-parser');
@@ -22,20 +22,20 @@ var Ejs = require('ejs');
 var Fs = require('fs');
 var WSWebSocket = require("ws").Server;
 
-var WSHandle = require('./modules/websocket');
+var WSHandle = require('./static/modules/websocket');
 var Tools = require('./tools.js');
 var readyList = [];
 global.s = {
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb,
     dbPath: process.env.DB_PATH || 'mongodb://localhost:27017/',
-    googleLoginTool: require('./modules/google_login'),
+    googleLoginTool: require('./static/modules/google_login'),
     inProduction: process.env.NODE_ENV === 'production',
 };
 s.transactionRecord = require('./database/transaction_record.js');
 s.transactionRecord.initDatabase(readyList);
 
-s.sessionManager = require('./modules/sessionManager');
+s.sessionManager = require('./static/modules/sessionManager');
 
 var app = Express();
 
@@ -62,7 +62,7 @@ app.use(function (req, res, next) {
         });
     } else next();
 });
-app.use('/', require('./modules/rest').getRoute(s));
+app.use('/', require('./static/modules/rest').getRoute(s));
 
 // ---------------error handling section ---------------
 // 404 error

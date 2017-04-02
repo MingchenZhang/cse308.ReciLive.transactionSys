@@ -78,14 +78,15 @@ exports.addSession = function (param) {
     var startDate = param.startDate;
     var endDate = param.endDate;
     var status = param.status;
-
+    var slidesNumber = param.slidesNumber;
     var doc = {
         sessionID: sessionID,
         privilege: privilege,
         name: name,
         startDate: startDate,
         endDate: endDate,
-        status: status
+        status: status,
+        slidesNumber:slidesNumber
     };
     return sessionDB.sessionColl.insertOne(doc).catch(function (err) {
         console.error(err);

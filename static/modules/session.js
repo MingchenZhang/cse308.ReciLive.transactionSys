@@ -13,7 +13,7 @@ exports.session = function () {
     self.startDate = null;
     self.endDate = null;
     self.status = null;
-
+    self.slidesNumber = -1;
     var clients = [];
     var soundClients = [];
     var soundSpeaker = [];
@@ -27,15 +27,16 @@ exports.session = function () {
         self.startDate = param.startDate;
         self.endDate = param.endDate;
         self.status = param.status;
-
+        self.slidesNumber = param.slidesNumber;
         return s.transactionRecord.addSession({
             sessionID: self.sessionID,
             privilege: self.privilege,
             name: self.name,
             startDate: self.startDate,
             endDate: self.endDate,
-            status: self.status
-        }).then((value)=> {
+            status: self.status,
+            slidesNumber: self.slidesNumber
+        }).then((value) => {
             s.wsHandler.addRoute("/room/" + self.sessionID + "/transaction", self.wsHandleTransaction);
             s.wsHandler.addRoute("/room/" + self.sessionID + "/sound", self.wsHandleSound);
             return value;
@@ -50,12 +51,12 @@ exports.session = function () {
         self.startDate = param.startDate;
         self.endDate = param.endDate;
         self.status = param.status;
-
+        self.slidesNumber = param.slidesNumber;
         return s.transactionRecord.getLastTransactionIndex({sessionID: self.sessionID})
-            .then((index)=> {
+            .then((index) => {
                 lastTransactionIndex = index;
             })
-            .then((value)=> {
+            .then((value) => {
                 s.wsHandler.addRoute("/room/" + self.sessionID + "/transaction", self.wsHandleTransaction);
                 s.wsHandler.addRoute("/room/" + self.sessionID + "/sound", self.wsHandleSound);
                 if (!s.inProduction) {
@@ -149,10 +150,10 @@ exports.session = function () {
         ws.on('message', function (message) {
             //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
             log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
-            soundClients.forEach((client)=> {
-                try{
+            soundClients.forEach((client) => {
+                try {
                     client.send(message);
-                }catch(e){
+                } catch (e) {
                     console.error(e);
                 }
             });
@@ -179,12 +180,12 @@ exports.session = function () {
         transaction.sessionID = self.sessionID;
         transaction.createdAt = new Date();
 
-        log.debug(()=>'adding transaction:' + JSON.stringify(transaction));
+        log.debug(() => 'adding transaction:' + JSON.stringify(transaction));
 
         understandTransaction(transaction);
 
         lastTransactionIndex++;
-        clients.forEach((client)=> {
+        clients.forEach((client) => {
             client.send(JSON.stringify({
                 type: 'transaction_push',
                 index,
@@ -200,11 +201,11 @@ exports.session = function () {
     };
 
     this.listTransaction = function (startAt, sendNext) {
-        return new Promise((resolve, reject)=> {
+        return new Promise((resolve, reject) => {
             var cursor = s.transactionRecord.getTransactionCursor({sessionID: self.sessionID, startAt: startAt});
 
             function getMore() {
-                cursor.next((err, result)=> {
+                cursor.next((err, result) => {
                     if (err) reject(err);
                     if (result) {
                         if (sendNext(result)) getMore();
@@ -222,7 +223,7 @@ exports.session = function () {
         var finish = [
             s.transactionRecord.deleteSession({sessionID: self.sessionID}),
             s.transactionRecord.dropTransactionSession({sessionID: self.sessionID}),
-            new When.Promise((resolve, reject)=> {
+            new When.Promise((resolve, reject) => {
                 s.wsHandler.removeRoute("/room/" + self.sessionID);
                 resolve();
             })// TODO: close all ws connection
@@ -238,13 +239,26 @@ exports.session = function () {
 
     function understandTransaction(transaction) {
         if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
-            transaction.description.speakerChange.forEach((tuple)=> {
-                if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
-                else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
-            });
-        } else {
-            return false;
+        <<<<<<<
+            HEAD:modules / session.js
+            transaction.description.speakerChange.forEach((tuple) => {
+                ======
+                =
+                    transaction.description.speakerChange.forEach((tuple) => {
+                        >>>>>>>
+                        save
+                        for the upload
+                        code:static
+                        /modules/s
+                        ession.js
+                        if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
+                        else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
+                    });
+            }
+        else
+            {
+                return false;
+            }
+            return true;
         }
-        return true;
-    }
-};
+    };
