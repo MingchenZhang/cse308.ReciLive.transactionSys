@@ -68,7 +68,7 @@ function Queue(){
   }
 
   this.empty = function(){
-    var queue  = [];
-    var offset = 0;
+    queue  = [];
+    offset = 0;
   }
 }

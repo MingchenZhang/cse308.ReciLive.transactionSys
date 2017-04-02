@@ -3,8 +3,12 @@
     <script src="/static/javascript/jquery-3.1.1.js"></script>
     <!--<script src="/static/javascript/bluebird.js"></script>-->
     <script src="/static/javascript/transaction_system.js"></script>
+    <script src="/static/javascript/sound_system.js"></script>
     <script src="/static/javascript/module/chat_module.js"></script>
     <script src="/static/javascript/module/slide_module.js"></script>
+
+    <script src="/static/javascript/resampler.js"></script>
+    <script src="/static/javascript/Queue.src.js"></script>
 </head>
 <input>
 <p>transaction test</p>
@@ -12,19 +16,75 @@
 <input type="text" name="text" id="send"></input>
 <input type="button" id="submit">send text</input>
 <br>
-<input type="file" name="userPng" id = "sendSlide"></input>
+<input type="file" name="userPng" id="sendSlide"></input>
 <input type="button" id="submitSlide">send slide</input>
 <div id="result"></div>
+<button id="sound-speaker-btn">start sound system as speaker</button>
+<button id="sound-listener-btn">start sound system as listener</button>
 <script>
-    var path = "/room/<%= classroomNumber %>/transaction";
-    transactionSystem = new TransactionSystem(path);
+    transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     chatModule = new Chat(transactionSystem, $('#result'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem,$('#result'), $('#submitSlide'), $('#sendSlide'))
-    transactionSystem.registerModule(chatModule.moduleName,chatModule);
-    transactionSystem.registerModule(slideModule.moduleName,slideModule);
-    transactionSystem.init().then(()=>{
+    slideModule = new Slide(transactionSystem, $('#result'), $('#submitSlide'), $('#sendSlide'))
+    transactionSystem.registerModule(chatModule.moduleName, chatModule);
+    transactionSystem.registerModule(slideModule.moduleName, slideModule);
+    transactionSystem.init().then(()=> {
         console.log('ready');
     });
+
+    $('#sound-speaker-btn').click(function () {activateSound(true, false);});
+    $('#sound-listener-btn').click(function () {activateSound(false, true);});
+
+    function activateSound(asSpeaker, asListener) {
+        var eventRate = 16384;
+
+        if (!navigator.getUserMedia)
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                    navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({
+                        audio: true
+                    },
+                    function (stream) {
+                        start_microphone(stream);
+                    },
+                    function (e) {
+                        alert('Error capturing audio.');
+                    }
+            );
+        } else {
+            alert('getUserMedia not supported in this browser.');
+        }
+
+        var AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        console.log('sample rate: '+audioCtx.sampleRate);
+        soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);
+        if(asListener) soundSystem.receiveFlag = true;
+        soundSystem.connect();
+
+        function start_microphone(stream) {
+            var microphone_stream = audioCtx.createMediaStreamSource(stream);
+            //microphone_stream.connect(audioCtx.destination);
+            var scriptProc = getAudioProc();
+            microphone_stream.connect(scriptProc);
+            scriptProc.connect(audioCtx.destination);
+            //scriptProc.connect(audioCtx.createMediaStreamDestination());
+        }
+
+        function getAudioProc() {
+            var script_processor_node = audioCtx.createScriptProcessor(eventRate, 1, 1);
+            script_processor_node.onaudioprocess = function(audioProcessingEvent) {
+                var inputBuffer = audioProcessingEvent.inputBuffer;
+                var outputBuffer = audioProcessingEvent.outputBuffer;
+                var inputData = inputBuffer.getChannelData(0);
+                var outputData = outputBuffer.getChannelData(0);
+                if(asSpeaker) soundSystem.send(inputData);
+                if(asListener) soundSystem.writeNextSoundBuffer(outputData);
+            };
+            return script_processor_node;
+        }
+    }
 
 </script>
 </body>

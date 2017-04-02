@@ -1,6 +1,5 @@
 SoundSystem = function(path, nativeSampleRate, eventRate){
     var self = this;
-    var relayPath;
     var connection;
 
     var transmitionRate = 22000;
@@ -21,13 +20,15 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         var array = new Float32Array(e.data);
         var senderSampleRate = array[array.length-1];
         array = getReceiveResampler(senderSampleRate).resampler(array, array.length-1);
-        if(receiverBuffer.getLength() > consumeRate*10){
+        if(receiverBuffer.getLength() > consumeRate*4){ // TODO; better delay drop algorithm
             console.log('receiverBuffer piling up, cleaning the queue...');
             receiverBuffer.empty();
         }
         for(var i = 0; i<array.length; i++){
             receiverBuffer.enqueue(array[i]);
         }
+        console.log('sound received length: ' + array.length);
+        console.log('tailing 2: ' + receiverBuffer.getLength());
     };
 
     this.connect = function () {
@@ -41,7 +42,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
             if(k<inputData.length)return inputData[k];return nativeSampleRate; // append source sample rate
         });
         connection.send(tobeSent.buffer);
-        console.log(inputData[0]);
+        console.log(tobeSent[0]);
     };
 
     this.writeNextSoundBuffer = function (bufferToWrite) {
@@ -50,6 +51,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
             for(var i=0; i<consumeRate; i++){
                 bufferToWrite[i] = receiverBuffer.dequeue();
             }
+            //console.log('tailing: '+(bufferLength-consumeRate));
             return true;
         }else{
             console.log('waiting for sound data... ');
@@ -62,8 +64,6 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         connection = null;
         receiverBuffer.empty();
     };
-
-    init();
 };
 
 
@@ -76,6 +76,7 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
     this.connect = function () {
         // console.error('connect called');
         ws = createWebSocket(destination);
+        ws.binaryType = "arraybuffer";
         ws.addEventListener("open", function (e) {
             onConnectCallback(e);
         });

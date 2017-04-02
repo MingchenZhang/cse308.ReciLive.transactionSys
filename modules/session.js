@@ -142,14 +142,19 @@ exports.session = function () {
     };
 
     this.wsHandleSound = function (ws) {
-        log.debug('start sound wsHandler for ' + self.sessionID);
+        log.debug('start sound wsHandler. room id: ' + self.sessionID + ' user: ' + ws.userLoginInfo.userID);
         ws.roomSession = self;
         soundClients.push(ws);
 
         ws.on('message', function (message) {
             //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
-            soundClients.forEach((client)=>{
-                client.send(message);
+            log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
+            soundClients.forEach((client)=> {
+                try{
+                    client.send(message);
+                }catch(e){
+                    console.error(e);
+                }
             });
         });
         ws.on('close', function () {
@@ -231,13 +236,13 @@ exports.session = function () {
         return self.privilege[userID].indexOf(module) != -1;
     };
 
-    function understandTransaction(transaction){
-        if(transaction.module == 'sound_control' && transaction.description.speakerChange){
-            transaction.description.speakerChange.forEach((tuple)=>{
-                if(tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
+    function understandTransaction(transaction) {
+        if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
+            transaction.description.speakerChange.forEach((tuple)=> {
+                if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
                 else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
             });
-        }else{
+        } else {
             return false;
         }
         return true;

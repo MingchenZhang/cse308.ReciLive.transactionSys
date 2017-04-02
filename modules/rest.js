@@ -49,6 +49,13 @@ exports.getRoute = function (s) {
         }
         res.send({status:"ok"});
     });
+    router.get('/give_cookie', jsonParser, function (req, res, next) {
+        for (var key in req.query) {
+            if (!req.query.hasOwnProperty(key)) continue;
+            res.cookie(key, req.query[key], {});
+        }
+        res.send({status:"ok"});
+    });
 
     return router;
 };
