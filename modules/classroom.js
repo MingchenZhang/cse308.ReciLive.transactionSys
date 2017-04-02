@@ -7,7 +7,7 @@ var MongoEscape = require('mongo-escape').escape;
 exports.getRoute = function (s) {
     var router = Express.Router({mergeParams: true});
 
-    var jsonParser = BodyParser.json({limit: '10kb'});
+    var jsonParser = BodyParser.json({limit: '10mb'});
 
     // classroom page
     router.get('/', function (req, res, next) {

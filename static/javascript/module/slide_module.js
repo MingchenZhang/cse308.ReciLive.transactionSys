@@ -1,11 +1,11 @@
 function Slide(transactionSystem, showDiv, sendButton, sendSlide) {
     var self = this;
     this.moduleName = 'slide';
-    self.currentSlide;
+    self.slide64;
     var slideList = [];
     var ignoreTransaction = {};
     sendSlide.on('change', () => {
-        self.currentSlide = sendSlide.prop('files');
+        self.slide64 = getBase64(sendSlide.prop('files'));
     });
     this.newSlide = function (slideImage) {
         var id = Math.random();
@@ -13,9 +13,9 @@ function Slide(transactionSystem, showDiv, sendButton, sendSlide) {
         transactionSystem.newTransaction(self.moduleName, {
             type: 'slide',
             id: id
-        }, {slideImage: slideImage}).then(function (result) {
+        }, {slideImage: self.slide64}).then(function (result) {
             slideList.push(slideImage);
-            return showImage(slideImage, showDiv);
+            showImage(dataURItoBlob(self.slide64), showDiv);
 
         }).catch(function (err) {
             console.error('fail to new transaction');
@@ -29,7 +29,7 @@ function Slide(transactionSystem, showDiv, sendButton, sendSlide) {
             return;
         }
         slideList.push(payload.slideImage);
-        showImage(payload.slideImage, showDiv);
+        showImage(dataURItoBlob(payload.slideImage), showDiv);
     };
     this.reset = function () {
         ignoreTransaction = {};
@@ -39,13 +39,44 @@ function Slide(transactionSystem, showDiv, sendButton, sendSlide) {
 
     sendButton.click(function () {
         console.log('image:' + this.id);
-        self.newSlide(self.currentSlide);
+        self.newSlide(self.slide64);
     });
-function showImage(file, showDiv){
-    var img = new Image();
-    img.src = file;
+
+function showImage(blob, showDiv){
+    var img = document.createElement('img');
+    img.src = URL.createObjectURL(blob);
     showDiv.prepend(img);
 }
+    function dataURItoBlob(dataURI) {
+        // convert base64/URLEncoded data component to raw binary data held in a string
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            byteString = atob(dataURI.split(',')[1]);
+        else
+            byteString = unescape(dataURI.split(',')[1]);
 
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+        // write the bytes of the string to a typed array
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        return new Blob([ia], {type:mimeString});
+    }
+
+    function getBase64(file) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file[0]);
+        reader.onload = function (e) {
+            self.slide64 = reader.result;
+            return ;
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+    }
 
 }
