@@ -11,10 +11,7 @@ exports.getRoute = function (s) {
 
     // classroom page
     router.get('/', function (req, res, next) {
-        res.render("main_student", {
-            username: req.userLoginInfo.name,
-            classroomNumber: req.classroomNumber,
-            slidesNumber:req.slidesNumber
+        res.render("transaction-test", {username: req.userLoginInfo.name, classroomNumber: req.classroomNumber});
     });
 
     router.post('/transaction_post', jsonParser, function (req, res, next) {
@@ -34,15 +31,21 @@ exports.getRoute = function (s) {
             description,
             payload,
             createdBy,
-        }).then(() => {
+        }).then(()=> {
             res.send({status: 'ok'});
-        }).catch((err) => {
+        }).catch((err)=> {
             var message = {status: 'error'};
             if (err.reason) message.reason = err.reason;
             else err.reason = 7;
             if (!s.inProduction) message.detail = err;
             res.send(message);
         });
+    });
+
+    router.get('/my_privilege', function (req, res, next) {
+        var privilege = req.classroomSession.privilege[req.userLoginInfo.userID];
+        if(privilege) return res.send({status:'ok', privilege: privilege});
+        else return res.send({status:'error', reason: 2});
     });
 
     return router;

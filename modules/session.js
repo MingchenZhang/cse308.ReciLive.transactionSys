@@ -239,18 +239,13 @@ exports.session = function () {
 
     function understandTransaction(transaction) {
         if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
-            transaction.description.speakerChange.forEach((tuple) => {
-                        code:static
-                        /modules/s
-                        ession.js
-                        if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
-                        else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
-                    });
-            }
-        else
-            {
-                return false;
-            }
-            return true;
+            transaction.description.speakerChange.forEach((tuple)=> {
+                if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
+                else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
+            });
+        } else {
+            return false;
         }
-    };
+        return true;
+    }
+};

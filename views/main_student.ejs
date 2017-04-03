@@ -70,13 +70,21 @@
     </div>
 </div>
 <script>
-    var path = "/room/<%= classroomNumber %>/transaction";
-    transactionSystem = new TransactionSystem(path);
+    privilege = null;
+    transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
     slideModule = new Slide(transactionSystem,$('#slide-stage'), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName,chatModule);
     transactionSystem.registerModule(slideModule.moduleName,slideModule);
-    transactionSystem.init().then(()=>{
+    $.ajax({
+        url: window.location.href+'/my_privilege',
+        type: 'get',
+        dataType: 'json',
+    }).then((result)=>{
+        if(result.status == 'ok'){
+            privilege = result.privilege;
+        } else throw result;
+    }).then(transactionSystem.init).then(()=>{
         console.log('ready');
     });
 </script>
