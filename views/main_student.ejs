@@ -60,8 +60,10 @@
             <span class="fa fa-download fa-2x download"></span>
         </div>
         <div class="col-md-6" id="slide-stage" >
-            <button class="add-message" type="button" id="next-slide">&lt</button>
-            <button class="add-message" type="button" id="previous-slide">&gt</button>
+            <canvas id="slide-canvas" style="border:1px solid #000000;">
+            </canvas>
+            <button type="button" id="next-slide">&lt</button>
+            <button type="button" id="previous-slide">&gt</button>
         </div>
         <div class="col-md-4" id="info-board">
             <input type="text" name="text" id="send"></input>
@@ -73,7 +75,7 @@
     privilege = null;
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem,$('#slide-stage'), $('#previous-slide'), $('#next-slide'));
+    slideModule = new Slide(transactionSystem, 1,$('#slide-canvas'), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName,chatModule);
     transactionSystem.registerModule(slideModule.moduleName,slideModule);
     $.ajax({

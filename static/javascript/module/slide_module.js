@@ -1,9 +1,10 @@
-function Slide(transactionSystem,asController, showDiv, previousButton, nextButton) {
+function Slide(transactionSystem, asController, showCanvas, previousButton, nextButton) {
     var self = this;
     this.moduleName = 'slide';
-    self.slide64;
-    var slideList = [];
+    self.slideList = [];
     var ignoreTransaction = {};
+    self.currentSlidesNumber = -1;
+    var workCanvas = document.createElement('canvas');
     this.loadAllSlides = function () {
         return new promise(function (resolve, reject) {
             //TODO: delete IDToken
@@ -25,44 +26,37 @@ function Slide(transactionSystem,asController, showDiv, previousButton, nextButt
                     return;
                 } else if (response.status == "ok") {
                     return loadSlideFromURLList(response.payload);
-
                 }
             }
         ).catch();
     };
     function loadSlideFromURLList(payload) {
         let index = 0;
-        return new promise(function (resolve, reject) {
+        return new Promise(function (resolve, reject) {
             payload.URLList.forEach(function (url) {
                 index++;
                 var image = new Image();
                 image.id = index;
                 image.src = url;
-                slideList.push();
+                self.slideList.push(image);
             });
             resolve();
         });
     }
 
-    this.addSessionDummy = function () {
-        return loadSlideFromURLList(['localhost'])
-    }
-    previousButton.on('click', function () {
+    function addDummySlides() {
+        return loadSlideFromURLList({URLList:['/static/dummy_data/slides/1.png', '/static/dummy_data/slides/2.png', '/static/dummy_data/slides/3.png', '/static/dummy_data/slides/4.png']});
+    };
 
-    });
-    nextButton.on('click', function () {
-
-    });
     this.newSlide = function (slideImage) {
         var id = Math.random();
         ignoreTransaction[id] = true;
+        getURI(slideImage);
         transactionSystem.newTransaction(self.moduleName, {
             type: 'slide',
             id: id
         }, {slideImage: self.slide64}).then(function (result) {
-            slideList.push(slideImage);
-            showImage(dataURItoBlob(self.slide64), showDiv);
-
+            showImage(slideImage, showCanvas);
         }).catch(function (err) {
             console.error('fail to new transaction');
             console.error(err);
@@ -71,60 +65,42 @@ function Slide(transactionSystem,asController, showDiv, previousButton, nextButt
     };
 
     this.update = function (index, description, createdBy, createdAt, payload) {
-        if (ignoreTransaction[description.id]) {
+        if (ignoreTransaction[description.id] || asController) {
             delete ignoreTransaction[description.id];
             return;
         }
-        slideList.push(payload.slideImage);
-        showImage(dataURItoBlob(payload.slideImage), showDiv);
+        var img = new Image();
+        img.src = payload.slideImage;
+        self.slideList.push(img);
+        showImage(img, showCanvas);
     };
     this.reset = function () {
         ignoreTransaction = {};
-        slideList = [];
-        showDiv.empty();
+        self.slideList = [];
+        showCanvas.empty();
     };
+    function showImage(img, showCanvas) {
+        let ctx=showCanvas.get(0).getContext("2d");
+        ctx.clearRect(0, 0, showCanvas.width, showCanvas.height);
+        ctx.drawImage(img, 0, 0);
+    }
 
-    sendButton.click(function () {
-        console.log('image:' + this.id);
-        self.newSlide(self.slide64);
+    function getURI(img) {
+        let ctx = workCanvas.getContext('2d');
+        ctx.clearRect(0, 0, workCanvas.width, workCanvas.height);
+        ctx.drawImage(img, 0, 0);
+        self.slide64 = workCanvas.toDataURL();
+    }
+
+    previousButton.on('click', function () {
+        //TODO: check if there is a previous
+        self.newSlide(self.slideList[--self.currentSlidesNumber]);
+        console.log("previous slide\n current slide number :", self.currentSlidesNumber);
     });
-
-    function showImage(blob, showDiv) {
-        var img = document.createElement('img');
-        img.src = URL.createObjectURL(blob);
-        showDiv.prepend(img);
-    }
-
-    function dataURItoBlob(dataURI) {
-        // convert base64/URLEncoded data component to raw binary data held in a string
-        var byteString;
-        if (dataURI.split(',')[0].indexOf('base64') >= 0)
-            byteString = atob(dataURI.split(',')[1]);
-        else
-            byteString = unescape(dataURI.split(',')[1]);
-
-        // separate out the mime component
-        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-        // write the bytes of the string to a typed array
-        var ia = new Uint8Array(byteString.length);
-        for (var i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-
-        return new Blob([ia], {type: mimeString});
-    }
-
-    function getBase64(file) {
-        var reader = new FileReader();
-        reader.readAsDataURL(file[0]);
-        reader.onload = function (e) {
-            self.slide64 = reader.result;
-            return;
-        };
-        reader.onerror = function (error) {
-            console.log('Error: ', error);
-        };
-    }
-
+    nextButton.on('click', function () {
+//TODO: check if there is a next
+        self.newSlide(self.slideList[++self.currentSlidesNumber]);
+        console.log("next slide\n current slide number :", self.currentSlidesNumber);
+    });
+    addDummySlides().then(self.newSlide(self.slideList[++self.currentSlidesNumber]));
 }
