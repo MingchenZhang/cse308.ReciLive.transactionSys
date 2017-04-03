@@ -239,15 +239,7 @@ exports.session = function () {
 
     function understandTransaction(transaction) {
         if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
-        <<<<<<<
-            HEAD:modules / session.js
             transaction.description.speakerChange.forEach((tuple) => {
-                ======
-                =
-                    transaction.description.speakerChange.forEach((tuple) => {
-                        >>>>>>>
-                        save
-                        for the upload
                         code:static
                         /modules/s
                         ession.js

@@ -11,7 +11,10 @@ exports.getRoute = function (s) {
 
     // classroom page
     router.get('/', function (req, res, next) {
-        res.render("main_student", {username: req.userLoginInfo.name,classroomNumber:req.classroomNumber,slidesNumber:});
+        res.render("main_student", {
+            username: req.userLoginInfo.name,
+            classroomNumber: req.classroomNumber,
+            slidesNumber:req.slidesNumber
     });
 
     router.post('/transaction_post', jsonParser, function (req, res, next) {
@@ -20,7 +23,7 @@ exports.getRoute = function (s) {
         var description = MongoEscape(req.body.description);
         var payload = MongoEscape(req.body.payload);
 
-        if(!ParameterChecker.transactionPush(req.body))
+        if (!ParameterChecker.transactionPush(req.body))
             return res.status(400).send({status: 'error', reason: 5});
 
         var createdBy = req.userLoginInfo.userID;
@@ -31,13 +34,13 @@ exports.getRoute = function (s) {
             description,
             payload,
             createdBy,
-        }).then(()=>{
-            res.send({status:'ok'});
-        }).catch((err)=>{
-            var message = {status:'error'};
-            if(err.reason) message.reason = err.reason;
+        }).then(() => {
+            res.send({status: 'ok'});
+        }).catch((err) => {
+            var message = {status: 'error'};
+            if (err.reason) message.reason = err.reason;
             else err.reason = 7;
-            if(!s.inProduction) message.detail = err;
+            if (!s.inProduction) message.detail = err;
             res.send(message);
         });
     });

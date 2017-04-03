@@ -1,74 +1,58 @@
-function Slide(transactionSystem, showDiv, previousButton, nextButton) {
+function Slide(transactionSystem,asController, showDiv, previousButton, nextButton) {
     var self = this;
     this.moduleName = 'slide';
     self.slide64;
     var slideList = [];
     var ignoreTransaction = {};
-    //code for upload slides
-    /*sendSlide.on('change', () => {
-     self.slide64 = getBase64(sendSlide.prop('files'));
-     });*/
-    this.loadAllSlides = function() {
-        return new promise(function (resolve, reject)  {
+    this.loadAllSlides = function () {
+        return new promise(function (resolve, reject) {
             //TODO: delete IDToken
             $.ajax({
                 url: 'http://localhost/get_resource',
                 type: "POST",
-                data: JSON.stringify({type:"slides",payload:{classNumber:classroomNumber,slidesNumber:0,StartAt:0,EndAt:-1}}),
+                data: JSON.stringify({
+                    type: "slides",
+                    payload: {classNumber: classroomNumber, slidesNumber: 0, StartAt: 0, EndAt: -1}
+                }),
                 contentType: "application/json",
                 complete: resolve(response),
-                error:reject(e)
+                error: reject(e)
             });
         }).then(
-            function (response){
-                if(response.status=="error"){
+            function (response) {
+                if (response.status == "error") {
                     //TODO: load error
-                    return ;
-                }else if(response.status=="ok"){
+                    return;
+                } else if (response.status == "ok") {
                     return loadSlideFromURLList(response.payload);
 
                 }
             }
-
         ).catch();
     };
-    this.dummyLoad=
-    function loadSlideFromURLList(payload){
+    function loadSlideFromURLList(payload) {
         let index = 0;
-        return new promise(function (){payload.URLList.forEach(function (url){
-            index++;
-            var image = new Image();
-            image.id = index;
-            image.src = url;
-            slideList.push()
-        });});
-
+        return new promise(function (resolve, reject) {
+            payload.URLList.forEach(function (url) {
+                index++;
+                var image = new Image();
+                image.id = index;
+                image.src = url;
+                slideList.push();
+            });
+            resolve();
+        });
     }
-this
+
+    this.addSessionDummy = function () {
+        return loadSlideFromURLList(['localhost'])
+    }
     previousButton.on('click', function () {
 
     });
+    nextButton.on('click', function () {
 
-    function postAjax(url, data, success) {
-        var params = typeof data == 'string' ? data : Object.keys(data).map(
-            function (k) {
-                return encodeURIComponent(k) + '=' + encodeURIComponent(data[k])
-            }
-        ).join('&');
-
-        var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-        xhr.open('POST', url);
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState > 3 && xhr.status == 200) {
-                success(xhr.responseText);
-            }
-        };
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.send(params);
-        return xhr;
-    }
-
+    });
     this.newSlide = function (slideImage) {
         var id = Math.random();
         ignoreTransaction[id] = true;
@@ -86,7 +70,6 @@ this
         });
     };
 
-    this.next
     this.update = function (index, description, createdBy, createdAt, payload) {
         if (ignoreTransaction[description.id]) {
             delete ignoreTransaction[description.id];
