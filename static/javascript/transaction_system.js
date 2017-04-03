@@ -1,10 +1,13 @@
 // dependence: jquery, bluebird
 
 function TransactionSystem(path) {
+    var self = this;
     var connection;
     var transactions = [];
     var latestReady = null;
     var modules = {};
+    this.privilege = null; // assign by outside
+    this.userID = null; // assign by outside
 
     this.init = function () {
         connection = new wsConnection(path, sendStart, receive, false);
