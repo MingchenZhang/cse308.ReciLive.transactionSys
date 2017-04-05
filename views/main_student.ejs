@@ -25,6 +25,11 @@
     <script src="/static/javascript/transaction_system.js"></script>
     <script src="/static/javascript/module/chat_module.js"></script>
     <script src="/static/javascript/module/slide_module.js"></script>
+    <script src="/static/javascript/module/sound_control_module.js"></script>
+    <script src="/static/javascript/sound_system.js"></script>
+    <script src="/static/javascript/resampler.js"></script>
+    <script src="/static/javascript/Queue.src.js"></script>
+    <script src="/static/javascript/canvas_controller.js"></script>
 </head>
 
 <body>
@@ -67,8 +72,8 @@
         <div class="col-md-6" id="slide-stage" >
             <canvas id="slide-canvas" style="border:1px solid #000000;">
             </canvas>
-            <button type="button" id="next-slide">&lt</button>
-            <button type="button" id="previous-slide">&gt</button>
+            <button type="button" id="previous-slide">&lt</button>
+            <button type="button" id="next-slide">&gt</button>
         </div>
         <div class="col-md-4" id="info-board">
             <input type="text" name="text" id="send"></input>
@@ -81,10 +86,10 @@
     transactionSystem.userID = parseInt("<%= userID %>");
     soundControlSystem = new SoundControl(transactionSystem);
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem, 1,$('#slide-canvas'), $('#previous-slide'), $('#next-slide'));
+    slideModule = new Slide(transactionSystem,$('#slide-canvas'), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName,chatModule);
     transactionSystem.registerModule(slideModule.moduleName,slideModule);
-
+    canvasController = new canvasontroller($('#slide-canvas'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
@@ -98,7 +103,7 @@
         if(result.status == 'ok'){
             transactionSystem.privilege = result.privilege;
         } else throw result;
-    }).then(transactionSystem.init).then(function (result) {
+    }).then(transactionSystem.init).then(slideModule.init).then(function (result) {
         return activateSound();
     }).then(()=>{
         vex.close(loadingDialog);
@@ -107,6 +112,9 @@
 
     var audioCtx;
     var soundSystem;
+
+
+
     function activateSound() {
         var eventRate = 16384;
 
@@ -137,7 +145,7 @@
                 audioCtx = new AudioContext();
                 console.log('native sample rate: '+audioCtx.sampleRate);
                 soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);
-                if(asListener) soundSystem.receiveFlag = true;
+                if(soundControlSystem.asListener) soundSystem.receiveFlag = true;
                 soundSystem.connect();
                 var microphone_stream = audioCtx.createMediaStreamSource(stream);
                 //microphone_stream.connect(audioCtx.destination);
