@@ -97,7 +97,10 @@ exports.session = function () {
                     ws.initStatus++;
                     return true;
                 } else {
-                    assert(ws.initStatus <= lastTransactionIndex);
+                    if (ws.initStatus > lastTransactionIndex) {
+                        socketPanic(9);
+                        throw "client side error, reason 9";
+                    }
                     if (ws.initStatus == lastTransactionIndex) {
                         delete ws.initStatus;
                         clients.push(ws);
@@ -122,17 +125,22 @@ exports.session = function () {
                 if (!s.inProduction) console.error("receive abnormal message from websocket: " + message);
                 return socketPanic(5);
             }
-            if (message.type == "initialization" && typeof message.startAt == "number") {
-                if (ws.initStatus != -1) return socketPanic(8);
-                ws.initStatus = message.startAt - 1;
-                sendToTheLatest(message.startAt).on('done', function () {
-                    ws.send(JSON.stringify({
-                        type: 'latest_sent'
-                    }));
-                });
-            } else {
-                if (!s.inProduction) console.error("receive abnormal message format from websocket: " + message);
-                return socketPanic(5);
+            try {
+                if (message.type == "initialization" && typeof message.startAt == "number") {
+                    if (ws.initStatus != -1) return socketPanic(8);
+                    ws.initStatus = message.startAt - 1;
+                    sendToTheLatest(message.startAt).on('done', function () {
+
+                        ws.send(JSON.stringify({
+                            type: 'latest_sent'
+                        }));
+                    });
+                } else {
+                    if (!s.inProduction) console.error("receive abnormal message format from websocket: " + message);
+                    return socketPanic(5);
+                }
+            } catch (e) {
+                console.error(e)
             }
         });
         ws.on('close', function () {
@@ -186,15 +194,19 @@ exports.session = function () {
 
         lastTransactionIndex++;
         clients.forEach((client) => {
-            client.send(JSON.stringify({
-                type: 'transaction_push',
-                index,
-                module,
-                description,
-                createdAt: transaction.createdAt,
-                createdBy,
-                payload
-            }));
+            try {
+                client.send(JSON.stringify({
+                    type: 'transaction_push',
+                    index,
+                    module,
+                    description,
+                    createdAt: transaction.createdAt,
+                    createdBy,
+                    payload
+                }));
+            } catch (e) {
+                console.error(e);
+            }
         });
 
         return s.transactionRecord.addTransaction(transaction);

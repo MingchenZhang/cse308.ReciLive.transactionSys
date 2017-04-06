@@ -89,6 +89,7 @@
     slideModule = new Slide(transactionSystem,$('#slide-canvas'), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName,chatModule);
     transactionSystem.registerModule(slideModule.moduleName,slideModule);
+    transactionSystem.registerModule(soundControlSystem.moduleName,soundControlSystem);
     canvasController = new canvasontroller($('#slide-canvas'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
@@ -103,7 +104,7 @@
         if(result.status == 'ok'){
             transactionSystem.privilege = result.privilege;
         } else throw result;
-    }).then(transactionSystem.init).then(slideModule.init).then(function (result) {
+    }).then(transactionSystem.init).then(slideModule.init).then(soundControlSystem.init).then(function (result) {
         return activateSound();
     }).then(()=>{
         vex.close(loadingDialog);
@@ -163,8 +164,10 @@
                     var outputBuffer = audioProcessingEvent.outputBuffer;
                     var inputData = inputBuffer.getChannelData(0);
                     var outputData = outputBuffer.getChannelData(0);
-                    if(soundControlSystem.asSpeaker) soundSystem.send(inputData);
-                    if(soundControlSystem.asListener) soundSystem.writeNextSoundBuffer(outputData);
+                    if(soundControlSystem.asSpeaker)
+                        soundSystem.send(inputData);
+                    if(soundControlSystem.asListener)
+                        soundSystem.writeNextSoundBuffer(outputData);
                 };
                 return script_processor_node;
             }

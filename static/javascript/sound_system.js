@@ -54,6 +54,9 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
             //console.log('tailing: '+(bufferLength-consumeRate));
             return true;
         }else{
+            for(var i=0; i<consumeRate; i++){
+                bufferToWrite[i] = 0;
+            }
             console.log('waiting for sound data... ');
             return false;
         }

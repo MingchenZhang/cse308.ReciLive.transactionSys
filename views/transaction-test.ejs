@@ -79,8 +79,10 @@
                 var outputBuffer = audioProcessingEvent.outputBuffer;
                 var inputData = inputBuffer.getChannelData(0);
                 var outputData = outputBuffer.getChannelData(0);
-                if(asSpeaker) soundSystem.send(inputData);
-                if(asListener) soundSystem.writeNextSoundBuffer(outputData);
+                if(asSpeaker)
+                    soundSystem.send(inputData);
+                if(asListener)
+                    soundSystem.writeNextSoundBuffer(outputData);
             };
             return script_processor_node;
         }

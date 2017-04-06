@@ -5,8 +5,11 @@ function SoundControl(transactionSystem) {
     self.asListener = false;
 
     self.init = function(){
-        if(transactionSystem.privilege.indexOf(transactionSystem.userID)){
+        if(self.asSpeaker || self.asListener) return;
+        if(transactionSystem.privilege.indexOf(self.moduleName) >=0 ){
             transactionSystem.newTransaction(self.moduleName, {speakerChange: [[transactionSystem.userID, true]]}, {});
+        }else{
+            self.asListener = true;
         }
     };
 
