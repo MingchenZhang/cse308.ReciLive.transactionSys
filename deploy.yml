@@ -17,7 +17,7 @@
         User=root
         Group=root
         WorkingDirectory=/var/node/{{project_name}}/
-        Environment=HTTP_PORT={{http_port}}a
+        Environment=HTTP_PORT={{http_port}}
         Environment=DB_PATH=mongodb://localhost:{{DB_PORT}}/
         ExecStart=/usr/bin/node app.js
 
