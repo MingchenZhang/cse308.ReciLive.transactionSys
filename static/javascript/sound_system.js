@@ -20,7 +20,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         var array = new Float32Array(e.data);
         var senderSampleRate = array[array.length-1];
         array = getReceiveResampler(senderSampleRate).resampler(array, array.length-1);
-        if(receiverBuffer.getLength() > consumeRate*4){ // TODO; better delay drop algorithm
+        if(receiverBuffer.getLength() > consumeRate*16){ // TODO; better delay drop algorithm
             console.log('receiverBuffer piling up, cleaning the queue...');
             receiverBuffer.empty();
         }
