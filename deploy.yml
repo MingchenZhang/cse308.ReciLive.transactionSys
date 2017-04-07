@@ -19,6 +19,9 @@
         WorkingDirectory=/var/node/{{project_name}}/
         Environment=HTTP_PORT={{http_port}}
         Environment=DB_PATH=mongodb://localhost:{{DB_PORT}}/
+        Environment=HTTPS_PORT=443
+        Environment=HTTPS_KEY_PATH=/etc/letsencrypt/live/room.recilive.stream/privkey.pem
+        Environment=HTTPS_CERT_PATH=/etc/letsencrypt/live/room.recilive.stream/fullchain.pem
         ExecStart=/usr/bin/node app.js
 
         [Install]
@@ -37,7 +40,7 @@
   
   gather_facts: no
   pre_tasks:
-  - name: install python2
+  - name: install python
     raw: sudo apt-get update && sudo apt-get -y install python-simplejson
 
   tasks:
@@ -88,6 +91,9 @@
       
   - name: enable nodejs service
     command: systemctl enable {{systemd_config_nodejs_name}}
+
+  - name: enable nodejs service
+    command: systemctl stop {{systemd_config_nodejs_name}}
   
   - name: write systemd config to auto run mongodb
     copy:
