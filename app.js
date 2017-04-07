@@ -78,10 +78,16 @@ app.use(function (err, req, res, next) {
 // create server
 var httpServer = Http.createServer(app);
 if (process.env.HTTPS_PORT) {
-    var privateKey = Fs.readFileSync(process.env.HTTPS_KEY_PATH, 'utf8');
-    var certificate = Fs.readFileSync(process.env.HTTPS_CERT_PATH, 'utf8');
-    var credentials = {key: privateKey, cert: certificate};
-    var httpsServer = Https.createServer(credentials, app);
+    try{
+        var privateKey = Fs.readFileSync(process.env.HTTPS_KEY_PATH, 'utf8');
+        var certificate = Fs.readFileSync(process.env.HTTPS_CERT_PATH, 'utf8');
+        var credentials = {key: privateKey, cert: certificate};
+        var httpsServer = Https.createServer(credentials, app);
+    }catch(e){
+        console.error(e);
+        console.error('fail to read essential https files');
+        delete process.env.HTTPS_PORT;
+    }
 }
 
 wsServer = new WSWebSocket({server: httpServer});
