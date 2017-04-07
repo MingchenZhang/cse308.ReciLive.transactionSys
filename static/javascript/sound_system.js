@@ -110,7 +110,7 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
 
     this.send = function (data) {
         if (ws.readyState != ws.OPEN && ws.readyState != ws.CONNECTING) {
-            console.log('writing while websocket is not opened, reconnect in 0,5 second');
+            console.log('writing while websocket is not opened, reconnect in 0.5 second');
             if(!reconnectPending) {
                 setTimeout(()=>{self.connect(); reconnectPending = false;}, 500);
                 reconnectPending = true;
