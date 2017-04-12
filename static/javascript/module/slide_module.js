@@ -3,7 +3,7 @@ function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
     var self = this;
     self.moduleName = 'slides';
     //slideList get all transaction in order
-    //
+    self.isIncremental = false;
     self.slideList = [];
     //instructor slide base64 data list
     self.slideDataList = [];
