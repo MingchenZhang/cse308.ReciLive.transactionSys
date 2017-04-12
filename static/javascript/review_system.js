@@ -11,7 +11,7 @@ function TransactionSystem(path) {
     var watchdog = null; // used for non live update
     var pastaTime = null;// user chosen time in transaction record
     var currentTime = null;// current time when user click on replay or review button
-    var currentPlayedIndex = -1;
+    var currentPlayedIndex = 0;
     //TODO: change current time to relative time soon™
     this.privilege = null; // assign by outside
     this.userID = null; // assign by outside
@@ -48,11 +48,11 @@ function TransactionSystem(path) {
                     transactions[i].payload);
                 
             } else {
-                currentPlayedIndex = i - 1;
+                if(currentPlayedIndex < i) currentPlayedIndex = i-1;
                 return;
             }
         }
-        currentPlayedIndex = i - 1;
+        if(currentPlayedIndex < i) currentPlayedIndex = i;
         console.log('replay session is over (UI is needed)');
         // TODO: Added vex dialog
         clearInterval(watchdog);
@@ -121,14 +121,14 @@ function TransactionSystem(path) {
                         transactions[keyTrans].createdBy,
                         transactions[keyTrans].createdAt,
                         transactions[keyTrans].payload);
-                    if (currentPlayedIndex < keyTrans) currentPlayedIndex = keyTrans;
+                    if(currentPlayedIndex < keyTrans) currentPlayedIndex = keyTrans;
                 }
                 else {
                     var keyTrans = findKeyTransaction(module.moduleName, time, false);
                     if (keyTrans < 0)return;//-1
                     for (var j = keyTrans; j < transactions.length; j++) {
-                        if (time < transactions[j].createdAt) {
-                            if (currentPlayedIndex < j-1) currentPlayedIndex = j-1;
+                        if(time>transactions[j].createdAt) {
+                            if(currentPlayedIndex < j) currentPlayedIndex = j;
                             break;
                         }
                         if (transactions[j].module == module.moduleName) {

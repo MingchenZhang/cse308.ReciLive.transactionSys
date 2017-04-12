@@ -6,18 +6,17 @@
     <title>ReciLive</title>
     <link rel="icon" type="image/png" sizes="96x96" href="../static/img/logo/favicon-96x96.png">
     <!-- CSS Library -->
-    <link href="../static/css/library/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="../static/css/library/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/library/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/library/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <!-- JS Library -->
-    <script src="../static/javascript/jquery-3.1.1.js"></script>
+    <script src="/static/javascript/jquery-3.1.1.js"></script>
     <script src="../static/javascript/bootstrap.min.js"></script>
     <!-- Our CSS -->
     <link href="../static/css/main_common.css" rel="stylesheet" type="text/css">
     <link href="../static/css/main_student.css" rel="stylesheet" type="text/css">
 
-    <script src="/static/javascript/jquery-3.1.1.js"></script>
     <!--<script src="/static/javascript/bluebird.js"></script>-->
-    
+    <script src="/static/javascript/ui.js"></script>
     <script src="/static/javascript/vex.combined.min.js"></script>
     <link href="/static/css/library/vex.css" rel="stylesheet" type="text/css">
     <link href="/static/css/library/vex-theme-default.css" rel="stylesheet" type="text/css">
@@ -31,6 +30,7 @@
     <script src="/static/javascript/resampler.js"></script>
     <script src="/static/javascript/Queue.src.js"></script>
     <script src="/static/javascript/canvas_controller.js"></script>
+
 </head>
 
 <body>
@@ -70,11 +70,16 @@
             <span class="fa fa-area-chart fa-2x quiz"></span>
             <span class="fa fa-download fa-2x download"></span>
         </div>
-        <div class="col-md-6" id="slide-stage" >
-            <canvas id="slide-canvas" style="border:1px solid #000000;">
+        <div class="col-md-6" id="slide-stage">
+            <canvas id="CursorLayer" style="border:1px solid #000000;">
             </canvas>
-            <button type="button" id="previous-slide">&lt</button>
-            <button type="button" id="next-slide">&gt</button>
+            <div class="slide-nav">
+                <label id="previous-slide" class="slide-prev">&#x2039;</label>
+                <label id="next-slide" class="slide-next">&#x203a;</label>
+            </div>
+            <div class="slider">
+                <input class="slider__range" type="range" value="0" min="0" max="100">
+            </div>
         </div>
         <div class="col-md-4" id="info-board">
             <input type="text" name="text" id="send"></input>
@@ -82,32 +87,33 @@
         </div>
     </div>
 </div>
+
 <script>
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     transactionSystem.userID = parseInt("<%= userID %>");
     soundControlSystem = new SoundControl(transactionSystem);
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem,$('#slide-canvas'), $('#previous-slide'), $('#next-slide'));
-    transactionSystem.registerModule(chatModule.moduleName,chatModule);
-    transactionSystem.registerModule(slideModule.moduleName,slideModule);
-    transactionSystem.registerModule(soundControlSystem.moduleName,soundControlSystem);
-    canvasController = new canvasontroller($('#slide-canvas'));
+    slideModule = new Slide(transactionSystem, $('#CursorLayer'), $('#previous-slide'), $('#next-slide'));
+    transactionSystem.registerModule(chatModule.moduleName, chatModule);
+    transactionSystem.registerModule(slideModule.moduleName, slideModule);
+    transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
+    canvasController = new canvasontroller($('#CursorLayer'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
-        overlayClosesOnClick:false
+        overlayClosesOnClick: false
     })
     $.ajax({
-        url: window.location.href+'/my_privilege',
+        url: window.location.href + '/my_privilege',
         type: 'get',
         dataType: 'json',
-    }).then((result)=>{
-        if(result.status == 'ok'){
+    }).then((result)=> {
+        if (result.status == 'ok') {
             transactionSystem.privilege = result.privilege;
         } else throw result;
     }).then(transactionSystem.init).then(slideModule.init).then(soundControlSystem.init).then(function (result) {
         return activateSound();
-    }).then(()=>{
+    }).then(()=> {
         vex.close(loadingDialog);
         console.log('ready');
     });
@@ -116,9 +122,8 @@
     var soundSystem;
 
 
-
     function activateSound() {
-        var eventRate = 4096;
+        var eventRate = 2048;
 
         return new Promise(function (resolve, reject) {
             if (!navigator.getUserMedia)
@@ -145,9 +150,9 @@
 
             function start_microphone(stream) {
                 audioCtx = new AudioContext();
-                console.log('native sample rate: '+audioCtx.sampleRate);
+                console.log('native sample rate: ' + audioCtx.sampleRate);
                 soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);
-                if(soundControlSystem.asListener) soundSystem.receiveFlag = true;
+                if (soundControlSystem.asListener) soundSystem.receiveFlag = true;
                 soundSystem.connect();
                 var microphone_stream = audioCtx.createMediaStreamSource(stream);
                 //microphone_stream.connect(audioCtx.destination);
@@ -160,14 +165,14 @@
 
             function getAudioProc() {
                 var script_processor_node = audioCtx.createScriptProcessor(eventRate, 1, 1);
-                script_processor_node.onaudioprocess = function(audioProcessingEvent) {
+                script_processor_node.onaudioprocess = function (audioProcessingEvent) {
                     var inputBuffer = audioProcessingEvent.inputBuffer;
                     var outputBuffer = audioProcessingEvent.outputBuffer;
                     var inputData = inputBuffer.getChannelData(0);
                     var outputData = outputBuffer.getChannelData(0);
-                    if(soundControlSystem.asSpeaker)
+                    if (soundControlSystem.asSpeaker)
                         soundSystem.send(inputData);
-                    if(soundControlSystem.asListener)
+                    if (soundControlSystem.asListener)
                         soundSystem.writeNextSoundBuffer(outputData);
                 };
                 return script_processor_node;
@@ -176,5 +181,4 @@
     }
 </script>
 </body>
-
 </html>
