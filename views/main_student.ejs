@@ -71,8 +71,7 @@
             <span class="fa fa-download fa-2x download"></span>
         </div>
         <div class="col-md-6" id="slide-stage">
-            <canvas id="CursorLayer" style="border:1px solid #000000;">
-            </canvas>
+
             <div class="slide-nav">
                 <label id="previous-slide" class="slide-prev">&#x2039;</label>
                 <label id="next-slide" class="slide-next">&#x203a;</label>
@@ -93,7 +92,7 @@
     transactionSystem.userID = parseInt("<%= userID %>");
     soundControlSystem = new SoundControl(transactionSystem);
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem, $('#CursorLayer'), $('#previous-slide'), $('#next-slide'));
+    slideModule = new Slide(transactionSystem, $('#slide-stage'), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName, chatModule);
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);

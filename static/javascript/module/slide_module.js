@@ -1,16 +1,14 @@
-function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
-    
+function Slide(transactionSystem, showDiv, previousButton, nextButton) {
+
     var self = this;
     self.moduleName = 'slides';
     //slideList get all transaction in order
     self.isIncremental = false;
     self.slideList = [];
-    //instructor slide base64 data list
+    //instructor img tag list
     self.slideDataList = [];
     self.ignoreTransaction = {};
     self.currentSlidesNumber = -1;
-    //canvas just for get URI
-    //TODO: there should have a better way to get URI
     self.workCanvas = document.createElement('canvas');
     //when there are multiple slides use in one recitation
     self.slidesNumber = -1;
@@ -19,20 +17,21 @@ function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
         self.ignoreTransaction = {};
         self.slideList = [];
         self.slideDataList = [];
-        showCanvas.empty();
+        //check here for reset problem
+        if (showDiv.find('slide-img')) showDiv.find('slide-img').remove();
+        currentSlidesNumber = -1;
     };
 //clean canvas and show given img(URL or URI)
-    function showImage(imgBase64, showCanvas) {
-        let ctx = showCanvas.get(0).getContext("2d");
-        //TODO: check if there onload problem
-        let img = new Image();
-        img.onload = function () {
-            ctx.clearRect(0, 0, showCanvas.width(), showCanvas.height());
-            ctx.drawImage(img, 0, 0);
-        };
-        img.src = imgBase64;
+    function showImage(imgBase64, showDiv) {
+        let img = $('<img id="slide-img">');
+        img.on('load',function () {
+            showDiv.find('#slide-img').remove();
+            showDiv.append(img)
+            //change the ratio and hight width
+        });
+        img.attr("src",imgBase64);
     }
-    
+
     //update all the slides to front end transaction system
     self.update = function (index, description, createdBy, createdAt, payload) {
         if (self.ignoreTransaction[description.id]) {
@@ -40,7 +39,7 @@ function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
             return;
         }
         //add img to slideList by time
-        showImage(payload.slideImage, showCanvas);
+        showImage(payload.slideImage, showDiv);
         self.slideList.push(payload.slideImage);
         self.currentSlidesNumber = payload.slideIndex;
     };
@@ -92,15 +91,15 @@ function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
                         };
                         image.src = url;
                     });
-                    
+
                 });
                 return promiseList;
             };
-            
+
             self.addDummySlides = function () {
                 return Promise.all(self.loadSlideFromURLList({URLList: ['/static/dummy_data/slides/1.png', '/static/dummy_data/slides/2.png', '/static/dummy_data/slides/3.png', '/static/dummy_data/slides/4.png']}));
             };
-            
+
             self.newSlide = function (slideDataObj) {
                 var id = Math.random();
                 self.ignoreTransaction[id] = true;
@@ -114,7 +113,7 @@ function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
                     slidesNumber: self.slidesNumber
                 })
                     .then(function (result) {
-                        showImage(slideDataObj.slide64, showCanvas);
+                        showImage(slideDataObj.slide64, showDiv);
                     }).catch(function (err) {
                     console.error('fail to new transaction');
                     console.error(err);
@@ -128,9 +127,9 @@ function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
                 ctx.drawImage(img, 0, 0);
                 console.log("loaded img ", img.id);
                 return self.slide64 = self.workCanvas.toDataURL();
-                
+
             };
-            
+
             previousButton.on('click', function () {
                 if (self.currentSlidesNumber - 1 > -1) {
                     self.newSlide(self.slideDataList[--self.currentSlidesNumber]);
@@ -163,11 +162,11 @@ function Slide(transactionSystem, showCanvas, previousButton, nextButton) {
                 nextButton.remove();
                 previousButton.remove();
                 resolve();
-                
+
             })
-            
+
         }
-        
-        
+
+
     }
 }
