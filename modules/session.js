@@ -151,20 +151,66 @@ exports.session = function () {
     };
 
     this.wsHandleSound = function (ws) {
+        ws.nextSoundFrame = null; // the sound object to denote the next sound tobe send, null if live
+
         log.debug('start sound wsHandler. room id: ' + self.sessionID + ' user: ' + ws.userLoginInfo.userID);
         ws.roomSession = self;
         soundClients.push(ws);
 
-        ws.on('message', function (message) {
-            //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
-            log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
-            soundClients.forEach((client) => {
-                try {
-                    client.send(message);
-                } catch (e) {
-                    console.error(e);
+        function sendSoundFrame(){
+            var start = new Date();
+            ws.send(ws.nextSoundFrame.data);
+            s.transactionRecord.getSoundCursor({sessionID, startAt: ws.nextSoundFrame.createdAt}).next().then((soundFrame)=>{
+                if(!soundFrame) {
+                    ws.nextSoundFrame = null;
+                    return;
                 }
+                setTimeout(sendSoundFrame, soundFrame.createdAt - nextSoundFrame.createdAt - (new Date()-start));
+                ws.nextSoundFrame = soundFrame;
+            }).catch((err)=>{
+                log.warning('encounter error during retrieving sound frame: '+err);
             });
+        }
+
+        ws.on('message', function (message, flags) {
+            if(flags.binary){
+                //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
+                log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
+                s.transactionRecord.addSound({sessionID, createdAt: new Date(), data: message});
+                soundClients.forEach((client) => {
+                    if(client.nextSoundFrame) return; // client is in playback mode
+                    try {
+                        client.send(message);
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+            }else{
+                try{
+                    message = JSON.stringify(message);
+                }catch(e){
+                    log.warning(()=>{return 'message not valid from sound channel: '+JSON.stringify(message)});
+                    return false;
+                }
+                // {type: 'jump_to', startAt: iso date }
+                if(message.type == 'jump_to' && message.startAt){
+                    var startAt = new Date(message.startAt);
+                    s.transactionRecord.getSoundCursor({sessionID, startAt}).next().then((soundFrame)=>{
+                        if(!soundFrame) {
+                            ws.nextSoundFrame = null;
+                            return;
+                        }
+                        setTimeout(sendSoundFrame, soundFrame.createdAt - nextSoundFrame.createdAt);
+                        ws.nextSoundFrame = soundFrame;
+                    }).catch((err)=>{
+                        log.warning('encounter error during retrieving sound frame: '+err);
+                    });
+                }else if(message.type == 'jump_to' && !message.startAt){
+                    ws.nextSoundFrame = null;
+                }else{
+                    log.warning('receive invalid sound command: '+JSON.stringify(message));
+                }
+            }
         });
         ws.on('close', function () {
             log.debug('sound websocket to ' + ws.userLoginInfo.userID + ' closed');

@@ -17,6 +17,7 @@ exports.initDatabase = function (readyList) {
             console.log('MongodbClient connection to ' + convDBPath + ' has been established');
             transactionDB.transactionColl = db.collection('transaction');
             sessionDB.sessionColl = db.collection('session');
+            transactionDB.soundColl = db.collection('sound');
             convDBReady.resolve();
         }
     });
@@ -101,4 +102,19 @@ exports.getSession = function () {
 exports.deleteSession = function (param) {
     var sessionID = param.sessionID;
     return sessionDB.sessionColl.deleteOne({sessionID: sessionID});
+};
+
+exports.addSound = function(param){
+    var sessionID = param.sessionID;
+    var createdAt = param.createdAt;
+    var data = s.mongodb.Binary(param.data); // data: any buffer
+
+    return transactionDB.soundColl.insertOne({sessionID, createdAt, data});
+};
+
+exports.getSoundCursor = function(param){
+    var sessionID = param.sessionID;
+    var startAt = param.startAt;
+
+return transactionDB.transactionColl.find({sessionID, startAt: {$gt: startAt}}).sort({startAt: 1});
 };
