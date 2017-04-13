@@ -1,5 +1,5 @@
 function Slide(transactionSystem, showDiv, previousButton, nextButton) {
-    
+
     var self = this;
     self.moduleName = 'slides';
     //slideList get all transaction in order
@@ -9,6 +9,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
     self.slideDataList = [];
     self.ignoreTransaction = {};
     self.currentSlidesNumber = -1;
+    self.workCanvas = document.createElement('canvas');
     //when there are multiple slides use in one recitation
     self.slidesNumber = -1;
     //reset ignore slidelist and clean up canvas
@@ -17,20 +18,20 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
         self.slideList = [];
         self.slideDataList = [];
         //check here for reset problem
-        if(showDiv.find('img'))showDiv.find('img').remove();
+        if (showDiv.find('slide-img')) showDiv.find('slide-img').remove();
         currentSlidesNumber = -1;
     };
 //clean canvas and show given img(URL or URI)
     function showImage(imgBase64, showDiv) {
-        let img = new Image();
-        img.onload = function () {
-            showDiv.('.img').remove();
+        let img = $('<img id="slide-img">');
+        img.on('load',function () {
+            showDiv.find('#slide-img').remove();
             showDiv.append(img)
             //change the ratio and hight width
-        };
-        img.src = imgBase64;
+        });
+        img.attr("src",imgBase64);
     }
-    
+
     //update all the slides to front end transaction system
     self.update = function (index, description, createdBy, createdAt, payload) {
         if (self.ignoreTransaction[description.id]) {
@@ -90,15 +91,15 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                         };
                         image.src = url;
                     });
-                    
+
                 });
                 return promiseList;
             };
-            
+
             self.addDummySlides = function () {
                 return Promise.all(self.loadSlideFromURLList({URLList: ['/static/dummy_data/slides/1.png', '/static/dummy_data/slides/2.png', '/static/dummy_data/slides/3.png', '/static/dummy_data/slides/4.png']}));
             };
-            
+
             self.newSlide = function (slideDataObj) {
                 var id = Math.random();
                 self.ignoreTransaction[id] = true;
@@ -112,7 +113,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                     slidesNumber: self.slidesNumber
                 })
                     .then(function (result) {
-                        showImage(slideDataObj.slide64, showCanvas);
+                        showImage(slideDataObj.slide64, showDiv);
                     }).catch(function (err) {
                     console.error('fail to new transaction');
                     console.error(err);
@@ -126,9 +127,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                 ctx.drawImage(img, 0, 0);
                 console.log("loaded img ", img.id);
                 return self.slide64 = self.workCanvas.toDataURL();
-                
+
             };
-            
+
             previousButton.on('click', function () {
                 if (self.currentSlidesNumber - 1 > -1) {
                     self.newSlide(self.slideDataList[--self.currentSlidesNumber]);
@@ -161,11 +162,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                 nextButton.remove();
                 previousButton.remove();
                 resolve();
-                
+
             })
-            
+
         }
-        
-        
+
+
     }
 }
