@@ -159,13 +159,20 @@ exports.session = function () {
 
         function sendSoundFrame(){
             var start = new Date();
-            ws.send(ws.nextSoundFrame.data);
+            try{
+                ws.send(ws.nextSoundFrame.data.buffer);
+            }catch (e){
+                return;
+            }
             s.transactionRecord.getSoundCursor({sessionID:self.sessionID, startAt: ws.nextSoundFrame.createdAt}).next().then((soundFrame)=>{
+                log.debug('sound frame found: '+(soundFrame?soundFrame._id:null));
                 if(!soundFrame) {
                     ws.nextSoundFrame = null;
                     return;
                 }
-                setTimeout(sendSoundFrame, soundFrame.createdAt - nextSoundFrame.createdAt - (new Date()-start));
+                var delay = soundFrame.createdAt - ws.nextSoundFrame.createdAt - (new Date()-start);
+                log.debug('schedule to send sound frame in '+delay);
+                setTimeout(sendSoundFrame, delay);
                 ws.nextSoundFrame = soundFrame;
             }).catch((err)=>{
                 log.warning('encounter error during retrieving sound frame: '+err);
@@ -175,7 +182,7 @@ exports.session = function () {
         ws.on('message', function (message, flags) {
             if(flags.binary){
                 //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
-                log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
+                //log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
                 s.transactionRecord.addSound({sessionID:self.sessionID, createdAt: new Date(), data: message});
                 soundClients.forEach((client) => {
                     if(client.nextSoundFrame) return; // client is in playback mode
@@ -187,23 +194,23 @@ exports.session = function () {
                 });
             }else{
                 try{
-                    message = JSON.stringify(message);
+                    message = JSON.parse(message);
                 }catch(e){
-                    log.warning(()=>{return 'message not valid from sound channel: '+JSON.stringify(message)});
+                    log.warning(()=>{return 'message not valid from sound channel: '+message});
                     return false;
                 }
-                // {type: 'jump_to', startAt: iso date }
+                log.debug(()=>{return 'sound channel command receive: '+JSON.stringify(message)});
                 if(message.type == 'jump_to' && message.startAt){
                     var startAt = new Date(message.startAt);
-                    s.transactionRecord.getSoundCursor({sessionID:self.sessionID, startAt}).next().then((soundFrame)=>{
+                    s.transactionRecord.getSoundCursor({sessionID:self.sessionID, startAt}).next((err, soundFrame)=>{
+                        if(err) log.warning('encounter error during retrieving sound frame: '+err);
+                        log.debug('sound frame found: '+(soundFrame?soundFrame._id:null));
                         if(!soundFrame) {
                             ws.nextSoundFrame = null;
                             return;
                         }
-                        setTimeout(sendSoundFrame, soundFrame.createdAt - nextSoundFrame.createdAt);
+                        setTimeout(sendSoundFrame, 0);
                         ws.nextSoundFrame = soundFrame;
-                    }).catch((err)=>{
-                        log.warning('encounter error during retrieving sound frame: '+err);
                     });
                 }else if(message.type == 'jump_to' && !message.startAt){
                     ws.nextSoundFrame = null;

@@ -71,7 +71,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
                     }
                     playedTime = new Date(parseInt(slider.val()) * (sysTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
                     transactionSystem.switchTime(playedTime);
-                    //soundTransactionSystem.jumpTo(playedTime);
+                    soundTransactionSystem.jumpTo(playedTime);
                     playedTimerTick();
                 });
             }

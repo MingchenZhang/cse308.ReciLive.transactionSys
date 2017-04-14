@@ -4,7 +4,7 @@ var s = global.s;
 var transactionDB = {};
 var sessionDB = {};
 exports.initDatabase = function (readyList) {
-    var convDBPath = s.dbPath+"transaction";
+    var convDBPath = s.dbPath + "transaction";
     var convDBReady = When.defer();
     readyList.push(convDBReady.promise);
     console.log('try to connect to ' + convDBPath);
@@ -16,8 +16,10 @@ exports.initDatabase = function (readyList) {
         } else {
             console.log('MongodbClient connection to ' + convDBPath + ' has been established');
             transactionDB.transactionColl = db.collection('transaction');
+            transactionDB.transactionColl.createIndex({sessionID:1, index:1});
             sessionDB.sessionColl = db.collection('session');
             transactionDB.soundColl = db.collection('sound');
+            transactionDB.soundColl.createIndex({sessionID:1, createdAt:1});
             convDBReady.resolve();
         }
     });
@@ -39,8 +41,8 @@ exports.addTransaction = function (param) {
         module: module,
         description: description,
         payload: payload,
-        createdAt:new Date(createdAt),
-        createdBy:s.mongodb.ObjectId(createdBy)
+        createdAt: new Date(createdAt),
+        createdBy: s.mongodb.ObjectId(createdBy)
     };
 
     return transactionDB.transactionColl.insertOne(doc).catch(function (err) {
@@ -58,8 +60,8 @@ exports.getTransactionCursor = function (param) {
 
 exports.getLastTransactionIndex = function (param) {
     var sessionID = param.sessionID;
-    return transactionDB.transactionColl.findOne({sessionID: sessionID}, {sort:[['index', -1]]}).then((doc)=> {
-        if(doc) return doc.index;
+    return transactionDB.transactionColl.findOne({sessionID: sessionID}, {sort: [['index', -1]]}).then((doc)=> {
+        if (doc) return doc.index;
         else return -1;
     });
 };
@@ -87,7 +89,7 @@ exports.addSession = function (param) {
         startDate: startDate,
         endDate: endDate,
         status: status,
-        slidesNumber:slidesNumber
+        slidesNumber: slidesNumber
     };
     return sessionDB.sessionColl.insertOne(doc).catch(function (err) {
         console.error(err);
@@ -104,17 +106,17 @@ exports.deleteSession = function (param) {
     return sessionDB.sessionColl.deleteOne({sessionID: sessionID});
 };
 
-exports.addSound = function(param){
+exports.addSound = function (param) {
     var sessionID = param.sessionID;
-    var createdAt = param.createdAt;
+    var createdAt = new Date(param.createdAt);
     var data = s.mongodb.Binary(param.data); // data: any buffer
 
     return transactionDB.soundColl.insertOne({sessionID, createdAt, data});
 };
 
-exports.getSoundCursor = function(param){
+exports.getSoundCursor = function (param) {
     var sessionID = param.sessionID;
-    var startAt = param.startAt;
+    var startAt = new Date(param.startAt);
 
-return transactionDB.transactionColl.find({sessionID, startAt: {$gt: startAt}}).sort({startAt: 1});
+    return transactionDB.soundColl.find({sessionID, createdAt: {$gt: startAt}}).sort({createdAt: 1});
 };
