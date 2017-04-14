@@ -24,12 +24,12 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
 //clean canvas and show given img(URL or URI)
     function showImage(imgBase64, showDiv) {
         let img = $('<img id="slide-img">');
-        img.on('load',function () {
+        img.on('load', function () {
             showDiv.find('#slide-img').remove();
             showDiv.append(img)
             //change the ratio and hight width
         });
-        img.attr("src",imgBase64);
+        img.attr("src", imgBase64);
     }
 
     //update all the slides to front end transaction system
@@ -49,31 +49,28 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
         if (asController) {
             //as controller of slides
             self.loadAllSlides = function (slidesIndex) {
-                return new promise(function (resolve, reject) {
-                    //TODO: delete IDToken
-                    $.ajax({
-                        url: 'http://localhost/get_resource',//TODO: change this to gae server
-                        type: "POST",
-                        data: JSON.stringify({
-                            type: "slides",
-                            index: slidesIndex,
-                            payload: {classNumber: classroomNumber, slidesNumber: 0, StartAt: 0, EndAt: -1}
-                        }),
-                        contentType: "application/json",
-                        complete: resolve(response),
-                        error: reject(e)
-                    });
-                }).then(
-                    function (response) {
-                        if (response.status == "error") {
-                            //TODO: load error
-                            return;
-                        } else if (response.status == "ok") {
-                            self.slidesNumber = slidesIndex;
-                            return self.loadSlideFromURLList(response.payload);
+                //TODO: delete IDToken
+                return $.ajax({
+                    url: 'http://localhost/get_resource',//TODO: change this to gae server
+                    type: "POST",
+                    data: JSON.stringify({
+                        type: "slides",
+                        index: slidesIndex,
+                        payload: {classNumber: classroomNumber, slidesNumber: 0, StartAt: 0, EndAt: -1}
+                    }),
+                    contentType: "application/json",
+                })
+                    .then(
+                        function (response) {
+                            if (response.status == "error") {
+                                //TODO: load error
+                                return;
+                            } else if (response.status == "ok") {
+                                self.slidesNumber = slidesIndex;
+                                return self.loadSlideFromURLList(response.payload);
+                            }
                         }
-                    }
-                ).catch();
+                    ).catch();
             };
             self.loadSlideFromURLList = function (payload) {
                 let index = -1;

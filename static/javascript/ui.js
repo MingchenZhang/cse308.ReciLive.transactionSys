@@ -10,17 +10,13 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
     var playedTimer = null;
 
     function getServerTime() {
-        return new Promise(function (resolve, reject) {
-            $.ajax({
-                url: 'http://localhost/current_time',//TODO: change this to gae server
-                type: "POST",
-                data: JSON.stringify({
-                    type: "time"
-                }),
-                contentType: "application/json",
-                complete: resolve(response),
-                error: reject(e)
-            });
+        return $.ajax({
+            url: 'http://localhost/current_time',//TODO: change this to gae server
+            type: "POST",
+            data: JSON.stringify({
+                type: "time"
+            }),
+            contentType: "application/json",
         });
 
     };
@@ -63,12 +59,12 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
         //return a Promise
         return getServerTime().then(function (response) {
             //syc system time with total
-            totalTime = response.time;
+            totalTime = new Date(response.time);
         }).then(timeTick());
     }
 
     function detachListener(slider) {
-        slider.removeAllListeners();
+        slider.off();
 
     }
 
@@ -106,7 +102,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
             if (transactionSystem[0]) {
                 //if user join after first transaction
 
-                return getServerTime.then(function (response) {
+                return getServerTime().then(function (response) {
                     startTime = transactionSystem[0].createdAt;
                     console.log("get start time from transaction system= " + startTime);
                     totalTime = new Date(response.time);
@@ -116,7 +112,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
                 resolve();
             } else {
                 //no transaction when user get in
-                return getServerTime.then(function (response) {
+                return getServerTime().then(function (response) {
                     startTime = new Date(response.time);
                     console.log("get start time from server= " + startTime);
                     totalTime = startTime;
