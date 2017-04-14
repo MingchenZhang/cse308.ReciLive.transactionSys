@@ -49,7 +49,7 @@ function TransactionSystem(path) {
                     transactions[i].createdBy,
                     transactions[i].createdAt,
                     transactions[i].payload);
-
+                console.log('watchdog updated %s', transactions[i].module);
             } else {
                 currentPlayedIndex = i - 1;
                 return;
@@ -67,7 +67,7 @@ function TransactionSystem(path) {
         function findKeyTransaction(moduleName, time, isNotIncremental) {
             if (isNotIncremental) {
                 for (var i = transactions.length - 1; i >= 0; i--) {
-                    if (transactions[i].module == moduleName && time >= transactions[i].createdAt) {
+                    if (transactions[i].module == moduleName && time >= new Date(transactions[i].createdAt)) {
                         return i;
                     }
                 }
@@ -125,8 +125,8 @@ function TransactionSystem(path) {
                 modules[key].reset();
                 if (modules[key].isNotIncremental) {
                     var keyTrans = findKeyTransaction(modules[key].moduleName, time, true);
-                    if (keyTrans < 0) return;
-                    modules[key].update(keyTrans,
+                    if (keyTrans < 0) {}
+                    else modules[key].update(keyTrans,
                         transactions[keyTrans].description,
                         transactions[keyTrans].createdBy,
                         transactions[keyTrans].createdAt,
@@ -135,7 +135,7 @@ function TransactionSystem(path) {
                 }
                 else {
                     var keyTrans = findKeyTransaction(modules[key].moduleName, time, false);
-                    if (keyTrans < 0)return;//-1
+                    if (keyTrans < 0) continue;//-1
                     for (var j = keyTrans; j < transactions.length; j++) {
                         if (time < transactions[j].createdAt) {
                             if (currentPlayedIndex < j - 1) currentPlayedIndex = j - 1;
@@ -162,6 +162,7 @@ function TransactionSystem(path) {
             latestReady.ready();
         } else if (object.index == ((transactions.length > 0) ? transactions.length : 0)) {
             //transactions.push(object);
+            object.createdAt = new Date(object.createdAt);
             transactions[object.index] = object;
             if (live) modules[object.module].update(object.index,
                 object.description,

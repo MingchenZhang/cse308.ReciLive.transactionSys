@@ -35,6 +35,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
             playedTime = new Date(playedTime.getTime() + 1000);
 
             slider.val((playedTime - startTime) / (totalTime - startTime) * 100);
+            slider.prop( "disabled", false );
             updateTimeLine(slider, totalTime, playedTime, replayMode);
         }, 1000)
     }
@@ -95,8 +96,8 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
                 });
             } else {
                 //no transaction when user get in
-                slider.disable();
-                reject();
+                slider.prop( "disabled", true );
+                resolve();
             }
         }).then(function () {
             timeSysSycTimer = setInterval(function () {
