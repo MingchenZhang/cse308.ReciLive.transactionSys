@@ -41,9 +41,9 @@ function TransactionSystem(path) {
     function watchdogHandler() {
         console.assert(!live);
         var currentTimeOffset = new Date() - currentTime;
-        var pastaCurrentTime = new Date(currentTimeOffset + pastaTime);
+        var pastaCurrentTime = new Date(currentTimeOffset + pastaTime.getTime());
         for (var i = currentPlayedIndex + 1; i < transactions.length; i++) {
-            if (transactions[i].createdAt < pastaCurrentTime) {
+            if (new Date(transactions[i].createdAt) < pastaCurrentTime) {
                 modules[transactions[i].module].update(i,
                     transactions[i].description,
                     transactions[i].createdBy,
