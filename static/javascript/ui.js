@@ -88,8 +88,9 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
                 });
             } else {
                 //no transaction when user get in
+                console.log('no teacher in class room');
                 slider.prop( "disabled", true );
-                resolve();
+                reject('student waiting for instructor return');
             }
         }).then(function () {
             timeTick();
@@ -100,7 +101,6 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
             attachListener(slider)
         }).catch(function (e) {
             // handle for teacher's return
-            console.log("student waiting for instructor return");
             console.error(e);
 
         });
