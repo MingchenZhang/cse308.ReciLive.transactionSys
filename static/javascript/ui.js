@@ -24,19 +24,12 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
     function timeTick() {
         //sey interval for the timer add total time and played time
         sliderTime = setInterval(function () {
-            totalTime = new Date(totalTime.getTime() + 1000);
-            console.log('played time +1:',totalTime);
+            totalTime = new Date(totalTime.getTime() + 100);
+            playedTime = new Date(playedTime.getTime() + 100);
+            console.log('played time +0.1:',totalTime);
+            console.log('played time +0.1:',playedTime);
             updateTimeLine(slider, totalTime, playedTime, replayMode);
-        }, 1000)
-    }
-
-    function playedTimerTick() {
-        //sey interval for the timer add total time and played time
-        playedTimer = setInterval(function () {
-            playedTime = new Date(playedTime.getTime() + 1000);
-            console.log('played time +1:',playedTime);
-            updateTimeLine(slider, totalTime, playedTime, replayMode);
-        }, 1000)
+        }, 100)
     }
 
     function startUpdateTotal() {
@@ -71,7 +64,6 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
                     playedTime = new Date(parseInt(slider.val()) * (sysTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
                     transactionSystem.switchTime(playedTime);
                     soundTransactionSystem.jumpTo(playedTime);
-                    playedTimerTick();
                 });
             }
         });
