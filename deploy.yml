@@ -23,6 +23,7 @@
         Environment=HTTPS_PORT=443
         Environment=HTTPS_KEY_PATH=/etc/letsencrypt/live/room.recilive.stream/privkey.pem
         Environment=HTTPS_CERT_PATH=/etc/letsencrypt/live/room.recilive.stream/fullchain.pem
+        Environment=NODE_ENV=production
         ExecStart=/usr/bin/node app.js
 
         [Install]

@@ -62,6 +62,10 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         }
     };
 
+    this.jumpTo = function (date) {
+        connection.send(JSON.stringify({type:"jump_to", startAt: date}));
+    };
+
     this.disconnect = function () {
         connection.close();
         connection = null;
