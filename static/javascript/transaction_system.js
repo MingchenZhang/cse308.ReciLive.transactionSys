@@ -63,6 +63,7 @@ function TransactionSystem(path) {
 
 
     this.switchTime = function (time) {
+        console.log("someone call switchTime:"+time);
         function findKeyTransaction(moduleName, time, isNotIncremental) {
             if (isNotIncremental) {
                 for (var i = transactions.length - 1; i >= 0; i--) {

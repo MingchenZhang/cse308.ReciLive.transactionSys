@@ -33,7 +33,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
         playedTimer = setInterval(function () {
             playedTime = new Date(totalTime.getUTCMilliseconds() + 1000);
 
-            slider.val((playedTime-startTime)/(totalTime-startTime)*100);
+            slider.val((playedTime - startTime) / (totalTime - startTime) * 100);
             updateTimeLine(slider, totalTime, playedTime, replayMode);
         }, 1000)
     }
@@ -48,13 +48,8 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
         }).then(timeTick());
     }
 
-    function detachListener(slider) {
-        slider.off();
-
-    }
-
     function attachListener(slider) {
-        slider.change('change mousemove', function () {
+        slider.change('change', function () {
             //user change time
             if (parseInt(slider.val()) == 100) {
                 //jump to live
@@ -80,11 +75,10 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
     }
 
     function updateTimeLine(slider, totalTime, playedTime) {
-        detachListener(slider);
+        slider.off();
         //add node
         attachListener(slider);
     }
-
 
     self.init = function () {
         new Promise(function (resolve, reject) {

@@ -88,6 +88,9 @@
 </div>
 
 <script>
+    var audioCtx;
+    var soundSystem;
+
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     transactionSystem.userID = parseInt("<%= userID %>");
     soundControlSystem = new SoundControl(transactionSystem);
@@ -97,7 +100,7 @@
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
-    sliderController = new uiController(soundControlSystem,transactionSystem, $('.slider__range'));
+    sliderController = new uiController(soundSystem,transactionSystem, $('.slider__range'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
@@ -120,8 +123,6 @@
         console.log('ready');
     });
 
-    var audioCtx;
-    var soundSystem;
 
 
     function activateSound() {
