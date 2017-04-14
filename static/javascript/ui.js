@@ -25,6 +25,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
         //sey interval for the timer add total time and played time
         sliderTime = setInterval(function () {
             totalTime = new Date(totalTime.getTime() + 1000);
+            console.log('played time +1:',totalTime);
             updateTimeLine(slider, totalTime, playedTime, replayMode);
         }, 1000)
     }
@@ -33,9 +34,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
         //sey interval for the timer add total time and played time
         playedTimer = setInterval(function () {
             playedTime = new Date(playedTime.getTime() + 1000);
-
-            slider.val((playedTime - startTime) / (totalTime - startTime) * 100);
-            slider.prop( "disabled", false );
+            console.log('played time +1:',playedTime);
             updateTimeLine(slider, totalTime, playedTime, replayMode);
         }, 1000)
     }
@@ -80,6 +79,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
 
     function updateTimeLine(slider, totalTime, playedTime) {
         //TODO: update time node
+        slider.val((playedTime - startTime) / (totalTime - startTime) * 100);
     }
 
     self.init = function () {
@@ -100,7 +100,8 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
                 resolve();
             }
         }).then(function () {
-            timeSysSycTimer = setInterval(function () {
+            timeTick();
+            timeSysTimer = setInterval(function () {
                 startUpdateTotal();
             }, 30000);
         }).then(function () {
