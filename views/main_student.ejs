@@ -88,8 +88,10 @@
 </div>
 
 <script>
-    var audioCtx;
-    var soundSystem;
+    eventRate = 2048;
+
+    audioCtx = new AudioContext();
+    soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);;
 
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     transactionSystem.userID = parseInt("<%= userID %>");
@@ -126,8 +128,6 @@
 
 
     function activateSound() {
-        var eventRate = 2048;
-
         return new Promise(function (resolve, reject) {
             if (!navigator.getUserMedia)
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
@@ -152,9 +152,8 @@
             var AudioContext = window.AudioContext || window.webkitAudioContext;
 
             function start_microphone(stream) {
-                audioCtx = new AudioContext();
                 console.log('native sample rate: ' + audioCtx.sampleRate);
-                soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);
+                soundSystem
                 if (soundControlSystem.asListener) soundSystem.receiveFlag = true;
                 soundSystem.connect();
                 var microphone_stream = audioCtx.createMediaStreamSource(stream);
