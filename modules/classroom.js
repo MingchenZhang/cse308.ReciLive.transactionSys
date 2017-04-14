@@ -35,9 +35,9 @@ exports.getRoute = function (s) {
             description,
             payload,
             createdBy,
-        }).then(()=> {
+        }).then(() => {
             res.send({status: 'ok'});
-        }).catch((err)=> {
+        }).catch((err) => {
             var message = {status: 'error'};
             if (err.reason) message.reason = err.reason;
             else err.reason = 7;
@@ -48,8 +48,8 @@ exports.getRoute = function (s) {
 
     router.get('/my_privilege', function (req, res, next) {
         var privilege = req.classroomSession.privilege[req.userLoginInfo.userID];
-        if(privilege) return res.send({status:'ok', privilege: privilege});
-        else return res.send({status:'error', reason: 2});
+        if (privilege) return res.send({status: 'ok', privilege: privilege});
+        else return res.send({status: 'error', reason: 2});
     });
 
     return router;

@@ -20,9 +20,9 @@ exports.getRoute = function (s) {
             startDate: req.body.startDate,
             endDate: req.body.endDate,
             status: req.body.status
-        }).then(()=> {
+        }).then(() => {
             res.send({status: "ok"});
-        }).catch((err)=> {
+        }).catch((err) => {
             res.send({status: "error", reason: err.reason});
         });
     });
@@ -30,11 +30,11 @@ exports.getRoute = function (s) {
     router.use('/room/:classroomNumber', function (req, res, next) {
         req.classroomNumber = parseInt(req.params.classroomNumber);
         req.classroomSession = s.sessionManager.getSession(req.classroomNumber);
-        if(!req.userLoginInfo) return res.status(401).send("please login first");
+        if (!req.userLoginInfo) return res.status(401).send("please login first");
         if (req.classroomSession) {
-            if (req.classroomSession.userInSession(req.userLoginInfo.userID)){
+            if (req.classroomSession.userInSession(req.userLoginInfo.userID)) {
                 next();
-            }else{
+            } else {
                 res.status(401);
             }
         } else {
@@ -47,15 +47,22 @@ exports.getRoute = function (s) {
             if (!req.body.hasOwnProperty(key)) continue;
             res.cookie(key, req.body[key], {});
         }
-        res.send({status:"ok"});
+        res.send({status: "ok"});
     });
     router.get('/give_cookie', jsonParser, function (req, res, next) {
         for (var key in req.query) {
             if (!req.query.hasOwnProperty(key)) continue;
             res.cookie(key, req.query[key], {});
         }
-        res.send({status:"ok"});
+        res.send({status: "ok"});
     });
-
+    router.post('/current_time', jsonParser, (req, res, next) => {
+        res.send({status:"ok",time:(new Date()).toISOString()});
+        //TODO: send end time if there is one
+    });
+    router.get('/current_time', jsonParser, (req, res, next) => {
+        res.send({status:"ok",time:(new Date()).toISOString()});
+        //TODO: send end time if there is one
+    });
     return router;
 };

@@ -7,7 +7,7 @@ function TransactionSystem(path) {
     var latestReady = null;
     var modules = {};
     var live = true;
-    
+
     var watchdog = null; // used for non live update
     var pastaTime = null;// user chosen time in transaction record
     var currentTime = null;// current time when user click on replay or review button
@@ -15,7 +15,7 @@ function TransactionSystem(path) {
     //TODO: change current time to relative time soon™
     this.privilege = null; // assign by outside
     this.userID = null; // assign by outside
-    
+
     this.init = function () {
         connection = new wsConnection(path, sendStart, receive, false);
         var ready, fail;
@@ -34,7 +34,7 @@ function TransactionSystem(path) {
             startAt: ((transactions.length > 0) ? transactions.length : 0)
         }));
     }
-    
+
     function watchdogHandler() {
         console.assert(!live);
         var currentTimeOffset = new Date() - currentTime;
@@ -46,7 +46,7 @@ function TransactionSystem(path) {
                     transactions[i].createdBy,
                     transactions[i].createdAt,
                     transactions[i].payload);
-                
+
             } else {
                 currentPlayedIndex = i - 1;
                 return;
@@ -57,7 +57,8 @@ function TransactionSystem(path) {
         // TODO: Added vex dialog
         clearInterval(watchdog);
     }
-    
+
+
     this.switchTime = function (time) {
         function findKeyTransaction(moduleName, time, isNotIncremental) {
             if (isNotIncremental) {
@@ -71,7 +72,7 @@ function TransactionSystem(path) {
                 return 0; // TODO: find transaction
             }
         }
-        
+
         //check time param
         if (!time && live)return;
         //TODO: time greater than latest transaction
@@ -107,6 +108,7 @@ function TransactionSystem(path) {
             clearInterval(watchdog);
         } else {
             // switch to this time
+            //change the percentage to time first
             live = false;
             pastaTime = time;
             currentTime = new Date();
@@ -128,7 +130,7 @@ function TransactionSystem(path) {
                     if (keyTrans < 0)return;//-1
                     for (var j = keyTrans; j < transactions.length; j++) {
                         if (time < transactions[j].createdAt) {
-                            if (currentPlayedIndex < j-1) currentPlayedIndex = j-1;
+                            if (currentPlayedIndex < j - 1) currentPlayedIndex = j - 1;
                             break;
                         }
                         if (transactions[j].module == module.moduleName) {
@@ -145,7 +147,7 @@ function TransactionSystem(path) {
             watchdog = setInterval(watchdogHandler, 50);
         }
     };
-    
+
     function receive(e) {
         var object = JSON.parse(e.data);
         if (object.type == 'latest_sent') {
@@ -164,14 +166,14 @@ function TransactionSystem(path) {
         }
         // TODO: process error message
     }
-    
+
     this.registerModule = function (moduleName, module) {
         modules[moduleName] = module;
     };
-    
+
     this.newTransaction = function (module, description, payload) {
         var attemptInterval = 200;
-        
+
         function sendAttempt(err) {
             return new Promise(function (resolve, reject) {
                 var index = ((transactions.length > 0) ? transactions.length : 0);
@@ -197,7 +199,7 @@ function TransactionSystem(path) {
                 });
             });
         }
-        
+
         function failDelay(err) {
             return new Promise(function (resolve, reject) {
                 if (err.reason == 1)
@@ -207,7 +209,7 @@ function TransactionSystem(path) {
                 setTimeout(reject.bind(null, err), attemptInterval);
             });
         }
-        
+
         var p = Promise.reject(new Error('nothing is wrong'));
         for (var i = 0; i < 10; i++) {
             p = p.catch(sendAttempt).catch(failDelay);
@@ -218,7 +220,7 @@ function TransactionSystem(path) {
         });
         return p;
     };
-    
+
 }
 
 function transaction() {
@@ -234,7 +236,7 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
     var self = this;
     var ws;
     var reconnectPending = false;
-    
+
     this.connect = function () {
         // console.error('connect called');
         ws = createWebSocket(destination);
@@ -247,7 +249,7 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
         ws.addEventListener('close', function () {
             if (!reconnectPending) {
                 console.log('connection to %s closed, reconnect in 1 second', destination);
-                setTimeout(()=> {
+                setTimeout(() => {
                     self.connect();
                     reconnectPending = false;
                 }, 1000);
@@ -258,7 +260,7 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
             if (!reconnectPending) {
                 console.log('connection to %s failed, reconnect in 3 second', destination);
                 ws.close();
-                setTimeout(()=> {
+                setTimeout(() => {
                     self.connect();
                     reconnectPending = false;
                 }, 3000);
@@ -266,17 +268,17 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
             }
         });
     };
-    
+
     function createWebSocket(path) {
         var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
         return new WebSocket(protocolPrefix + '//' + location.host + path, 'transaction');
     }
-    
+
     this.send = function (data) {
         if (ws.readyState != ws.OPEN && ws.readyState != ws.CONNECTING) {
             console.log('writing while websocket is not opened, reconnect in 0,5 second');
             if (!reconnectPending) {
-                setTimeout(()=> {
+                setTimeout(() => {
                     self.connect();
                     reconnectPending = false;
                 }, 500);
@@ -293,19 +295,19 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
             ws.send(data);
         }
     };
-    
+
     this.reset = function () {
         ws.close();
-        
+
     };
 }
 
 function module(transactionSystem) {
-    
+
     this.update = function (index, description, createdBy, createdAt, payload) {
-        
+
     };
     this.reset = function () {
-        
+
     };
 }

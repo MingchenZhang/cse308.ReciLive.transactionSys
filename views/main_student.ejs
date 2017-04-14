@@ -77,7 +77,7 @@
                 <label id="next-slide" class="slide-next">&#x203a;</label>
             </div>
             <div class="slider">
-                <input class="slider__range" type="range" value="0" min="0" max="100">
+                <input class="slider__range" type="range" value="100" min="0" max="100">
             </div>
         </div>
         <div class="col-md-4" id="info-board">
@@ -97,6 +97,7 @@
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
+    sliderController = new uiController(soundControlSystem,transactionSystem, $('.slider__range'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
@@ -106,13 +107,17 @@
         url: window.location.href + '/my_privilege',
         type: 'get',
         dataType: 'json',
-    }).then((result)=> {
+    }).then((result) => {
         if (result.status == 'ok') {
             transactionSystem.privilege = result.privilege;
         } else throw result;
-    }).then(transactionSystem.init).then(slideModule.init).then(soundControlSystem.init).then(function (result) {
+    }).then(transactionSystem.init).then(function () {
+        //get all the previous transaction
+        slideModule.init();
+        sliderController.init();
+    }).then(soundControlSystem.init).then(function (result) {
         return activateSound();
-    }).then(()=> {
+    }).then(() => {
         vex.close(loadingDialog);
         console.log('ready');
     });
@@ -127,18 +132,18 @@
         return new Promise(function (resolve, reject) {
             if (!navigator.getUserMedia)
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                        navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                    navigator.mozGetUserMedia || navigator.msGetUserMedia;
             if (navigator.getUserMedia) {
                 navigator.getUserMedia({
-                            audio: true
-                        },
-                        function (stream) {
-                            start_microphone(stream);
-                        },
-                        function (e) {
-                            alert('Error capturing audio.');
-                            reject({reason: 'audio permission rejected'});
-                        }
+                        audio: true
+                    },
+                    function (stream) {
+                        start_microphone(stream);
+                    },
+                    function (e) {
+                        alert('Error capturing audio.');
+                        reject({reason: 'audio permission rejected'});
+                    }
                 );
             } else {
                 alert('getUserMedia not supported in this browser.');
