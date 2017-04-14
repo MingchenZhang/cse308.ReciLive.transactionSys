@@ -111,11 +111,9 @@
         if (result.status == 'ok') {
             transactionSystem.privilege = result.privilege;
         } else throw result;
-    }).then(transactionSystem.init).then(function () {
-        //get all the previous transaction
+    }).then(transactionSystem.init).then(soundControlSystem.init).then(function (result) {
         slideModule.init();
         sliderController.init();
-    }).then(soundControlSystem.init).then(function (result) {
         return activateSound();
     }).then(() => {
         vex.close(loadingDialog);

@@ -160,7 +160,7 @@ exports.session = function () {
         function sendSoundFrame(){
             var start = new Date();
             ws.send(ws.nextSoundFrame.data);
-            s.transactionRecord.getSoundCursor({sessionID, startAt: ws.nextSoundFrame.createdAt}).next().then((soundFrame)=>{
+            s.transactionRecord.getSoundCursor({sessionID:self.sessionID, startAt: ws.nextSoundFrame.createdAt}).next().then((soundFrame)=>{
                 if(!soundFrame) {
                     ws.nextSoundFrame = null;
                     return;
@@ -176,7 +176,7 @@ exports.session = function () {
             if(flags.binary){
                 //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
                 log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
-                s.transactionRecord.addSound({sessionID, createdAt: new Date(), data: message});
+                s.transactionRecord.addSound({sessionID:self.sessionID, createdAt: new Date(), data: message});
                 soundClients.forEach((client) => {
                     if(client.nextSoundFrame) return; // client is in playback mode
                     try {
@@ -195,7 +195,7 @@ exports.session = function () {
                 // {type: 'jump_to', startAt: iso date }
                 if(message.type == 'jump_to' && message.startAt){
                     var startAt = new Date(message.startAt);
-                    s.transactionRecord.getSoundCursor({sessionID, startAt}).next().then((soundFrame)=>{
+                    s.transactionRecord.getSoundCursor({sessionID:self.sessionID, startAt}).next().then((soundFrame)=>{
                         if(!soundFrame) {
                             ws.nextSoundFrame = null;
                             return;
