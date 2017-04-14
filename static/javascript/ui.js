@@ -36,26 +36,9 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
         }, 1000)
     }
 
-    function playedTimerStop() {
-        if (playedTime == null) {
-
-            console.log("playedTimer haven't set up");
-        } else {
-            clearInterval(playedTime);
-        }
-    }
-
-    function timeStop() {
-        if (sliderTime == null) {
-            //sliderTime not set up yet
-            console.log("sliderTime haven't set up");
-        } else {
-            clearInterval(sliderTime);
-        }
-    }
-
     function startUpdateTotal() {
-        timeStop();
+        //clean slider timer
+        if (sliderTime) clearInterval(sliderTime);
         //return a Promise
         return getServerTime().then(function (response) {
             //syc system time with total
@@ -74,7 +57,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
             if (ui.value == 100) {
                 //jump to live
                 replayMode = false;
-                if (playedTimer) playedTimerStop();
+                if (playedTimer) clearInterval(playedTime);
                 playedTime = null;
             } else {
                 getServerTime().then(function (response) {
