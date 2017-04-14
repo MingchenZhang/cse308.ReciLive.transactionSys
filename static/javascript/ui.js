@@ -32,6 +32,8 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
         //sey interval for the timer add total time and played time
         playedTimer = setInterval(function () {
             playedTime = new Date(totalTime.getUTCMilliseconds() + 1000);
+
+            slider.val((playedTime-startTime)/(totalTime-startTime)*100);
             updateTimeLine(slider, totalTime, playedTime, replayMode);
         }, 1000)
     }
@@ -52,9 +54,9 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
     }
 
     function attachListener(slider) {
-        slider.change(function (event, ui) {
+        slider.change('change mousemove', function () {
             //user change time
-            if (ui.value == 100) {
+            if (parseInt(slider.val()) == 100) {
                 //jump to live
                 replayMode = false;
                 if (playedTimer) clearInterval(playedTime);
@@ -62,8 +64,13 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
             } else {
                 getServerTime().then(function (response) {
                     sysTime = new Date(response.time);
-                    startTime = transactionSystem[0].createdAt;
-                    playedTime = ui.value * (sysTime - startTime) / 100 + startTime;
+                    if (transactionSystem.firstTransactionTime())
+                        startTime = new Date(transactionSystem.firstTransactionTime());
+                    else {
+                        console.log("no first transaction exsist");
+                        slider.val(100);
+                    }
+                    playedTime = parseInt(slider.val()) * (sysTime - startTime) / 100 + startTime;
                     transactionSystem.switchTime(playedTime);
                     soundTransactionSystem.jumpTo(playedTime);
                     playedTimerTick();
@@ -86,7 +93,7 @@ function uiController(soundTransactionSystem, transactionSystem, slider) {
                 //if user join after first transaction
 
                 return getServerTime().then(function (response) {
-                    startTime = transactionSystem[0].createdAt;
+                    startTime = new Date(transactionSystem[0].createdAt);
                     console.log("get start time from transaction system= " + startTime);
                     totalTime = new Date(response.time);
                     playedTime = null;

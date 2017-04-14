@@ -15,7 +15,10 @@ function TransactionSystem(path) {
     //TODO: change current time to relative time soon™
     this.privilege = null; // assign by outside
     this.userID = null; // assign by outside
-
+    this.firstTransactionTime = function () {
+        if (transactions[0])return transactions[0].createdAt;
+        return null;
+    };
     this.init = function () {
         connection = new wsConnection(path, sendStart, receive, false);
         var ready, fail;
@@ -79,24 +82,26 @@ function TransactionSystem(path) {
         if (!time) {
             // switch to live
             live = true;
-            modules.forEach(function (module) {
-                console.assert(module.reset);
-                module.reset();
-                if (module.isNotIncremental) {
-                    var keyTrans = findKeyTransaction(module.moduleName, new Date(), true);
+            for (var key in modules) {
+                // skip loop if the property is from prototype
+                if (!modules.hasOwnProperty(key)) continue;
+                console.assert(modules[key].reset);
+                modules[key].reset();
+                if (modules[key].isNotIncremental) {
+                    var keyTrans = findKeyTransaction(modules[key].moduleName, new Date(), true);
                     if (keyTrans < 0) return;
-                    module.update(keyTrans,
+                    modules[key].update(keyTrans,
                         transactions[keyTrans].description,
                         transactions[keyTrans].createdBy,
                         transactions[keyTrans].createdAt,
                         transactions[keyTrans].payload);
                 }
                 else {
-                    var keyTrans = findKeyTransaction(module.moduleName, new Date(), false);
+                    var keyTrans = findKeyTransaction(modules[key].moduleName, new Date(), false);
                     if (keyTrans < 0)return;//-1
                     for (var j = keyTrans; j < transactions.length; j++) {
-                        if (transactions[j].module == module.moduleName) {
-                            module.update(j,
+                        if (transactions[j].module == modules[key].moduleName) {
+                            modules[key].update(j,
                                 transactions[j].description,
                                 transactions[j].createdBy,
                                 transactions[j].createdAt,
@@ -104,7 +109,8 @@ function TransactionSystem(path) {
                         }
                     }
                 }
-            });
+
+            }
             clearInterval(watchdog);
         } else {
             // switch to this time
@@ -112,13 +118,14 @@ function TransactionSystem(path) {
             live = false;
             pastaTime = time;
             currentTime = new Date();
-            modules.forEach(function (module) {
-                console.assert(module.reset);
-                module.reset();
-                if (module.isNotIncremental) {
-                    var keyTrans = findKeyTransaction(module.moduleName, time, true);
+            for (var key in modules) {
+                if (!modules.hasOwnProperty(key)) continue;
+                console.assert(modules[key].reset);
+                modules[key].reset();
+                if (modules[key].isNotIncremental) {
+                    var keyTrans = findKeyTransaction(modules[key].moduleName, time, true);
                     if (keyTrans < 0) return;
-                    module.update(keyTrans,
+                    modules[key].update(keyTrans,
                         transactions[keyTrans].description,
                         transactions[keyTrans].createdBy,
                         transactions[keyTrans].createdAt,
@@ -126,15 +133,15 @@ function TransactionSystem(path) {
                     if (currentPlayedIndex < keyTrans) currentPlayedIndex = keyTrans;
                 }
                 else {
-                    var keyTrans = findKeyTransaction(module.moduleName, time, false);
+                    var keyTrans = findKeyTransaction(modules[key].moduleName, time, false);
                     if (keyTrans < 0)return;//-1
                     for (var j = keyTrans; j < transactions.length; j++) {
                         if (time < transactions[j].createdAt) {
                             if (currentPlayedIndex < j - 1) currentPlayedIndex = j - 1;
                             break;
                         }
-                        if (transactions[j].module == module.moduleName) {
-                            module.update(j,
+                        if (transactions[j].module == modules[key].moduleName) {
+                            modules[key].update(j,
                                 transactions[j].description,
                                 transactions[j].createdBy,
                                 transactions[j].createdAt,
@@ -143,7 +150,7 @@ function TransactionSystem(path) {
                     }
                     console.assert(j == transactions.length, "you are too fasssssst");
                 }
-            });
+            }
             watchdog = setInterval(watchdogHandler, 50);
         }
     };
