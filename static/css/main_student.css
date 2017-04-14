@@ -115,6 +115,9 @@
 }
 
 /* arrows */
+.slide-nav::selection {
+  background: transparent;
+}
 .slide-nav label {
     width: 200px;
     height: 100%;
@@ -137,3 +140,10 @@
 .slide-nav label:hover { opacity: 1; }
 
 .slide-nav .slide-next { right: 0; }
+
+.slide-next::selection {
+  background: transparent;
+}
+.slide-prev::selection {
+  background: transparent;
+}
