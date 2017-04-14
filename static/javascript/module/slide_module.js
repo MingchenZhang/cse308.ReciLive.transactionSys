@@ -3,7 +3,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
     var self = this;
     self.moduleName = 'slides';
     //slideList get all transaction in order
-    self.isIncremental = false;
+    self.isNotIncremental = true;
     self.slideList = [];
     //instructor img tag list
     self.slideDataList = [];
@@ -18,7 +18,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
         self.slideList = [];
         self.slideDataList = [];
         //check here for reset problem
-        if (showDiv.find('slide-img')) showDiv.find('slide-img').remove();
+        if (showDiv.find('#slide-img')) showDiv.find('#slide-img').remove();
         currentSlidesNumber = -1;
     };
 //clean canvas and show given img(URL or URI)
