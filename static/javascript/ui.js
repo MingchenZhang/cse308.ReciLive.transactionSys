@@ -38,7 +38,7 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
             });
         }
         else {
-            if (systemTimeUpdateCounter >= 300) {
+            if (systemTimeUpdateCounter >= 30) {
                 totalTimeInitAndServerTimeUpdater();
                 systemTimeUpdateCounter = 0;
             }
