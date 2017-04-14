@@ -10,6 +10,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         if(receiveResamplerSet[senderSampleRate]) return receiveResamplerSet[senderSampleRate];
         var appendByte = nativeSampleRate/senderSampleRate*consumeRate;
         receiveResamplerSet[senderSampleRate] = new Resampler(transmitionRate, nativeSampleRate, 1, Math.ceil(appendByte));
+        return receiveResamplerSet[senderSampleRate];
     }
 
     var receiverBuffer = new Queue();
@@ -27,8 +28,8 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         for(var i = 0; i<array.length; i++){
             receiverBuffer.enqueue(array[i]);
         }
-        console.log('sound received length: ' + array.length);
-        console.log('tailing 2: ' + receiverBuffer.getLength());
+        //console.log('sound received length: ' + array.length);
+        //console.log('tailing 2: ' + receiverBuffer.getLength());
     };
 
     this.connect = function () {
