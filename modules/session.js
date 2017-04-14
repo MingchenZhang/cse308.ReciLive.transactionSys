@@ -271,12 +271,17 @@ exports.session = function () {
 
             function getMore() {
                 cursor.next((err, result) => {
-                    if (err) reject(err);
-                    if (result) {
-                        if (sendNext(result)) getMore();
-                    } else {
-                        sendNext(null);
-                        resolve();
+                    try{
+                        if (err) reject(err);
+                        if (result) {
+                            if (sendNext(result)) getMore();
+                        } else {
+                            sendNext(null);
+                            resolve();
+                        }
+                    }catch (e) {
+                        log.error(e);
+                        return reject(e);
                     }
                 });
             }
