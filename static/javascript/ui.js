@@ -1,108 +1,83 @@
 //ui controller
-function uiController(soundTransactionSystem, transactionSystem, slider) {
-    var self = this;
-    var playedTime = null;
-    //playedTime = null in live mode
-    var replayMode = false;
+var UIController = function (soundTransactionSystem, transactionSystem, slider) {
+    self = this;
+
     var totalTime = null;
     var startTime = null;
-    var sliderTime = null;
-    var playedTimer = null;
+    var playedTime = null;
+    var timer = null;
+    var systemTimeUpdateCounter = null;
+    var liveMode = null;
+    //teacher may not in the room
 
-    function getServerTime() {
+
+    function totalTimeInitAndServerTimeUpdater() {
         return $.ajax({
-            url: 'http://localhost/current_time',//TODO: change this to gae server
+            url: 'http://localhost/current_time',
             type: "POST",
             data: JSON.stringify({
                 type: "time"
             }),
             contentType: "application/json",
-        });
-
-    }
-
-    function timeTick() {
-        //sey interval for the timer add total time and played time
-        sliderTime = setInterval(function () {
-            totalTime = new Date(totalTime.getTime() + 100);
-            playedTime = new Date(playedTime.getTime() + 100);
-            console.log('played time +0.1:',totalTime);
-            console.log('played time +0.1:',playedTime);
-            updateTimeLine(slider, totalTime, playedTime, replayMode);
-        }, 100)
-    }
-
-    function startUpdateTotal() {
-        //clean slider timer
-        //if (sliderTime) clearInterval(sliderTime);
-        //return a Promise
-        return getServerTime().then(function (response) {
-            //syc system time with total
+        }).then(function (response) {
             totalTime = new Date(response.time);
-            console.log("total time syc with server time:" + totalTime);
+            if (liveMode) playedTime = totalTime;
+            if (!startTime) console.error("you should get a start time befoer total time init");
         });
     }
 
+    function sliderUpdater() {
+        if (!startTime && !transactionSystem.firstTransactionTime())return;
+        else if (!startTime && transactionSystem.firstTransactionTime()) {
+            liveMode = true;
+            startTime = transactionSystem.firstTransactionTime();
+            totalTimeInitAndServerTimeUpdater().then(function () {
+                slider.prop('disabled',false);
+                attachListener(slider);
+                setTimeout(sliderUpdater, 0);
+            });
+        }
+        else {
+            if (systemTimeUpdateCounter >= 300) {
+                totalTimeInitAndServerTimeUpdater();
+                systemTimeUpdateCounter = 0;
+            }
+            //run  every 0.1 second
+            playedTime = new Date(playedTime.getTime() + 100);
+            totalTime = new Date(totalTime.getTime() + 100);
+            slider.val((playedTime - startTime) / (totalTime - startTime) * 100);
+            systemTimeUpdateCounter++;
+            //TODO:check if class over
+            setTimeout(sliderUpdater, 1000);
+        }
+    }
+
+    self.init = function () {
+        //get start time
+        if (transactionSystem.firstTransactionTime()) {
+            setTimeout(sliderUpdater, 1000);
+        } else {
+            //no first transaction teacher haven't get in to room
+            slider.prop('disabled',true);
+            setTimeout(sliderUpdater, 1000);
+        }
+    };
     function attachListener(slider) {
         slider.change('change', function () {
             //user change time
             //slider.val will get int
             if (parseInt(slider.val() == 100)) {
                 //jump to live
-                replayMode = false;
-                if (playedTimer) clearInterval(playedTime);
-                playedTime = null;
+                liveMode = true;
+                playedTime = totalTime;
             } else {
-                getServerTime().then(function (response) {
-                    var sysTime = new Date(response.time);
-                    if (transactionSystem.firstTransactionTime())
-                        startTime = new Date(transactionSystem.firstTransactionTime());
-                    else {
-                        console.log("no first transaction exsist");
-                        slider.val(100);
-                    }
-                    playedTime = new Date(parseInt(slider.val()) * (sysTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
-                    transactionSystem.switchTime(playedTime);
-                    soundTransactionSystem.jumpTo(playedTime);
-                });
+                liveMode = false;
+                playedTime = new Date(slider.val() * (totalTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
+                transactionSystem.switchTime(playedTime);
+                soundTransactionSystem.jumpTo(playedTime);
             }
         });
     }
 
-    function updateTimeLine(slider, totalTime, playedTime) {
-        //TODO: update time node
-        slider.val((playedTime - startTime) / (totalTime - startTime) * 100);
-    }
 
-    self.init = function () {
-        new Promise(function (resolve, reject) {
-            //this promise set up the start time
-            if (transactionSystem.firstTransactionTime()) {
-                //if user join after first transaction
-                getServerTime().then(function (response) {
-                    startTime = new Date(transactionSystem.firstTransactionTime());
-                    console.log("get start time from transaction system= " + startTime);
-                    totalTime = new Date(response.time);
-                    playedTime = null;
-                    resolve();
-                });
-            } else {
-                //no transaction when user get in
-                console.log('no teacher in class room');
-                slider.prop( "disabled", true );
-                reject('student waiting for instructor return');
-            }
-        }).then(function () {
-            timeTick();
-            timeSysTimer = setInterval(function () {
-                startUpdateTotal();
-            }, 30000);
-        }).then(function () {
-            attachListener(slider)
-        }).catch(function (e) {
-            // handle for teacher's return
-            console.error(e);
-
-        });
-    }
 }

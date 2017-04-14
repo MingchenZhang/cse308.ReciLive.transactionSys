@@ -102,7 +102,7 @@
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
-    sliderController = new uiController(soundSystem,transactionSystem, $('.slider__range'));
+    sliderController = new UIController(soundSystem,transactionSystem, $('.slider__range'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
