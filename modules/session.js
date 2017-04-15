@@ -152,6 +152,8 @@ exports.session = function () {
 
     this.wsHandleSound = function (ws) {
         ws.nextSoundFrame = null; // the sound object to denote the next sound tobe send, null if live
+        ws.jumpRequestDate = null; // date the request was given
+        ws.jumpRequestTime = null; // requested date
 
         log.debug('start sound wsHandler. room id: ' + self.sessionID + ' user: ' + ws.userLoginInfo.userID);
         ws.roomSession = self;
@@ -170,7 +172,7 @@ exports.session = function () {
                     ws.nextSoundFrame = null;
                     return;
                 }
-                var delay = soundFrame.createdAt - ws.nextSoundFrame.createdAt - (new Date()-start);
+                var delay = soundFrame.createdAt - ws.jumpRequestTime - (new Date()-ws.jumpRequestDate);
                 log.debug('schedule to send sound frame in '+delay);
                 setTimeout(sendSoundFrame, delay);
                 ws.nextSoundFrame = soundFrame;
@@ -211,6 +213,8 @@ exports.session = function () {
                         }
                         setTimeout(sendSoundFrame, 0);
                         ws.nextSoundFrame = soundFrame;
+                        ws.jumpRequestDate = new Date();
+                        ws.jumpRequestTime = startAt;
                     });
                 }else if(message.type == 'jump_to' && !message.startAt){
                     ws.nextSoundFrame = null;
