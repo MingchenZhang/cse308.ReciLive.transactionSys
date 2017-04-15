@@ -15,12 +15,19 @@ function TransactionSystem(path) {
     //TODO: change current time to relative time soon™
     this.privilege = null; // assign by outside
     this.userID = null; // assign by outside
+
     this.firstTransactionTime = function () {
         if (transactions[0])return transactions[0].createdAt;
         return null;
     };
+
+    this.lastTransactionTime = function(){
+        if(transactions.length>0) return transactions[transactions.length-1].createdAt;
+        return null;
+    };
+
     this.init = function () {
-        connection = new wsConnection(path, sendStart, receive, false);
+        connection = new WSConnection(path, sendStart, receive, false);
         var ready, fail;
         latestReady = new Promise(function (resolve, reject) {
             ready = resolve;
@@ -29,8 +36,12 @@ function TransactionSystem(path) {
         latestReady.ready = ready;
         latestReady.fail = fail;
         connection.connect();
+
+        self.registerModule('admin', new AdminModule(self));
+
         return latestReady;
     };
+
     function sendStart() {
         connection.send(JSON.stringify({
             type: "initialization",
@@ -163,7 +174,7 @@ function TransactionSystem(path) {
             //transactions.push(object);
             object.createdAt = new Date(object.createdAt);
             transactions[object.index] = object;
-            if (live) modules[object.module].update(object.index,
+            if(live) modules[object.module].update(object.index,
                 object.description,
                 object.createdBy,
                 object.createdAt,
@@ -229,13 +240,12 @@ function TransactionSystem(path) {
         return p;
     };
 
+    this.startRecitation = function () {
+        return this.newTransaction('admin', {command: 'start_recitation'}, {});
+    };
+
     this.endRecitation = function () {
-        this.newTransaction('admin', {command: 'end_recitation'}, {}).then(()=>{
-            connection.reset();
-            soundSystem.disconnect();
-            document.dispatchEvent(events.endRecitation());
-            //document.addEventListener(events.endRecitation.type, (e)=>{}, false);
-        });
+        return this.newTransaction('admin', {command: 'end_recitation'}, {});
     };
 }
 
@@ -248,7 +258,7 @@ function transaction() {
     this.payload = null;
 }
 
-function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
+function WSConnection(destination, onConnectCallback, receiveCallback, resend) {
     var self = this;
     var ws;
     var reconnectPending = false;
@@ -323,6 +333,22 @@ function module(transactionSystem) {
 
     this.update = function (index, description, createdBy, createdAt, payload) {
 
+    };
+    this.reset = function () {
+
+    };
+}
+
+function AdminModule(transactionSystem) {
+    var moduleName = 'admin';
+    var isNotIncremental = false;
+
+    this.update = function (index, description, createdBy, createdAt, payload) {
+        if(description.command == 'end_recitation'){
+            document.dispatchEvent(events.endRecitation({endAt: createdAt}));
+        }else if(description.command == 'start_recitation'){
+            document.dispatchEvent(events.startRecitation({endAt: createdAt}));
+        }
     };
     this.reset = function () {
 
