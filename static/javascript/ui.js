@@ -1,7 +1,6 @@
 //ui controller
 var UIController = function (soundTransactionSystem, transactionSystem, slider) {
     self = this;
-
     var totalTime = null;
     var startTime = null;
     var playedTime = null;
@@ -9,7 +8,7 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
     var systemTimeUpdateCounter = null;
     var liveMode = null;
     //teacher may not in the room
-
+    var updateInternvarSecond = 1000;
 
     function totalTimeInitAndServerTimeUpdater() {
         return $.ajax({
@@ -43,23 +42,26 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
                 systemTimeUpdateCounter = 0;
             }
             //run  every 0.1 second
-            playedTime = new Date(playedTime.getTime() + 100);
-            totalTime = new Date(totalTime.getTime() + 100);
-            slider.val((playedTime - startTime) / (totalTime - startTime) * 100);
+            playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
+            totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
+            slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
+            console.log("current percentage:",slider.val());
+            console.log("total:",totalTime);
+            console.log("played:",playedTime);
             systemTimeUpdateCounter++;
             //TODO:check if class over
-            setTimeout(sliderUpdater, 1000);
+            setTimeout(sliderUpdater, updateInternvarSecond);
         }
     }
 
     self.init = function () {
         //get start time
         if (transactionSystem.firstTransactionTime()) {
-            setTimeout(sliderUpdater, 1000);
+            setTimeout(sliderUpdater, updateInternvarSecond);
         } else {
             //no first transaction teacher haven't get in to room
             slider.prop('disabled',true);
-            setTimeout(sliderUpdater, 1000);
+            setTimeout(sliderUpdater, updateInternvarSecond);
         }
     };
     function attachListener(slider) {
@@ -78,6 +80,4 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
             }
         });
     }
-
-
-}
+};
