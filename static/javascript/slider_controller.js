@@ -1,10 +1,9 @@
 //ui controller
-var UIController = function (soundTransactionSystem, transactionSystem, slider) {
+var replayController = function (soundTransactionSystem, transactionSystem, slider) {
     self = this;
     var totalTime = null;
     var startTime = null;
     var playedTime = null;
-    var timer = null;
     var systemTimeUpdateCounter = null;
     var liveMode = null;
     //teacher may not in the room

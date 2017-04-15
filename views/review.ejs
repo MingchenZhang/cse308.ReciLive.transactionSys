@@ -16,7 +16,7 @@
     <link href="../static/css/main_student.css" rel="stylesheet" type="text/css">
 
     <!--<script src="/static/javascript/bluebird.js"></script>-->
-    <script src="/static/javascript/slider_controller.js"></script>
+    <script src="/static/javascript/review_system.js"></script>
     <script src="/static/javascript/vex.combined.min.js"></script>
     <link href="/static/css/library/vex.css" rel="stylesheet" type="text/css">
     <link href="/static/css/library/vex-theme-default.css" rel="stylesheet" type="text/css">
@@ -90,15 +90,6 @@
 <script>
     eventRate = 2048;
 
-    events = {
-        fullyReady: new Event('fullyReady'),
-        disconnected: new Event('disconnected'),
-        endRecitation: new Event('endRecitation'),
-        switchToPlayBack: new Event('switchToPlayBack'),
-        switchToLive: new Event('switchToLive'),
-        workAreaRatioChange: new Event('workAreaRatioChange'),
-    };
-
     audioCtx = new AudioContext();
     soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);;
 
@@ -111,7 +102,7 @@
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
-    sliderController = new replayController(soundSystem,transactionSystem, $('.slider__range'));
+    sliderController = new reviewController(soundSystem,transactionSystem, $('.slider__range'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
