@@ -26,14 +26,17 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
     }
 
     function sliderUpdater() {
-        if (!startTime && !transactionSystem.firstTransactionTime())return;
+        if (!startTime && !transactionSystem.firstTransactionTime()) {
+            setTimeout(sliderUpdater,1000);
+            return;
+        }
         else if (!startTime && transactionSystem.firstTransactionTime()) {
             liveMode = true;
             startTime = transactionSystem.firstTransactionTime();
             totalTimeInitAndServerTimeUpdater().then(function () {
-                slider.prop('disabled',false);
+                slider.prop('disabled', false);
                 attachListener(slider);
-                setTimeout(sliderUpdater, 0);
+                sliderUpdater();
             });
         }
         else {
@@ -45,9 +48,9 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
             playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
             totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
             slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
-            console.log("current percentage:",slider.val());
-            console.log("total:",totalTime);
-            console.log("played:",playedTime);
+            console.log("current percentage:", slider.val());
+            console.log("total:", totalTime);
+            console.log("played:", playedTime);
             systemTimeUpdateCounter++;
             //TODO:check if class over
             setTimeout(sliderUpdater, updateInternvarSecond);
@@ -60,7 +63,7 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
             setTimeout(sliderUpdater, updateInternvarSecond);
         } else {
             //no first transaction teacher haven't get in to room
-            slider.prop('disabled',true);
+            slider.prop('disabled', true);
             setTimeout(sliderUpdater, updateInternvarSecond);
         }
     };
