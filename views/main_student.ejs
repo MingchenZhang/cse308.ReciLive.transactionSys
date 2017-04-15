@@ -90,13 +90,21 @@
 <script>
     eventRate = 2048;
 
+    function createEventConstructor(type){
+        var func = function (option) {
+            var event = new Event(type);
+            return Object.assign(event, option);
+        };
+        func.type = type;
+        return func;
+    }
     events = {
-        fullyReady: new Event('fullyReady'),
-        disconnected: new Event('disconnected'),
-        endRecitation: new Event('endRecitation'),
-        switchToPlayBack: new Event('switchToPlayBack'),
-        switchToLive: new Event('switchToLive'),
-        workAreaRatioChange: new Event('workAreaRatioChange'),
+        fullyReady: createEventConstructor('fullyReady'),
+        disconnected: createEventConstructor('disconnected'),
+        endRecitation: createEventConstructor('endRecitation'),
+        switchToPlayBack: createEventConstructor('switchToPlayBack'),
+        switchToLive: createEventConstructor('switchToLive'),
+        workAreaRatioChange: createEventConstructor('workAreaRatioChange'),
     };
 
     audioCtx = new AudioContext();
