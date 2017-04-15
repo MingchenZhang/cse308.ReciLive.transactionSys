@@ -93,6 +93,9 @@
 .slider__range:active::-webkit-slider-thumb {
     background: #1abc9c;
 }
+.slider__range::-webkit-slider-thumb:disabled {
+    background: #999999;
+}
 .slider__range::-moz-thumb {
     width: 20px;
     height: 20px;
@@ -102,6 +105,9 @@
     cursor: pointer;
     -webkit-transition: background .15s ease-in-out;
     transition: background .15s ease-in-out;
+}
+.slider__range::-moz-thumb:disabled {
+  background: #999999;
 }
 .slider__range::-moz-thumb:hover {
     background: #1abc9c;
