@@ -2,7 +2,7 @@
   width: 65%;
   padding-left: 0;
   padding-right: 0;
-  min-height: calc(100vh - 52px);
+  height: calc(100vh - 52px);
   /*background-color: #173e43;*/
   background: url("../img/l.png");
   background-size: 65%;
@@ -11,6 +11,8 @@
   background-size: cover;
   -o-background-size: cover;
 }
+
+
 .col-md-4 {
   width: 31%;
   padding-left: 0;

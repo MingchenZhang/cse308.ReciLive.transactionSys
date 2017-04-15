@@ -30,7 +30,7 @@
     <script src="/static/javascript/resampler.js"></script>
     <script src="/static/javascript/Queue.src.js"></script>
     <script src="/static/javascript/canvas_controller.js"></script>
-
+    <script src="/static/javascript/view_manager.js"></script>
 </head>
 
 <body>
@@ -71,12 +71,13 @@
             <span class="fa fa-download fa-2x download"></span>
         </div>
         <div class="col-md-6" id="slide-stage">
-
+            <div id="img-div"></div>
+            <div id="canvas-div"></div>
             <div class="slide-nav">
                 <label id="previous-slide" class="slide-prev">&#x2039;</label>
                 <label id="next-slide" class="slide-next">&#x203a;</label>
             </div>
-            <div class="slider">
+            <div id='slider-div' class="slider">
                 <input class="slider__range" type="range" value="100" min="0" step="0.000001" max="100">
             </div>
         </div>
@@ -114,12 +115,13 @@
     transactionSystem.userID = parseInt("<%= userID %>");
     soundControlSystem = new SoundControl(transactionSystem);
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem, $('#slide-stage'), $('#previous-slide'), $('#next-slide'));
+    slideModule = new Slide(transactionSystem, $('#img-div'), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName, chatModule);
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
     sliderController = new replayController(soundSystem,transactionSystem, $('.slider__range'));
+    viewManager = new view($('#slide-stage'));
     var loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
@@ -136,6 +138,7 @@
     }).then(transactionSystem.init).then(soundControlSystem.init).then(function (result) {
         slideModule.init();
         sliderController.init();
+        viewManager.init();
         return activateSound();
     }).then(() => {
         vex.close(loadingDialog);

@@ -13,6 +13,18 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
     //when there are multiple slides use in one recitation
     self.slidesNumber = -1;
     //reset ignore slidelist and clean up canvas
+
+
+    function getBinaryCode(URL) {
+
+        return $.ajax({
+            url: URL,
+            type: "GET",
+            dataType: "binary",
+            processData: false,
+        });
+    }
+
     self.reset = function () {
         self.ignoreTransaction = {};
         self.slideList = [];
@@ -159,11 +171,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                 nextButton.remove();
                 previousButton.remove();
                 resolve();
-
             })
-
         }
-
-
     }
+
 }

@@ -8,7 +8,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
     var liveMode = null;
     //teacher may not in the room
     var updateInternvarSecond = 1000;
-
+    var classEnd = null;
     function totalTimeInitAndServerTimeUpdater() {
         return $.ajax({
             url: 'http://localhost/current_time',
@@ -26,7 +26,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
 
     function sliderUpdater() {
         if (!startTime && !transactionSystem.firstTransactionTime()) {
-            setTimeout(sliderUpdater,1000);
+            setTimeout(sliderUpdater, 1000);
             return;
         }
         else if (!startTime && transactionSystem.firstTransactionTime()) {
@@ -56,13 +56,25 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         }
     }
 
+    function enrollEvent() {
+        document.addEventListener(events.endRecitation.type, classEnd);
+    }
+
+    function classEnd() {
+//TODO: need maek sure last transaction be set up before this function called
+        classEnd=true;
+     //no one should change total time after this
+        totalTime = transactionSystem.transaction[transactionSystem.transaction]
+    }
+
     self.init = function () {
-        if (transactionSystem.privilege.indexOf("admin") != -1){
+        enrollEvent()
+        if (transactionSystem.privilege.indexOf("admin") != -1) {
+            //instructor live
             slider.remove();
-            return;
         }
         //get start time
-        if (transactionSystem.firstTransactionTime()) {
+        else if (transactionSystem.firstTransactionTime()) {
             setTimeout(sliderUpdater, updateInternvarSecond);
         } else {
             //no first transaction teacher haven't get in to room
