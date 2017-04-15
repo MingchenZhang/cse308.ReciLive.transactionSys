@@ -100,7 +100,7 @@
         return func;
     }
     events = {
-        fullyReady: createEventConstructor('fullyReady'),
+        startRecitation: createEventConstructor('startRecitation'),
         disconnected: createEventConstructor('disconnected'),
         endRecitation: createEventConstructor('endRecitation'),
         switchToPlayBack: createEventConstructor('switchToPlayBack'),
@@ -122,11 +122,13 @@
     canvasController = new canvasontroller($('#CursorLayer'));
     sliderController = new replayController(soundSystem,transactionSystem, $('.slider__range'));
     viewManager = new view($('#slide-stage'));
-    var loadingDialog = vex.dialog.open({
+    var loadingDialog;
+    var prestartDialog;
+    loadingDialog = vex.dialog.open({
         message: 'page loading...',
         buttons: [],
         overlayClosesOnClick: false
-    })
+    });
     $.ajax({
         url: window.location.href + '/my_privilege',
         type: 'get',
@@ -135,13 +137,44 @@
         if (result.status == 'ok') {
             transactionSystem.privilege = result.privilege;
         } else throw result;
-    }).then(transactionSystem.init).then(soundControlSystem.init).then(function (result) {
+    }).then(transactionSystem.init).then(function(){
+        if(!transactionSystem.firstTransactionTime()){
+            // no transaction posted
+            return new Promise(function (resolve, reject) {
+                if (transactionSystem.privilege.indexOf('admin') >= 0) {
+                    // lecturer coming
+                    prestartDialog = vex.dialog.open({
+                        message: 'the class has not started yet',
+                        buttons: [{
+                            text: 'start class', type: 'button', className: 'vex-dialog-button-primary',
+                            click: function() {
+                                transactionSystem.startRecitation();
+                            }
+                        }],
+                        overlayClosesOnClick: false,
+                    });
+                } else {
+                    // student coming
+                    prestartDialog = vex.dialog.open({
+                        message: 'the class has not started yet',
+                        buttons: [],
+                        overlayClosesOnClick: false,
+                    });
+                }
+                document.addEventListener(events.startRecitation.type, (e)=>{
+                    resolve(e)
+                }, false);
+            });
+        }
+    }).then(function (event) {
+        if(prestartDialog) vex.close(prestartDialog);
+    }).then(soundControlSystem.init).then(function (result) {
         slideModule.init();
         sliderController.init();
         viewManager.init();
         return activateSound();
     }).then(() => {
-        vex.close(loadingDialog);
+        if(loadingDialog) vex.close(loadingDialog);
         console.log('ready');
     });
 
@@ -173,7 +206,6 @@
 
             function start_microphone(stream) {
                 console.log('native sample rate: ' + audioCtx.sampleRate);
-                soundSystem
                 if (soundControlSystem.asListener) soundSystem.receiveFlag = true;
                 soundSystem.connect();
                 var microphone_stream = audioCtx.createMediaStreamSource(stream);
