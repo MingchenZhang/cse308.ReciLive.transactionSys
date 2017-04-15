@@ -12,7 +12,7 @@ exports.getUserInfo = function (tokenID) {
     if (tokenID == "345")  return new When.resolve({userID: 345, name: "studentB"});
     return new When.promise((resolve, reject)=> {
         client.verifyIdToken(tokenID,
-            CLIENT_ID,
+            s.googleLoginClientID,
             function (e, login) {
                 if (e) {
                     console.error(e);
