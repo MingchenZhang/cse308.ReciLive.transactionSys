@@ -2,11 +2,10 @@ var GoogleAuth = require('google-auth-library');
 var When = require('when');
 var auth = new GoogleAuth;
 
-var CLIENT_ID = s.googleLoginClientID;
-
-var client = new auth.OAuth2(CLIENT_ID, '', '');
+var client = null;
 
 exports.getUserInfo = function (tokenID) {
+    if(!client) client = new auth.OAuth2(s.googleLoginClientID, '', '');
     //dummy user info
     if (tokenID == "123")  return new When.resolve({userID: 123, name: "instructor"});
     if (tokenID == "234")  return new When.resolve({userID: 234, name: "studentA"});

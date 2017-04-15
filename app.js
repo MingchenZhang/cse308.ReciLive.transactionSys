@@ -29,10 +29,10 @@ global.s = {
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb,
     dbPath: process.env.DB_PATH || 'mongodb://localhost:27017/',
+    googleLoginTool: require('./modules/google_login'),
     inProduction: process.env.NODE_ENV === 'production',
     googleLoginClientID: process.env.GOOGLE_LOGIN_CLIENT_ID,
 };
-s.googleLoginTool = require('./modules/google_login');
 
 s.transactionRecord = require('./database/transaction_record.js');
 s.transactionRecord.initDatabase(readyList);
