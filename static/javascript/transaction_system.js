@@ -231,8 +231,10 @@ function TransactionSystem(path) {
 
     this.endRecitation = function () {
         this.newTransaction('admin', {command: 'end_recitation'}, {}).then(()=>{
+            connection.reset();
             soundSystem.disconnect();
-            document.dispatchEvent(events.endRecitation.type);
+            document.dispatchEvent(events.endRecitation());
+            //document.addEventListener(events.endRecitation.type, (e)=>{}, false);
         });
     };
 }
@@ -312,7 +314,6 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
 
     this.reset = function () {
         ws.close();
-
     };
 }
 
