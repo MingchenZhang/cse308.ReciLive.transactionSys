@@ -24,6 +24,7 @@
         Environment=HTTPS_KEY_PATH=/etc/letsencrypt/live/room.recilive.stream/privkey.pem
         Environment=HTTPS_CERT_PATH=/etc/letsencrypt/live/room.recilive.stream/fullchain.pem
         Environment=NODE_ENV=production
+        Environment=GOOGLE_LOGIN_CLIENT_ID=42088802485-n1mb2q3d8gigkqoth61ca07nfthgk9hr.apps.googleusercontent.com
         ExecStart=/usr/bin/node app.js
 
         [Install]
