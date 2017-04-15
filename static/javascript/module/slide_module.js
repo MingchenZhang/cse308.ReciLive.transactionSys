@@ -45,7 +45,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
     };
 //init call after transaction finish load and get privilege info
     self.init = function () {
-        if (transactionSystem.privilege.indexOf("slides") != -1) var asController = 1;
+        if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;
         if (asController) {
             //as controller of slides
             self.loadAllSlides = function (slidesIndex) {

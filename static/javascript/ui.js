@@ -48,9 +48,9 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
             playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
             totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
             slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
-            console.log("current percentage:", slider.val());
-            console.log("total:", totalTime);
-            console.log("played:", playedTime);
+            //console.log("current percentage:", slider.val());
+            //console.log("total:", totalTime);
+            //console.log("played:", playedTime);
             systemTimeUpdateCounter++;
             //TODO:check if class over
             setTimeout(sliderUpdater, updateInternvarSecond);
@@ -58,6 +58,10 @@ var UIController = function (soundTransactionSystem, transactionSystem, slider) 
     }
 
     self.init = function () {
+        if (transactionSystem.privilege.indexOf("admin") != -1){
+            slider.remove();
+            return;
+        }
         //get start time
         if (transactionSystem.firstTransactionTime()) {
             setTimeout(sliderUpdater, updateInternvarSecond);
