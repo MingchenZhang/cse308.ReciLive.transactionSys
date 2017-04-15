@@ -11,7 +11,7 @@ exports.getRoute = function (s) {
 
     // classroom page
     router.get('/', function (req, res, next) {
-        res.render("main_student", {
+        res.render("live", {
             username: req.userLoginInfo.name,
             classroomNumber: req.classroomNumber,
             userID: req.userLoginInfo.userID
