@@ -61,7 +61,6 @@ function TransactionSystem(path) {
         clearInterval(watchdog);
     }
 
-
     this.switchTime = function (time) {
         console.log("transaction time switch to: "+time);
         function findKeyTransaction(moduleName, time, isNotIncremental) {
@@ -230,6 +229,12 @@ function TransactionSystem(path) {
         return p;
     };
 
+    this.endRecitation = function () {
+        this.newTransaction('admin', {command: 'end_recitation'}, {}).then(()=>{
+            soundSystem.disconnect();
+            document.dispatchEvent(events.endRecitation.type);
+        });
+    };
 }
 
 function transaction() {
@@ -312,6 +317,8 @@ function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
 }
 
 function module(transactionSystem) {
+    var moduleName;
+    var isNotIncremental;
 
     this.update = function (index, description, createdBy, createdAt, payload) {
 

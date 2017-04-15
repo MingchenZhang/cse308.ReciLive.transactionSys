@@ -90,6 +90,15 @@
 <script>
     eventRate = 2048;
 
+    events = {
+        fullyReady: new Event('fullyReady'),
+        disconnected: new Event('disconnected'),
+        endRecitation: new Event('endRecitation'),
+        switchToPlayBack: new Event('switchToPlayBack'),
+        switchToLive: new Event('switchToLive'),
+        workAreaRatioChange: new Event('workAreaRatioChange'),
+    };
+
     audioCtx = new AudioContext();
     soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);;
 
