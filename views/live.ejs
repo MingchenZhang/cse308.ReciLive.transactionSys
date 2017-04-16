@@ -102,10 +102,12 @@
         switchToPlayBack: createEventConstructor('switchToPlayBack'),
         switchToLive: createEventConstructor('switchToLive'),
         workAreaRatioChange: createEventConstructor('workAreaRatioChange'),
+        switchToSpeaker: createEventConstructor('switchToSpeaker'),
     };
 
     audioCtx = new AudioContext();
-    soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);;
+    console.log('native sample rate: ' + audioCtx.sampleRate);
+    soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);
 
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     transactionSystem.roomNumber = parseInt('<%= classroomNumber %>');
@@ -176,70 +178,66 @@
             $(".rec-ended-notification").css("display","block");
             // show the ended image
         }, false);
-
-        return activateSound();
     }).then(() => {
         if(loadingDialog) vex.close(loadingDialog);
         console.log('ready');
     });
 
-    function activateSound() {
+    var scriptProc = getAudioProc();
+    scriptProc.connect(audioCtx.destination);
+
+    audioProc = null;
+    microphoneGet = false;
+    function getAudioProc() {
+        if(audioProc) return audioProc;
+        var script_processor_node = audioCtx.createScriptProcessor(eventRate, 1, 1);
+        script_processor_node.onaudioprocess = function (audioProcessingEvent) {
+            var inputBuffer = audioProcessingEvent.inputBuffer;
+            var outputBuffer = audioProcessingEvent.outputBuffer;
+            var inputData = inputBuffer.getChannelData(0);
+            var outputData = outputBuffer.getChannelData(0);
+            if (soundControlSystem.asSpeaker && microphoneGet)
+                soundSystem.send(inputData);
+            if (soundControlSystem.asListener)
+                soundSystem.writeNextSoundBuffer(outputData);
+        };
+        audioProc = script_processor_node;
+        return script_processor_node;
+    }
+    function start_microphone() {
         return new Promise(function (resolve, reject) {
-            if(!soundControlSystem.asSpeaker) return start_microphone();
+            if(!soundControlSystem.asSpeaker) {
+                console.error('skipping microphone request');
+                return start_microphone();
+            }
             if (!navigator.getUserMedia)
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                    navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                        navigator.mozGetUserMedia || navigator.msGetUserMedia;
             if (navigator.getUserMedia) {
                 navigator.getUserMedia({
-                        audio: true
-                    },
-                    function (stream) {
-                        start_microphone(stream);
-                    },
-                    function (e) {
-                        alert('Error capturing audio.');
-                        reject({reason: 'audio permission rejected'});
-                    }
+                            audio: true
+                        },
+                        function (stream) {
+                            soundSystem.receiveFlag = !!soundControlSystem.asListener;
+                            soundSystem.connect();
+                            var microphone_stream = audioCtx.createMediaStreamSource(stream);
+                            var scriptProc = getAudioProc();
+                            microphone_stream.connect(scriptProc);
+                            microphoneGet = true;
+                            resolve();
+                        },
+                        function (e) {
+                            alert('Error capturing audio.');
+                            reject({reason: 'audio permission rejected'});
+                        }
                 );
             } else {
                 alert('getUserMedia not supported in this browser.');
                 reject({reason: 'getUserMedia not supported in this browser.'});
             }
-
-            function start_microphone(stream) {
-                console.log('native sample rate: ' + audioCtx.sampleRate);
-                if (soundControlSystem.asListener) soundSystem.receiveFlag = true;
-                soundSystem.connect();
-                if(stream){
-                    var microphone_stream = audioCtx.createMediaStreamSource(stream);
-                    //microphone_stream.connect(audioCtx.destination);
-                    var scriptProc = getAudioProc();
-                    microphone_stream.connect(scriptProc);
-                    scriptProc.connect(audioCtx.destination);
-                    //scriptProc.connect(audioCtx.createMediaStreamDestination());
-                }else{
-                    var scriptProc = getAudioProc();
-                    scriptProc.connect(audioCtx.destination);
-                }
-                return resolve();
-            }
-
-            function getAudioProc() {
-                var script_processor_node = audioCtx.createScriptProcessor(eventRate, 1, 1);
-                script_processor_node.onaudioprocess = function (audioProcessingEvent) {
-                    var inputBuffer = audioProcessingEvent.inputBuffer;
-                    var outputBuffer = audioProcessingEvent.outputBuffer;
-                    var inputData = inputBuffer.getChannelData(0);
-                    var outputData = outputBuffer.getChannelData(0);
-                    if (soundControlSystem.asSpeaker)
-                        soundSystem.send(inputData);
-                    if (soundControlSystem.asListener)
-                        soundSystem.writeNextSoundBuffer(outputData);
-                };
-                return script_processor_node;
-            }
         });
     }
+    document.addEventListener(events.switchToSpeaker.type, start_microphone, false);
 </script>
 </body>
 </html>

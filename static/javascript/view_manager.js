@@ -3,8 +3,7 @@ function view(stageDiv) {
 var imgDiv = stageDiv.find('#img-div');
 var canvasDiv = stageDiv.find('#canvas-div');
 var sliderDiv = stageDiv.find('#slider-div');
-    this.init = function()
-    {
+    this.init = function() {
         stageDiv.css('position','relative');
         imgDiv.css('position','absolute');
         canvasDiv.css('position','absolute');
@@ -13,6 +12,18 @@ var sliderDiv = stageDiv.find('#slider-div');
         imgDiv.css('width','100%');
         canvasDiv.css('height','100%');
         canvasDiv.css('width','100%')
+    };
+
+    this.getCanvas = function(){
+
+    };
+
+    this.getDiv = function(){
+
+    };
+
+    this.changeRatio = function(){
+
     };
 }
 

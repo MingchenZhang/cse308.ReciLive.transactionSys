@@ -33,6 +33,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
     };
 
     this.connect = function () {
+        if(connection) return;
         connection = new wsConnection(path, ()=>{}, receiveHandle, false);
         connection.connect();
     };
