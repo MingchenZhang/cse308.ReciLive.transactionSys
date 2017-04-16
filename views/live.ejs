@@ -107,6 +107,7 @@
     soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);;
 
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
+    transactionSystem.roomNumber = parseInt('<%= classroomNumber %>');
     transactionSystem.userID = parseInt("<%= userID %>");
     soundControlSystem = new SoundControl(transactionSystem);
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
