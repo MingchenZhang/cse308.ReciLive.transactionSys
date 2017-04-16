@@ -157,7 +157,8 @@
                     });
                 }
                 document.addEventListener(events.startRecitation.type, (e)=>{
-                    resolve(e)
+                    resolve(e);
+                    event.currentTarget.removeEventListener(event.type, cb);
                 }, false);
             });
         }
@@ -167,6 +168,13 @@
         slideModule.init();
         sliderController.init();
         viewManager.init();
+
+        document.addEventListener(events.endRecitation.type, (e)=>{
+            // if class has ended
+            $(".rec-ended-notification").css("display","block");
+            // show the ended image
+        }, false);
+
         return activateSound();
     }).then(() => {
         if(loadingDialog) vex.close(loadingDialog);
@@ -177,6 +185,7 @@
 
     function activateSound() {
         return new Promise(function (resolve, reject) {
+            if(!soundControlSystem.asSpeaker) return start_microphone();
             if (!navigator.getUserMedia)
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                     navigator.mozGetUserMedia || navigator.msGetUserMedia;
@@ -197,18 +206,21 @@
                 reject({reason: 'getUserMedia not supported in this browser.'});
             }
 
-            var AudioContext = window.AudioContext || window.webkitAudioContext;
-
             function start_microphone(stream) {
                 console.log('native sample rate: ' + audioCtx.sampleRate);
                 if (soundControlSystem.asListener) soundSystem.receiveFlag = true;
                 soundSystem.connect();
-                var microphone_stream = audioCtx.createMediaStreamSource(stream);
-                //microphone_stream.connect(audioCtx.destination);
-                var scriptProc = getAudioProc();
-                microphone_stream.connect(scriptProc);
-                scriptProc.connect(audioCtx.destination);
-                //scriptProc.connect(audioCtx.createMediaStreamDestination());
+                if(stream){
+                    var microphone_stream = audioCtx.createMediaStreamSource(stream);
+                    //microphone_stream.connect(audioCtx.destination);
+                    var scriptProc = getAudioProc();
+                    microphone_stream.connect(scriptProc);
+                    scriptProc.connect(audioCtx.destination);
+                    //scriptProc.connect(audioCtx.createMediaStreamDestination());
+                }else{
+                    var scriptProc = getAudioProc();
+                    scriptProc.connect(audioCtx.destination);
+                }
                 return resolve();
             }
 

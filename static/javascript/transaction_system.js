@@ -55,12 +55,17 @@ function TransactionSystem(path) {
         var pastaCurrentTime = new Date(currentTimeOffset + pastaTime.getTime());
         for (var i = currentPlayedIndex + 1; i < transactions.length; i++) {
             if (new Date(transactions[i].createdAt) < pastaCurrentTime) {
-                modules[transactions[i].module].update(i,
-                    transactions[i].description,
-                    transactions[i].createdBy,
-                    transactions[i].createdAt,
-                    transactions[i].payload);
-                console.log('watchdog updated %s', transactions[i].module);
+                try{
+                    modules[transactions[i].module].update(i,
+                        transactions[i].description,
+                        transactions[i].createdBy,
+                        transactions[i].createdAt,
+                        transactions[i].payload);
+                    console.log('watchdog updated %s', transactions[i].module);
+                }catch(e){
+                    console.error('watchdog updated %s encountered an error', transactions[i].module);
+                    console.error(e);
+                }
             } else {
                 currentPlayedIndex = i - 1;
                 return;
@@ -129,6 +134,7 @@ function TransactionSystem(path) {
             live = false;
             pastaTime = time;
             currentTime = new Date();
+            currentPlayedIndex = 0;
             for (var key in modules) {
                 if (!modules.hasOwnProperty(key)) continue;
                 console.assert(modules[key].reset);
@@ -162,6 +168,7 @@ function TransactionSystem(path) {
                     console.assert(j == transactions.length, "you are too fasssssst");
                 }
             }
+            clearInterval(watchdog);
             watchdog = setInterval(watchdogHandler, 50);
         }
     };

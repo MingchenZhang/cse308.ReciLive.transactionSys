@@ -66,6 +66,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
     this.jumpTo = function (date) {
         console.log('sound jump to: '+date);
         connection.send(JSON.stringify({type:"jump_to", startAt: date}));
+        receiverBuffer.empty();
     };
 
     this.disconnect = function () {
