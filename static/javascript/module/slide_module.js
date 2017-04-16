@@ -14,17 +14,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
     self.slidesNumber = -1;
     //reset ignore slidelist and clean up canvas
 
-
-    function getBinaryCode(URL) {
-
-        return $.ajax({
-            url: URL,
-            type: "GET",
-            dataType: "binary",
-            processData: false,
-        });
-    }
-
     self.reset = function () {
         self.ignoreTransaction = {};
         self.slideList = [];
@@ -36,12 +25,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
 //clean canvas and show given img(URL or URI)
     function showImage(imgBase64, showDiv) {
         let img = $('<img id="slide-img">');
-        img.on('load', function () {
-            showDiv.find('#slide-img').remove();
-            showDiv.append(img)
             //change the ratio and hight width
-        });
-        img.attr("src", imgBase64);
+        img.attr("src", "data:image/png;base64,"+imgBase64);
+        console.log(imgBase64);
+        showDiv.find('#slide-img').remove();
+        showDiv.append(img);
     }
 
     //update all the slides to front end transaction system
@@ -82,7 +70,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                                 return self.loadSlideFromURLList(response.payload);
                             }
                         }
-                    ).catch();
+                    ).catch(function (err) {
+                        console.error(err);
+                    });
             };
             self.loadSlideFromURLList = function (payload) {
                 let index = -1;
@@ -90,15 +80,27 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                 payload.URLList.forEach(function (url) {
                     index++;
                     let i = index;
-                    var image = new Image();
                     promiseList[i] = new Promise(function (resolve, reject) {
-                        image.id = i;
-                        image.onload = function () {
-                            //call after finish load
-                            self.slideDataList[i] = {id: i, slide64: self.getURI(image)};
-                            resolve();
+                        var oReq = new XMLHttpRequest();
+                        oReq.open("GET", url, true);
+                        oReq.responseType = "arraybuffer";
+
+                        oReq.onload = function (oEvent) {
+                            var arrayBuffer = oReq.response; // Note: not oReq.responseText
+                            if (arrayBuffer) {
+                                var bytes = new Uint8Array(arrayBuffer);
+                                var binary='';
+                                for (var j = 0; j < bytes.byteLength; j++) {
+                                    binary += String.fromCharCode(bytes[j]);
+                                }
+                                var base64 = window.btoa(binary);
+                                self.slideDataList[i]={slide64:base64,id:i};
+                                resolve();
+                            }
                         };
-                        image.src = url;
+
+                        oReq.send(null);
+
                     });
 
                 });
@@ -129,15 +131,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                     delete self.ignoreTransaction[id];
                 });
             };
-            self.getURI = function (img) {
-                let ctx = self.workCanvas.getContext('2d');
-                ctx.clearRect(0, 0, self.workCanvas.width, self.workCanvas.height);
-                //image is loaded by caller
-                ctx.drawImage(img, 0, 0);
-                console.log("loaded img ", img.id);
-                return self.slide64 = self.workCanvas.toDataURL();
-
-            };
 
             previousButton.on('click', function () {
                 if (self.currentSlidesNumber - 1 > -1) {
@@ -165,6 +158,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                 } else {
                     console.log("reconnect to classroom and instructor and get previous slides");
                 }
+            }).catch(function (err) {
+                console.error(err);
             });
         } else {
             return new Promise(function (resolve, reject) {
