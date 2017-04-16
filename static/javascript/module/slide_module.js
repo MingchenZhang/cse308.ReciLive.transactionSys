@@ -27,7 +27,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
         let img = $('<img id="slide-img">');
             //change the ratio and hight width
         img.attr("src", "data:image/png;base64,"+imgBase64);
-        console.log(imgBase64);
+        //console.log(imgBase64);
         showDiv.find('#slide-img').remove();
         showDiv.append(img);
     }

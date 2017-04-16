@@ -13,7 +13,6 @@ var sliderDiv = stageDiv.find('#slider-div');
         imgDiv.css('width','100%');
         canvasDiv.css('height','100%');
         canvasDiv.css('width','100%')
-
     };
 }
 

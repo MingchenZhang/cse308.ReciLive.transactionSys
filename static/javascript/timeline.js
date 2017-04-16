@@ -47,9 +47,9 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
             totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
             slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
-            //console.log("current percentage:", slider.val());
-            //console.log("total:", totalTime);
-            //console.log("played:", playedTime);
+            console.log("current percentage:", slider.val());
+            console.log("total:", totalTime);
+            console.log("played:", playedTime);
             systemTimeUpdateCounter++;
             //TODO:check if class over
             setTimeout(sliderUpdater, updateInternvarSecond);
@@ -64,7 +64,8 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
 //TODO: need maek sure last transaction be set up before this function called
         classEnd=true;
      //no one should change total time after this
-        totalTime = transactionSystem.transaction[transactionSystem.transaction]
+        totalTime = transactionSystem.lastTransactionTime();
+
     }
 
     self.init = function () {
