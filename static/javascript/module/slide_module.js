@@ -51,12 +51,12 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
             self.loadAllSlides = function (slidesIndex) {
                 //TODO: delete IDToken
                 return $.ajax({
-                    url: 'http://localhost/get_resource',//TODO: change this to gae server
+                    url: 'htttp://localhost:8080/get_resource',//TODO: change this to gae server
                     type: "POST",
                     data: JSON.stringify({
                         type: "slides",
                         index: slidesIndex,
-                        payload: {classNumber: classroomNumber, slidesNumber: 0, StartAt: 0, EndAt: -1}
+                        payload: {classNumber: transactionSystem.roomNumber, slidesNumber: 0, StartAt: 0, EndAt: -1}
                     }),
                     contentType: "application/json",
                 })
@@ -150,7 +150,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                     console.log("no next slide\n");
                 }
             });
-            return self.addDummySlides().then(function () {
+            return self.loadAllSlides().then(function () {
                 self.slidesNumber = 0;
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");

@@ -18,7 +18,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             }),
             contentType: "application/json",
         }).then(function (response) {
-            totalTime = new Date(response.time);
+            if(!classEnd)totalTime = new Date(response.time);
             if (liveMode) playedTime = totalTime;
             if (!startTime) console.error("you should get a start time befoer total time init");
         });
@@ -40,12 +40,12 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         }
         else {
             if (systemTimeUpdateCounter >= 30) {
-                totalTimeInitAndServerTimeUpdater();
+           if(!classEnd)     totalTimeInitAndServerTimeUpdater();
                 systemTimeUpdateCounter = 0;
             }
             //run  every 0.1 second
-            playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
-            totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
+            if(playedTime>=totalTime)playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
+            if(!classEnd)totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
             slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
             console.log("current percentage:", slider.val());
             console.log("total:", totalTime);
@@ -65,14 +65,17 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         classEnd=true;
      //no one should change total time after this
         totalTime = transactionSystem.lastTransactionTime();
-
+        if (transactionSystem.privilege.indexOf("admin") != -1) {
+            //instructor live
+            slider.show();
+        }
     }
 
     self.init = function () {
         enrollEvent()
         if (transactionSystem.privilege.indexOf("admin") != -1) {
             //instructor live
-            slider.remove();
+            slider.hide();
         }
         //get start time
         else if (transactionSystem.firstTransactionTime()) {

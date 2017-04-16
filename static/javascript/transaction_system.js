@@ -113,6 +113,7 @@ function TransactionSystem(path) {
                         transactions[keyTrans].payload);
                 }
                 else {
+                    //jump to a past time point
                     var keyTrans = findKeyTransaction(modules[key].moduleName, new Date(), false);
                     if (keyTrans < 0)return;//-1
                     for (var j = keyTrans; j < transactions.length; j++) {
