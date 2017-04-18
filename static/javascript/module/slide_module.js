@@ -22,13 +22,23 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
         if (showDiv.find('#slide-img')) showDiv.find('#slide-img').remove();
         currentSlidesNumber = -1;
     };
+    function getRatio(img) {
+        //check if document ready
+        return img[0].naturalHeight / img[0].naturalWidth;
+    }
+
 //clean canvas and show given img(URL or URI)
     function showImage(imgBase64, showDiv) {
         let img = $('<img id="slide-img">');
-            //change the ratio and hight width
-        img.attr("src", "data:image/png;base64,"+imgBase64);
+        //change the ratio and hight width
+        img.attr("src", "data:image/png;base64," + imgBase64);
         //console.log(imgBase64);
+
         showDiv.find('#slide-img').remove();
+        img.css('width', '100%');
+        //color border
+        img.css('border', '3px solid red');
+        viewManager.changeRatio(getRatio(img));
         showDiv.append(img);
     }
 
@@ -89,12 +99,12 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                             var arrayBuffer = oReq.response; // Note: not oReq.responseText
                             if (arrayBuffer) {
                                 var bytes = new Uint8Array(arrayBuffer);
-                                var binary='';
+                                var binary = '';
                                 for (var j = 0; j < bytes.byteLength; j++) {
                                     binary += String.fromCharCode(bytes[j]);
                                 }
                                 var base64 = window.btoa(binary);
-                                self.slideDataList[i]={slide64:base64,id:i};
+                                self.slideDataList[i] = {slide64: base64, id: i};
                                 resolve();
                             }
                         };
