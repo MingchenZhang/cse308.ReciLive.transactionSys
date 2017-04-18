@@ -83,7 +83,7 @@
 </div>
 
 <script>
-    document.domain = "recilive.stream";
+   // document.domain = "recilive.stream";
     eventRate = 2048;
 
     function createEventConstructor(type){
@@ -101,6 +101,7 @@
         switchToPlayBack: createEventConstructor('switchToPlayBack'),
         switchToLive: createEventConstructor('switchToLive'),
         workAreaRatioChange: createEventConstructor('workAreaRatioChange'),
+        switchToSpeaker: createEventConstructor('switchToSpeaker'),
     };
 
     audioCtx = new AudioContext();
@@ -110,7 +111,7 @@
     transactionSystem.roomNumber = parseInt('<%= classroomNumber %>');
     transactionSystem.userID = parseInt("<%= userID %>");
     soundControlSystem = new SoundControl(transactionSystem);
-    viewManager = new ViewManager($('#slide-stage'));
+    viewManager = new ViewManager($('.stage-view'));
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
     slideModule = new Slide(transactionSystem,viewManager.getDiv(), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName, chatModule);

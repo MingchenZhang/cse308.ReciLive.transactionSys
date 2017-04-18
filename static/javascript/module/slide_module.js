@@ -150,7 +150,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                     console.log("no next slide\n");
                 }
             });
-            return self.loadAllSlides().then(function () {
+            return self.addDummySlides().then(function () {
                 self.slidesNumber = 0;
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");

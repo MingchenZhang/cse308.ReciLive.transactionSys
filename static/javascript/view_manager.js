@@ -14,7 +14,7 @@ function ViewManager(stageDiv) {
     function resizeElem(elem, ratio, parent){
         var h = parent.innerHeight();
         var w = parent.innerWidth();
-        if(w/h > ratio){ // wider
+        if(h/w < ratio){ // wider
             elem.css('top', '0px');
             elem.css('bottom', '0px');
             var marginW = (w-h/ratio)/2.0;
@@ -31,7 +31,9 @@ function ViewManager(stageDiv) {
 
     this.getCanvas = function(){
         var elem = $('<canvas></canvas>')
-            .css('position','absolute').appendTo(stageDiv);
+            .css('position','absolute')
+            .css('border-style', 'solid')
+            .appendTo(stageDiv);
         views.push(elem);
         parentChangeHandler();
         return elem;
@@ -39,7 +41,9 @@ function ViewManager(stageDiv) {
 
     this.getDiv = function(){
         var elem = $('<div></div>')
-            .css('position','absolute').appendTo(stageDiv);
+            .css('position','absolute')
+            .css('border-style', 'solid')
+            .appendTo(stageDiv);
         views.push(elem);
         parentChangeHandler();
         return elem;
