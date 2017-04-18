@@ -61,7 +61,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
             self.loadAllSlides = function (slidesIndex) {
                 //TODO: delete IDToken
                 return $.ajax({
-                    url: 'htttp://recilive.stream/get_resource',//TODO: change this to gae server
+                    url: 'https://recilive.stream/get_resource',//TODO: change this to gae server
                     type: "POST",
                     data: JSON.stringify({
                         type: "slides",
