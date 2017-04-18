@@ -83,10 +83,10 @@
 </div>
 
 <script>
-   // document.domain = "recilive.stream";
+    document.domain = "recilive.stream";
     eventRate = 2048;
 
-    function createEventConstructor(type){
+    function createEventConstructor(type) {
         var func = function (option) {
             var event = new Event(type);
             return Object.assign(event, option);
@@ -105,7 +105,8 @@
     };
 
     audioCtx = new AudioContext();
-    soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);;
+    soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);
+    ;
 
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     transactionSystem.roomNumber = parseInt('<%= classroomNumber %>');
@@ -113,12 +114,12 @@
     soundControlSystem = new SoundControl(transactionSystem);
     viewManager = new ViewManager($('.stage-view'));
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem,viewManager.getDiv(), $('#previous-slide'), $('#next-slide'));
+    slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'));
     transactionSystem.registerModule(chatModule.moduleName, chatModule);
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
-    sliderController = new replayController(soundSystem,transactionSystem, $('.slider__range'));
+    sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'));
 
     var loadingDialog;
     var prestartDialog;
@@ -135,8 +136,8 @@
         if (result.status == 'ok') {
             transactionSystem.privilege = result.privilege;
         } else throw result;
-    }).then(transactionSystem.init).then(function(){
-        if(!transactionSystem.firstTransactionTime()){
+    }).then(transactionSystem.init).then(function () {
+        if (!transactionSystem.firstTransactionTime()) {
             // no transaction posted
             return new Promise(function (resolve, reject) {
                 if (transactionSystem.privilege.indexOf('admin') >= 0) {
@@ -145,7 +146,7 @@
                         message: 'the class has not started yet',
                         buttons: [{
                             text: 'start class', type: 'button', className: 'vex-dialog-button-primary',
-                            click: function() {
+                            click: function () {
                                 transactionSystem.startRecitation();
                             }
                         }],
@@ -159,34 +160,34 @@
                         overlayClosesOnClick: false,
                     });
                 }
-                document.addEventListener(events.startRecitation.type, function handler(e){
+                document.addEventListener(events.startRecitation.type, function handler(e) {
                     resolve(e);
                     event.currentTarget.removeEventListener(event.type, handler);
                 }, false);
             });
         }
     }).then(function (event) {
-        if(prestartDialog) vex.close(prestartDialog);
+        if (prestartDialog) vex.close(prestartDialog);
     }).then(soundControlSystem.init).then(function (result) {
         slideModule.init();
         sliderController.init();
         viewManager.init();
 
-        document.addEventListener(events.endRecitation.type, (e)=>{
+        document.addEventListener(events.endRecitation.type, (e) => {
             // if class has ended
-            $(".rec-ended-notification").css("display","block");
+            $(".rec-ended-notification").css("display", "block");
             // show the ended image
         }, false);
 
         return activateSound();
     }).then(() => {
-        if(loadingDialog) vex.close(loadingDialog);
+        if (loadingDialog) vex.close(loadingDialog);
         console.log('ready');
     });
 
     function activateSound() {
         return new Promise(function (resolve, reject) {
-            if(!soundControlSystem.asSpeaker) return start_microphone();
+            if (!soundControlSystem.asSpeaker) return start_microphone();
             if (!navigator.getUserMedia)
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                     navigator.mozGetUserMedia || navigator.msGetUserMedia;
@@ -211,14 +212,14 @@
                 console.log('native sample rate: ' + audioCtx.sampleRate);
                 if (soundControlSystem.asListener) soundSystem.receiveFlag = true;
                 soundSystem.connect();
-                if(stream){
+                if (stream) {
                     var microphone_stream = audioCtx.createMediaStreamSource(stream);
                     //microphone_stream.connect(audioCtx.destination);
                     var scriptProc = getAudioProc();
                     microphone_stream.connect(scriptProc);
                     scriptProc.connect(audioCtx.destination);
                     //scriptProc.connect(audioCtx.createMediaStreamDestination());
-                }else{
+                } else {
                     var scriptProc = getAudioProc();
                     scriptProc.connect(audioCtx.destination);
                 }
