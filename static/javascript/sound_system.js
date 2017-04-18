@@ -44,7 +44,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
             if(k<inputData.length)return inputData[k];return nativeSampleRate; // append source sample rate
         });
         connection.send(tobeSent.buffer);
-        console.log(tobeSent[0]);
+        //console.log(tobeSent[0]);
     };
 
     this.writeNextSoundBuffer = function (bufferToWrite) {
