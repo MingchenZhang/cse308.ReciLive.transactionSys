@@ -158,9 +158,9 @@
                         overlayClosesOnClick: false,
                     });
                 }
-                document.addEventListener(events.startRecitation.type, (e)=>{
+                document.addEventListener(events.startRecitation.type, function handler(e){
                     resolve(e);
-                    event.currentTarget.removeEventListener(event.type, cb);
+                    event.currentTarget.removeEventListener(event.type, handler);
                 }, false);
             });
         }
