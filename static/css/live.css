@@ -196,3 +196,11 @@ body {
 .slide-prev::selection {
   background: transparent;
 }
+
+.stage-view {
+    position: absolute;
+    top: 0;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+}
