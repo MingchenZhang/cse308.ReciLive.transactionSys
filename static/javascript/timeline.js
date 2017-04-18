@@ -47,6 +47,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             if(playedTime>=totalTime)playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
             if(!classEnd)totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
             slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
+            //TODO: delete this later
             console.log("current percentage:", slider.val());
             console.log("total:", totalTime);
             console.log("played:", playedTime);

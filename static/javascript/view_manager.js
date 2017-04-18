@@ -31,7 +31,7 @@ function ViewManager(stageDiv) {
 
     this.getCanvas = function(){
         var elem = $('<canvas></canvas>')
-            .css('position','absolute');
+            .css('position','absolute').appendTo(stageDiv);
         views.push(elem);
         parentChangeHandler();
         return elem;
@@ -39,7 +39,7 @@ function ViewManager(stageDiv) {
 
     this.getDiv = function(){
         var elem = $('<div></div>')
-            .css('position','absolute');
+            .css('position','absolute').appendTo(stageDiv);
         views.push(elem);
         parentChangeHandler();
         return elem;
