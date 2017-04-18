@@ -14,12 +14,11 @@
     <!-- Our CSS -->
     <link href="../static/css/live.css" rel="stylesheet" type="text/css">
 
-    <!--<script src="/static/javascript/bluebird.js"></script>-->
-    <script src="/static/javascript/timeline.js"></script>
     <script src="/static/javascript/vex.combined.min.js"></script>
     <link href="/static/css/library/vex.css" rel="stylesheet" type="text/css">
     <link href="/static/css/library/vex-theme-default.css" rel="stylesheet" type="text/css">
     <script>vex.defaultOptions.className = 'vex-theme-default'</script>
+    <script src="/static/javascript/css-element-query.js"></script>
 
     <script src="/static/javascript/transaction_system.js"></script>
     <script src="/static/javascript/module/chat_module.js"></script>
@@ -30,6 +29,7 @@
     <script src="/static/javascript/Queue.src.js"></script>
     <script src="/static/javascript/canvas_controller.js"></script>
     <script src="/static/javascript/view_manager.js"></script>
+    <script src="/static/javascript/timeline.js"></script>
 </head>
 
 <body>
@@ -120,7 +120,7 @@
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
     sliderController = new replayController(soundSystem,transactionSystem, $('.slider__range'));
-    viewManager = new view($('#slide-stage'));
+    viewManager = new ViewManager($('#slide-stage'));
     var loadingDialog;
     var prestartDialog;
     loadingDialog = vex.dialog.open({
