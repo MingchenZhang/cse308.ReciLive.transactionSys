@@ -18,7 +18,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             }),
             contentType: "application/json",
         }).then(function (response) {
-            totalTime = new Date(response.time);
+            if(!classEnd)totalTime = new Date(response.time);
             if (liveMode) playedTime = totalTime;
             if (!startTime) console.error("you should get a start time befoer total time init");
         });
@@ -40,15 +40,16 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         }
         else {
             if (systemTimeUpdateCounter >= 30) {
-                totalTimeInitAndServerTimeUpdater();
+           if(!classEnd)     totalTimeInitAndServerTimeUpdater();
                 systemTimeUpdateCounter = 0;
             }
             //run  every 0.1 second
-            playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
-            totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
+            if(playedTime>=totalTime)playedTime = new Date(playedTime.getTime() + updateInternvarSecond);
+            if(!classEnd)totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
             slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
+            //TODO: delete this later
             //console.log("current percentage:", slider.val());
-            //console.log("total:", totalTime);
+            console.log("total:", totalTime);
             //console.log("played:", playedTime);
             systemTimeUpdateCounter++;
             //TODO:check if class over
@@ -57,21 +58,26 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
     }
 
     function enrollEvent() {
-        document.addEventListener(events.endRecitation.type, classEnd);
+        document.addEventListener(events.endRecitation.type, classEndFunc);
     }
 
-    function classEnd() {
+    function classEndFunc() {
 //TODO: need maek sure last transaction be set up before this function called
         classEnd=true;
+        slider.off();
      //no one should change total time after this
-        totalTime = transactionSystem.transaction[transactionSystem.transaction]
+        totalTime = transactionSystem.lastTransactionTime();
+        if (transactionSystem.privilege.indexOf("admin") != -1) {
+            //instructor live
+            slider.show();
+        }
     }
 
     self.init = function () {
-        enrollEvent()
+        enrollEvent();
         if (transactionSystem.privilege.indexOf("admin") != -1) {
             //instructor live
-            slider.remove();
+            slider.hide();
         }
         //get start time
         else if (transactionSystem.firstTransactionTime()) {
@@ -86,15 +92,17 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         slider.change('change', function () {
             //user change time
             //slider.val will get int
-            if (parseInt(slider.val() == 100)) {
+            if (parseInt(slider.val() == 100)&&!classEnd) {
                 //jump to live
                 liveMode = true;
                 playedTime = totalTime;
-            } else {
+                document.dispatchEvent(events.switchToLive);
+            } else{
                 liveMode = false;
                 playedTime = new Date(slider.val() * (totalTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
                 transactionSystem.switchTime(playedTime);
                 soundTransactionSystem.jumpTo(playedTime);
+                document.dispatchEvent(events.switchToPlayBack);
             }
         });
     }

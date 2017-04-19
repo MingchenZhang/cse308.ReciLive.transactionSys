@@ -3,6 +3,7 @@ var BodyParser = require('body-parser');
 var When = require('when');
 var ParameterChecker = require('./parameterChecker');
 var MongoEscape = require('mongo-escape').escape;
+var Request = require("request");
 
 exports.getRoute = function (s) {
     var router = Express.Router({mergeParams: true});
@@ -50,6 +51,17 @@ exports.getRoute = function (s) {
         var privilege = req.classroomSession.privilege[req.userLoginInfo.userID];
         if (privilege) return res.send({status: 'ok', privilege: privilege});
         else return res.send({status: 'error', reason: 2});
+    });
+
+    router.get('/get_resource', function (req, res, next) {
+        Request({
+            method: 'POST',
+            url:"https://recilive.stream/get_resource",
+            json: {classNumber: req.classroomNumber}
+        }, (error, response, body)=>{
+            if(error) return res.status(400).send({status:"error", error, statusCode: response.statusCode});
+            return res.send(body);
+        });
     });
 
     return router;

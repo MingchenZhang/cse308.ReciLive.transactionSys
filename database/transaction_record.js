@@ -106,6 +106,12 @@ exports.deleteSession = function (param) {
     return sessionDB.sessionColl.deleteOne({sessionID: sessionID});
 };
 
+exports.setSessionState = function(param){
+    var sessionID = param.sessionID;
+    var status = param.status;
+    return sessionDB.sessionColl.updateMany({sessionID: sessionID}, {$set: {status}});
+};
+
 exports.addSound = function (param) {
     var sessionID = param.sessionID;
     var createdAt = new Date(param.createdAt);
@@ -120,3 +126,4 @@ exports.getSoundCursor = function (param) {
 
     return transactionDB.soundColl.find({sessionID, createdAt: {$gt: startAt}}).sort({createdAt: 1});
 };
+

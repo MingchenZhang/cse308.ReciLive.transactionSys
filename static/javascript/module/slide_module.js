@@ -1,4 +1,4 @@
-function Slide(transactionSystem, showDiv, previousButton, nextButton) {
+function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox) {
 
     var self = this;
     self.moduleName = 'slides';
@@ -6,42 +6,41 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
     self.isNotIncremental = true;
     self.slideList = [];
     //instructor img tag list
-    self.slideDataList = [];
+    self.slideData = {};
     self.ignoreTransaction = {};
     self.currentSlidesNumber = -1;
-    self.workCanvas = document.createElement('canvas');
-    //when there are multiple slides use in one recitation
-    self.slidesNumber = -1;
     //reset ignore slidelist and clean up canvas
-
-
-    function getBinaryCode(URL) {
-
-        return $.ajax({
-            url: URL,
-            type: "GET",
-            dataType: "binary",
-            processData: false,
-        });
-    }
-
+    self.slidesName = null;
     self.reset = function () {
         self.ignoreTransaction = {};
         self.slideList = [];
-        self.slideDataList = [];
+        self.slideData = {};
+        self.slidesName = null;
         //check here for reset problem
         if (showDiv.find('#slide-img')) showDiv.find('#slide-img').remove();
         currentSlidesNumber = -1;
     };
+    function getRatio(img) {
+        //check if document ready
+        return img[0].naturalHeight / img[0].naturalWidth;
+    }
+
 //clean canvas and show given img(URL or URI)
     function showImage(imgBase64, showDiv) {
         let img = $('<img id="slide-img">');
-        img.on('load', function () {
-            showDiv.find('#slide-img').remove();
-            showDiv.append(img)
-            //change the ratio and hight width
-        });
-        img.attr("src", imgBase64);
+        //change the ratio and hight width
+        img.attr("src", "data:image/png;base64," + imgBase64);
+        //console.log(imgBase64);
+        showDiv.find('#slide-img').remove();
+        img.css('width', '100%');
+        //color border
+        img.css('border', '3px solid red');
+        viewManager.changeRatio(getRatio(img));
+        showDiv.append(img);
+    }
+
+    function getSlidesName() {
+
     }
 
     //update all the slides to front end transaction system
@@ -55,59 +54,73 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
         self.slideList.push(payload.slideImage);
         self.currentSlidesNumber = payload.slideIndex;
     };
+    function enrollEvent() {
+        document.addEventListener(events.switchToPlayBack.type, disableHandler);
+        document.addEventListener(events.switchToLive.type, enableHandler);
+    }
+
+    function disableHandler() {
+        previousButton.hide();
+        nextButton.hide();
+    }
+
+    function enableHandler() {
+        previousButton.hide();
+        nextButton.hide();
+    }
+
 //init call after transaction finish load and get privilege info
     self.init = function () {
+        enrollEvent();
         if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;
         if (asController) {
             //as controller of slides
             self.loadAllSlides = function (slidesIndex) {
                 //TODO: delete IDToken
-                return $.ajax({
-                    url: 'http://localhost/get_resource',//TODO: change this to gae server
-                    type: "POST",
-                    data: JSON.stringify({
-                        type: "slides",
-                        index: slidesIndex,
-                        payload: {classNumber: classroomNumber, slidesNumber: 0, StartAt: 0, EndAt: -1}
-                    }),
-                    contentType: "application/json",
-                })
-                    .then(
-                        function (response) {
-                            if (response.status == "error") {
-                                //TODO: load error
-                                return;
-                            } else if (response.status == "ok") {
-                                self.slidesNumber = slidesIndex;
-                                return self.loadSlideFromURLList(response.payload);
-                            }
-                        }
-                    ).catch();
+                resource.forEach(function (element) {
+                    if (element.type == "slide") {
+                        //get all slides list
+                        self.slideList = element.content;
+                    }
+                });
+                self.loadSlideFromURLList(element.contect);
             };
             self.loadSlideFromURLList = function (payload) {
-                let index = -1;
-                let promiseList = [];
-                payload.URLList.forEach(function (url) {
-                    index++;
-                    let i = index;
-                    var image = new Image();
-                    promiseList[i] = new Promise(function (resolve, reject) {
-                        image.id = i;
-                        image.onload = function () {
-                            //call after finish load
-                            self.slideDataList[i] = {id: i, slide64: self.getURI(image)};
-                            resolve();
-                        };
-                        image.src = url;
-                    });
 
+                let promiseList = [];
+                payload.forEach(function (slides) {
+                    //counter for promiseList
+                    let listItemCounter = -1;
+                    self.slideList[slides.name] = [];
+                    let index = -1;
+                    slides.pages.forEach(function (url) {
+                        index++;
+                        listItemCounter++;
+                        let i = index;
+                        promiseList[listItemCounter] = new Promise(function (resolve, reject) {
+                            var oReq = new XMLHttpRequest();
+                            oReq.open("GET", url, true);
+                            oReq.responseType = "arraybuffer";
+                            oReq.onload = function (oEvent) {
+                                var arrayBuffer = oReq.response; // Note: not oReq.responseText
+                                if (arrayBuffer) {
+                                    var bytes = new Uint8Array(arrayBuffer);
+                                    var binary = '';
+                                    for (var j = 0; j < bytes.byteLength; j++) {
+                                        binary += String.fromCharCode(bytes[j]);
+                                    }
+                                    var base64 = window.btoa(binary);
+                                    self.slideData[self.slidesName][i] = {slide64: base64, id: i};
+                                    resolve();
+                                }
+                            };
+                            oReq.send(null);
+                        });
+                    });
                 });
                 return promiseList;
             };
 
-            self.addDummySlides = function () {
-                return Promise.all(self.loadSlideFromURLList({URLList: ['/static/dummy_data/slides/1.png', '/static/dummy_data/slides/2.png', '/static/dummy_data/slides/3.png', '/static/dummy_data/slides/4.png']}));
-            };
 
             self.newSlide = function (slideDataObj) {
                 var id = Math.random();
@@ -119,7 +132,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                 }, {
                     slideImage: slideDataObj.slide64,
                     slideIndex: slideDataObj.id,
-                    slidesNumber: self.slidesNumber
+                    slidesName: self.slidesName
                 })
                     .then(function (result) {
                         showImage(slideDataObj.slide64, showDiv);
@@ -129,19 +142,10 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                     delete self.ignoreTransaction[id];
                 });
             };
-            self.getURI = function (img) {
-                let ctx = self.workCanvas.getContext('2d');
-                ctx.clearRect(0, 0, self.workCanvas.width, self.workCanvas.height);
-                //image is loaded by caller
-                ctx.drawImage(img, 0, 0);
-                console.log("loaded img ", img.id);
-                return self.slide64 = self.workCanvas.toDataURL();
-
-            };
 
             previousButton.on('click', function () {
                 if (self.currentSlidesNumber - 1 > -1) {
-                    self.newSlide(self.slideDataList[--self.currentSlidesNumber]);
+                    self.newSlide(self.slideData[self.slidesName][--self.currentSlidesNumber]);
                     console.log("previous slide\n current slide number :", self.currentSlidesNumber);
                 }
                 else {
@@ -149,23 +153,22 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton) {
                 }
             });
             nextButton.on('click', function () {
-                if (self.currentSlidesNumber + 1 < self.slideDataList.length) {
-                    self.newSlide(self.slideDataList[++self.currentSlidesNumber]);
+                if (self.currentSlidesNumber + 1 < self.slideData.length) {
+                    self.newSlide(self.slideData[self.slidesName][++self.currentSlidesNumber]);
                     console.log("next slide\n current slide number :", self.currentSlidesNumber);
                 }
                 else {
                     console.log("no next slide\n");
                 }
             });
-            return self.addDummySlides().then(function () {
-                self.slidesNumber = 0;
-                if (self.currentSlidesNumber == -1) {
-                    console.log("try send first slide");
-                    self.newSlide(self.slideDataList[++self.currentSlidesNumber])
-                } else {
-                    console.log("reconnect to classroom and instructor and get previous slides");
-                }
-            });
+            self.loadAllSlides();
+
+            if (self.currentSlidesNumber == -1) {
+                console.log("try send first slide");
+                self.newSlide(self.slideData[self.slidesName][++self.currentSlidesNumber])
+            } else {
+                console.log("reconnect to classroom and instructor and get previous slides");
+            }
         } else {
             return new Promise(function (resolve, reject) {
                 nextButton.remove();

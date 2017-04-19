@@ -33,6 +33,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
     };
 
     this.connect = function () {
+        if(connection) return;
         connection = new wsConnection(path, ()=>{}, receiveHandle, false);
         connection.connect();
     };
@@ -43,7 +44,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
             if(k<inputData.length)return inputData[k];return nativeSampleRate; // append source sample rate
         });
         connection.send(tobeSent.buffer);
-        console.log(tobeSent[0]);
+        //console.log(tobeSent[0]);
     };
 
     this.writeNextSoundBuffer = function (bufferToWrite) {
@@ -66,6 +67,7 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
     this.jumpTo = function (date) {
         console.log('sound jump to: '+date);
         connection.send(JSON.stringify({type:"jump_to", startAt: date}));
+        receiverBuffer.empty();
     };
 
     this.disconnect = function () {

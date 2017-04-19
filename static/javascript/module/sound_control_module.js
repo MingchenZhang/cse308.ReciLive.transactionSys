@@ -19,6 +19,7 @@ function SoundControl(transactionSystem) {
             if(changeTuple[0] == transactionSystem.userID){
                 self.asSpeaker = changeTuple[1];
                 self.asListener = !changeTuple[1];
+                if(self.asSpeaker) document.dispatchEvent(events.switchToSpeaker());
             }
         });
     };
