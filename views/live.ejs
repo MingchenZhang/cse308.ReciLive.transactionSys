@@ -121,6 +121,8 @@
     canvasController = new canvasontroller($('#CursorLayer'));
     sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'));
 
+    $('.ending-controller').click(transactionSystem.endRecitation);
+
     var loadingDialog;
     var prestartDialog;
     loadingDialog = vex.dialog.open({
