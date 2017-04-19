@@ -54,7 +54,43 @@ exports.getRoute = function (s) {
     });
 
     router.get('/get_resource', function (req, res, next) {
-        res.send({});
+        res.send({
+            "resources": [
+                {
+                    "type": "slide",
+                    "content": [
+                        {
+                            "name": "first slide",
+                            "pages": [
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/1.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/2.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/3.png"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "second slide",
+                            "pages": [
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/1.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/2.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/3.png"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
         // Request({
         //     method: 'POST',
         //     url:"https://recilive.stream/get_resource",

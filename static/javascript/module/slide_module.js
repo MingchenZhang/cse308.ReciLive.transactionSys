@@ -29,7 +29,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
     function showImage(imgBase64, showDiv) {
         let img = $('<img id="slide-img">');
         //change the ratio and hight width
-        img.attr("src", "data:image/png;base64," + imgBase64);
+        img.attr("src",  imgBase64);
         //console.log(imgBase64);
         showDiv.find('#slide-img').remove();
         img.css('width', '100%');
@@ -98,23 +98,14 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                         listItemCounter++;
                         let i = index;
                         promiseList[listItemCounter] = new Promise(function (resolve, reject) {
-                            var oReq = new XMLHttpRequest();
-                            oReq.open("GET", url, true);
-                            oReq.responseType = "arraybuffer";
-                            oReq.onload = function (oEvent) {
-                                var arrayBuffer = oReq.response; // Note: not oReq.responseText
-                                if (arrayBuffer) {
-                                    var bytes = new Uint8Array(arrayBuffer);
-                                    var binary = '';
-                                    for (var j = 0; j < bytes.byteLength; j++) {
-                                        binary += String.fromCharCode(bytes[j]);
-                                    }
-                                    var base64 = window.btoa(binary);
-                                    self.slideData[self.slidesName][i] = {slide64: base64, id: i};
-                                    resolve();
-                                }
-                            };
-                            oReq.send(null);
+                            let img = new Image();
+                            img.onload(function () {
+                                let canvas = document.createElement("canvas");
+                                canvas.getContext('2d').drawImage(this, 0, 0);
+                                self.slideData[self.slidesName][i] = {slide64: canvas.toDataURL("image/png"), id: i};
+                                resolve();
+                            });
+                            img.src(url);
                         });
                     });
                 });
