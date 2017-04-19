@@ -15,6 +15,9 @@ body {
 .navbar-toggle span {
   background-color: #e05038;
 }
+.row {
+  margin-bottom: 0;
+}
 .side-bar {
   width: 4%;
   min-width: 40px;
@@ -38,13 +41,16 @@ body {
   height: 70px;
   text-align: center;
   vertical-align: bottom;
+  cursor: pointer;
 }
 .draw {
   position: relative;
+  margin: auto;
+  width: 0;
 }
 #draw-control-panel {
   right: auto;
-  width: 350px;
+  width: 300px;
 }
 .ending-controller {
   width: 43px;
@@ -64,8 +70,10 @@ body {
   background-size: cover;
   -o-background-size: cover;
 }
-
-
+.slide-control-panel {
+  position: relative;
+  margin: auto;
+}
 .col-md-4 {
   width: 31%;
   padding-left: 0;
