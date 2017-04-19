@@ -354,6 +354,7 @@ function AdminModule(transactionSystem) {
     this.update = function (index, description, createdBy, createdAt, payload) {
         if(description.command == 'end_recitation'){
             document.dispatchEvent(events.endRecitation({endAt: createdAt}));
+            document.dispatchEvent(events.switchToPlayBack());
         }else if(description.command == 'start_recitation'){
             document.dispatchEvent(events.startRecitation({endAt: createdAt}));
         }
