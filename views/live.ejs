@@ -106,7 +106,7 @@
 
     audioCtx = new AudioContext();
     soundSystem = new SoundSystem("/room/<%= classroomNumber %>/sound", audioCtx.sampleRate, eventRate);
-    resource=null;
+    resource = null;
 
     transactionSystem = new TransactionSystem("/room/<%= classroomNumber %>/transaction");
     transactionSystem.roomNumber = parseInt('<%= classroomNumber %>');
@@ -136,7 +136,7 @@
     }), $.ajax({
         url: '/room/<%= classroomNumber %>/get_resource',
         type: 'get',
-        dataType:'json'
+        dataType: 'json'
     })];
     Promise.all(promiseList).then(function (result) {
         //handle the privilege
@@ -144,9 +144,9 @@
             transactionSystem.privilege = result[0].privilege;
         } else throw result[0];
         //handle the resource
-        if (result[0].status == 'ok') {
+        if (result[1].status == 'ok') {
             resource = result[1];
-        }else throw result[1];
+        } else throw result[1];
     }).then(transactionSystem.init).then(function () {
         if (!transactionSystem.firstTransactionTime()) {
             // no transaction posted
@@ -194,6 +194,8 @@
     }).then(() => {
         if (loadingDialog) vex.close(loadingDialog);
         console.log('ready');
+    }).catch(function (e) {
+        console.error(e);
     });
 
     function activateSound() {
