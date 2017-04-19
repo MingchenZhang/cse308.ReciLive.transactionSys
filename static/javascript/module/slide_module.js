@@ -90,7 +90,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                                 listItemCounter++;
                                 let i = index;
                                 promiseList[listItemCounter] = new Promise(function (resolve, reject) {
-                                    let img = new Image();
+                                    var img = new Image();
                                     img.crossOrigin='Anonymous';
                                     img.onload = function () {
                                         let canvas = document.createElement("canvas");
