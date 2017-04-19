@@ -6,7 +6,7 @@
     <title>ReciLive</title>
     <link rel="icon" type="image/png" sizes="96x96" href="../static/img/logo/favicon-96x96.png">
     <!--Import Google Icon Font-->
-    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- CSS Library -->
     <link href="/static/css/library/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
@@ -62,8 +62,11 @@
             <span class="fa fa-backward fa-2x student-list"></span>
             <span class="fa fa-hand-paper-o fa-2x microphone"></span>
             <span class="fa fa-comments fa-2x chat"></span>
+            <span class="fa fa-area-chart fa-2x quiz"></span>
+            <span class="fa fa-download fa-2x download"></span>
+            <span class="fa fa-window-restore fa-2x slides"></span>
             <div class="fixed-action-btn draw horizontal">
-              <span class="fa fa-pencil-square fa-2x"></span>
+              <span class="fa fa-pencil-square fa-3x"></span>
               <ul id="draw-control-panel">
                 <li><a class="btn-floating red"><i class="fa fa-pencil"></i></a></li>
                 <li><a class="btn-floating yellow darken-1"><i class="fa fa-undo"></i></a></li>
@@ -71,14 +74,23 @@
                 <li><a class="btn-floating blue"><i class="fa fa-eraser"></i></a></li>
               </ul>
             </div>
-            <span class="fa fa-area-chart fa-2x quiz"></span>
-            <span class="fa fa-download fa-2x download"></span>
             <img src="../static/img/shut-down.png" class="ending-controller">
         </div>
         <div class="col-md-6" id="slide-stage">
             <div class="stage-view"></div>
             <div class="slide-nav">
                 <label id="previous-slide" class="slide-prev">&#x2039;</label>
+                <div class="fixed-action-btn toolbar slide-control-panel">
+                  <a class="btn-floating btn-large red">
+                    <i class="fa fa-window-maximize"></i>
+                  </a>
+                  <ul>
+                    <li class="waves-effect waves-light"><a href="#!"><i class="fa fa-eraser"></a></li>
+                    <li class="waves-effect waves-light"><a href="#!"><i class="fa fa-eraser"></a></li>
+                    <li class="waves-effect waves-light"><a href="#!"><i class="fa fa-eraser"></a></li>
+                    <li class="waves-effect waves-light"><a href="#!"><i class="fa fa-eraser"></a></li>
+                  </ul>
+                </div>
                 <label id="next-slide" class="slide-next">&#x203a;</label>
             </div>
             <div id='slider-div' class="slider">
