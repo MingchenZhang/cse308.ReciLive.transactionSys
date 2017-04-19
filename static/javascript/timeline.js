@@ -96,11 +96,13 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                 //jump to live
                 liveMode = true;
                 playedTime = totalTime;
+                document.dispatchEvent(events.switchToLive);
             } else{
                 liveMode = false;
                 playedTime = new Date(slider.val() * (totalTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
                 transactionSystem.switchTime(playedTime);
                 soundTransactionSystem.jumpTo(playedTime);
+                document.dispatchEvent(events.switchToPlayBack);
             }
         });
     }

@@ -55,8 +55,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         self.currentSlidesNumber = payload.slideIndex;
     };
     function enrollEvent() {
-        document.addEventListener(event.switchToPlayBack.type, disableHandler);
-        document.addEventListener(event.switchToLive.type, enableHandler);
+        document.addEventListener(events.switchToPlayBack.type, disableHandler);
+        document.addEventListener(events.switchToLive.type, enableHandler);
     }
 
     function disableHandler() {
