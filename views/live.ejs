@@ -146,9 +146,7 @@
             transactionSystem.privilege = result[0].privilege;
         } else throw result[0];
         //handle the resource
-        if (result[1].status == 'ok') {
-            resource = result[1];
-        } else throw result[1];
+            resource = result[1].resources;
     }).then(transactionSystem.init).then(function () {
         if (!transactionSystem.firstTransactionTime()) {
             // no transaction posted
