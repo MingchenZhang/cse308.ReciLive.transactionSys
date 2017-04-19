@@ -17,6 +17,7 @@
     "mongodb": "2.2.24",
     "request": "^2.81.0",
     "when": "3.7.8",
-    "ws": "2.2.1"
+    "ws": "2.2.1",
+    "better-validator": "latest"
   }
 }

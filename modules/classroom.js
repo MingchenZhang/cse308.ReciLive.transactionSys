@@ -54,14 +54,15 @@ exports.getRoute = function (s) {
     });
 
     router.get('/get_resource', function (req, res, next) {
-        Request({
-            method: 'POST',
-            url:"https://recilive.stream/get_resource",
-            json: {classNumber: req.classroomNumber}
-        }, (error, response, body)=>{
-            if(error) return res.status(400).send({status:"error", error, statusCode: response.statusCode});
-            return res.send(body);
-        });
+        res.send({});
+        // Request({
+        //     method: 'POST',
+        //     url:"https://recilive.stream/get_resource",
+        //     json: {classNumber: req.classroomNumber}
+        // }, (error, response, body)=>{
+        //     if(error) return res.status(500).send({status:"error", error, statusCode: response.statusCode});
+        //     return res.send(body);
+        // });
     });
 
     return router;
