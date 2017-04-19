@@ -54,14 +54,51 @@ exports.getRoute = function (s) {
     });
 
     router.get('/get_resource', function (req, res, next) {
-        Request({
-            method: 'POST',
-            url:"https://recilive.stream/get_resource",
-            json: {classNumber: req.classroomNumber}
-        }, (error, response, body)=>{
-            if(error) return res.status(400).send({status:"error", error, statusCode: response.statusCode});
-            return res.send(body);
+        res.send({
+            "resources": [
+                {
+                    "type": "slide",
+                    "content": [
+                        {
+                            "name": "first slide",
+                            "pages": [
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/1.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/2.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/3.png"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "second slide",
+                            "pages": [
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/1.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/2.png"
+                                },
+                                {
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/3.png"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         });
+        // Request({
+        //     method: 'POST',
+        //     url:"https://recilive.stream/get_resource",
+        //     json: {classNumber: req.classroomNumber}
+        // }, (error, response, body)=>{
+        //     if(error) return res.status(500).send({status:"error", error, statusCode: response.statusCode});
+        //     return res.send(body);
+        // });
     });
 
     return router;

@@ -1,3 +1,16 @@
+const Validator = require("better-validator");
+
+const validator = new Validator();
+
+const getResourceRule = (object) => {
+    object.required().isObject((obj)=>{
+        obj('resources').required().isObjectArray((obj)=>{
+            obj("type").required().isString();
+            obj("content").required()
+        });
+    });
+};
+
 exports.privilegeObjectTest = function (privilege) {
     if (typeof privilege != "object") return false;
     for (var key in privilege) {
@@ -27,4 +40,8 @@ exports.transactionPush = function (req) {
         typeof req.module == 'string'
     );
     // TODO: check object safety
+};
+
+exports.getResource = function (req) {
+    return validator(req, getResourceRule).length = 0;
 };

@@ -4,7 +4,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
     self.moduleName = 'slides';
     //slideList get all transaction in order
     self.isNotIncremental = true;
-    self.slideList = [];
     //instructor img tag list
     self.slideData = {};
     self.ignoreTransaction = {};
@@ -13,7 +12,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
     self.slidesName = null;
     self.reset = function () {
         self.ignoreTransaction = {};
-        self.slideList = [];
         self.slideData = {};
         self.slidesName = null;
         //check here for reset problem
@@ -29,7 +27,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
     function showImage(imgBase64, showDiv) {
         let img = $('<img id="slide-img">');
         //change the ratio and hight width
-        img.attr("src", "data:image/png;base64," + imgBase64);
+        img.attr("src", imgBase64);
         //console.log(imgBase64);
         showDiv.find('#slide-img').remove();
         img.css('width', '100%');
@@ -51,7 +49,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         }
         //add img to slideList by time
         showImage(payload.slideImage, showDiv);
-        self.slideList.push(payload.slideImage);
         self.currentSlidesNumber = payload.slideIndex;
     };
     function enrollEvent() {
@@ -77,46 +74,40 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
             //as controller of slides
             self.loadAllSlides = function (slidesIndex) {
                 //TODO: delete IDToken
+                let promiseList=[];
                 resource.forEach(function (element) {
                     if (element.type == "slide") {
                         //get all slides list
-                        self.slideList = element.content;
-                    }
-                });
-                self.loadSlideFromURLList(element.contect);
-            };
-            self.loadSlideFromURLList = function (payload) {
+                        let payload = element.content;
+                        let promiseList = [];
+                        payload.forEach(function (slides) {
+                            //counter for promiseList
+                            let listItemCounter = -1;
+                            let index = -1;
+                            self.slideData[slides.name]=[];
+                            slides.pages.forEach(function (url) {
+                                index++;
+                                listItemCounter++;
+                                let i = index;
+                                promiseList[listItemCounter] = new Promise(function (resolve, reject) {
+                                    let img = new Image();
+                                    img.crossOrigin='Anonymous';
+                                    img.onload = function () {
+                                        let canvas = document.createElement("canvas");
+                                        canvas.width = img.width;
+                                        canvas.height = img.height;
+                                        canvas.getContext('2d').drawImage(img, 0, 0);
 
-                let promiseList = [];
-                payload.forEach(function (slides) {
-                    //counter for promiseList
-                    let listItemCounter = -1;
-                    self.slideList[slides.name] = [];
-                    let index = -1;
-                    slides.pages.forEach(function (url) {
-                        index++;
-                        listItemCounter++;
-                        let i = index;
-                        promiseList[listItemCounter] = new Promise(function (resolve, reject) {
-                            var oReq = new XMLHttpRequest();
-                            oReq.open("GET", url, true);
-                            oReq.responseType = "arraybuffer";
-                            oReq.onload = function (oEvent) {
-                                var arrayBuffer = oReq.response; // Note: not oReq.responseText
-                                if (arrayBuffer) {
-                                    var bytes = new Uint8Array(arrayBuffer);
-                                    var binary = '';
-                                    for (var j = 0; j < bytes.byteLength; j++) {
-                                        binary += String.fromCharCode(bytes[j]);
-                                    }
-                                    var base64 = window.btoa(binary);
-                                    self.slideData[self.slidesName][i] = {slide64: base64, id: i};
-                                    resolve();
-                                }
-                            };
-                            oReq.send(null);
+                                        self.slideData[slides.name][i] = {
+                                            slide64: canvas.toDataURL("image/png"),
+                                            id: i
+                                        };
+                                    };
+                                    img.src = url.url;
+                                });
+                            });
                         });
-                    });
+                    }
                 });
                 return promiseList;
             };
@@ -161,14 +152,17 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                     console.log("no next slide\n");
                 }
             });
-            self.loadAllSlides();
+            Promise.all(self.loadAllSlides()).then(function (responce) {
+                if (self.currentSlidesNumber == -1) {
+                    console.log("try send first slide");
+                    self.newSlide(self.slideData['first slide'][++self.currentSlidesNumber]);
+                    resolve();
+                } else {
+                    console.log("reconnect to classroom and instructor and get previous slides");
+                }
+            });
 
-            if (self.currentSlidesNumber == -1) {
-                console.log("try send first slide");
-                self.newSlide(self.slideData[self.slidesName][++self.currentSlidesNumber])
-            } else {
-                console.log("reconnect to classroom and instructor and get previous slides");
-            }
+
         } else {
             return new Promise(function (resolve, reject) {
                 nextButton.remove();

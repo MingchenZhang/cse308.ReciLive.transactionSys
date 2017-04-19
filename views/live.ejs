@@ -92,7 +92,6 @@
 </div>
 
 <script>
-    document.domain = "recilive.stream";
     eventRate = 2048;
 
     function createEventConstructor(type) {
@@ -130,6 +129,8 @@
     canvasController = new canvasontroller($('#CursorLayer'));
     sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'));
 
+    $('.ending-controller').click(transactionSystem.endRecitation);
+
     var loadingDialog;
     var prestartDialog;
     loadingDialog = vex.dialog.open({
@@ -153,9 +154,7 @@
             transactionSystem.privilege = result[0].privilege;
         } else throw result[0];
         //handle the resource
-        if (result[1].status == 'ok') {
-            resource = result[1];
-        } else throw result[1];
+            resource = result[1].resources;
     }).then(transactionSystem.init).then(function () {
         if (!transactionSystem.firstTransactionTime()) {
             // no transaction posted
