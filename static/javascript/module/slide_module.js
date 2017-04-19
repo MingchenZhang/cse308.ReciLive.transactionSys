@@ -72,9 +72,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;
         if (asController) {
             //as controller of slides
-            self.loadAllSlides = function (slidesIndex) {
+            self.loadAllSlides = function () {
                 //TODO: delete IDToken
-                let promiseList=[];
+                var promiseList=[];
                 resource.forEach(function (element) {
                     if (element.type == "slide") {
                         //get all slides list
