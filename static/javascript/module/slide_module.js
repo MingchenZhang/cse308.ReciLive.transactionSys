@@ -98,7 +98,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                                         canvas.height = img.height;
                                         canvas.getContext('2d').drawImage(img, 0, 0);
 
-                                        self.slideData[slides.slidesName][i] = {
+                                        self.slideData[slides.name][i] = {
                                             slide64: canvas.toDataURL("image/png"),
                                             id: i
                                         };
