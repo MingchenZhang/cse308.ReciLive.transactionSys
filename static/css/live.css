@@ -39,13 +39,18 @@ body {
   text-align: center;
   vertical-align: bottom;
 }
+.ending-controller {
+  width: 43px;
+  display: block;
+  margin: 0 auto;
+}
+
 .col-md-6 {
   width: 65%;
   padding-left: 0;
   padding-right: 0;
   height: calc(100vh - 52px);
   /*background-color: #173e43;*/
-  background: url("../img/l.png");
   background-size: 65%;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -81,7 +86,6 @@ body {
     padding-right: 0;
     min-height: calc(100vh - 52px);
     background-color: #173e43;
-    /*background: url("../img/l.png");*/
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
