@@ -54,8 +54,24 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         self.slideList.push(payload.slideImage);
         self.currentSlidesNumber = payload.slideIndex;
     };
+    function enrollEvent() {
+        document.addEventListener(event.switchToPlayBack.type, disableHandler);
+        document.addEventListener(event.switchToLive.type, enableHandler);
+    }
+
+    function disableHandler() {
+        previousButton.hide();
+        nextButton.hide();
+    }
+
+    function enableHandler() {
+        previousButton.hide();
+        nextButton.hide();
+    }
+
 //init call after transaction finish load and get privilege info
     self.init = function () {
+        enrollEvent();
         if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;
         if (asController) {
             //as controller of slides

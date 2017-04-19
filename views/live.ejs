@@ -136,10 +136,7 @@
     }), $.ajax({
         url: '/room/<%= classroomNumber %>/get_resource',
         type: 'get',
-        contentType: "application/json",
-        data: JSON.stringify({
-            classNumber: transactionSystem.classNumber
-        })
+        dataType:'json'
     })];
     Promise.all(promiseList).then(function (result) {
         //handle the privilege

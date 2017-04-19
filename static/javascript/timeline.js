@@ -49,7 +49,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
             //TODO: delete this later
             //console.log("current percentage:", slider.val());
-            //console.log("total:", totalTime);
+            console.log("total:", totalTime);
             //console.log("played:", playedTime);
             systemTimeUpdateCounter++;
             //TODO:check if class over
@@ -58,12 +58,13 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
     }
 
     function enrollEvent() {
-        document.addEventListener(events.endRecitation.type, classEnd);
+        document.addEventListener(events.endRecitation.type, classEndFunc);
     }
 
-    function classEnd() {
+    function classEndFunc() {
 //TODO: need maek sure last transaction be set up before this function called
         classEnd=true;
+        slider.off();
      //no one should change total time after this
         totalTime = transactionSystem.lastTransactionTime();
         if (transactionSystem.privilege.indexOf("admin") != -1) {
@@ -73,7 +74,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
     }
 
     self.init = function () {
-        enrollEvent()
+        enrollEvent();
         if (transactionSystem.privilege.indexOf("admin") != -1) {
             //instructor live
             slider.hide();
@@ -91,11 +92,11 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         slider.change('change', function () {
             //user change time
             //slider.val will get int
-            if (parseInt(slider.val() == 100)) {
+            if (parseInt(slider.val() == 100)&&!classEnd) {
                 //jump to live
                 liveMode = true;
                 playedTime = totalTime;
-            } else {
+            } else{
                 liveMode = false;
                 playedTime = new Date(slider.val() * (totalTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
                 transactionSystem.switchTime(playedTime);
