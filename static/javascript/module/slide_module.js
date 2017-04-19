@@ -16,7 +16,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         self.slidesName = null;
         //check here for reset problem
         if (showDiv.find('#slide-img')) showDiv.find('#slide-img').remove();
-        currentSlidesNumber = -1;
+        self.currentSlidesNumber = -1;
     };
     function getRatio(img) {
         //check if document ready
@@ -33,7 +33,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         img.css('width', '100%');
         //color border
         img.css('border', '3px solid red');
-        viewManager.changeRatio(getRatio(img));
+        img[0].onload = function () {
+            viewManager.changeRatio(getRatio(img));
+        };
         showDiv.append(img);
     }
 
@@ -50,6 +52,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         //add img to slideList by time
         showImage(payload.slideImage, showDiv);
         self.currentSlidesNumber = payload.slideIndex;
+        self.slidesName = payload.slidesName;
     };
     function enrollEvent() {
         document.addEventListener(events.switchToPlayBack.type, disableHandler);
@@ -79,7 +82,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                     if (element.type == "slide") {
                         //get all slides list
                         let payload = element.content;
-                        let promiseList = [];
                         payload.forEach(function (slides) {
                             //counter for promiseList
                             let listItemCounter = -1;
@@ -145,7 +147,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                 }
             });
             nextButton.on('click', function () {
-                if (self.currentSlidesNumber + 1 < self.slideData.length) {
+                if (self.currentSlidesNumber + 1 < self.slideData[self.slidesName].length) {
                     self.newSlide(self.slideData[self.slidesName][++self.currentSlidesNumber]);
                     console.log("next slide\n current slide number :", self.currentSlidesNumber);
                 }
@@ -156,8 +158,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
             Promise.all(self.loadAllSlides()).then(function (responce) {
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
-                    self.newSlide(self.slideData['first slide'][++self.currentSlidesNumber]);
-                    resolve();
+                    self.slidesName = Object.keys(self.slideData)[0];
+                    self.newSlide(self.slideData[self.slidesName][++self.currentSlidesNumber]);
                 } else {
                     console.log("reconnect to classroom and instructor and get previous slides");
                 }
