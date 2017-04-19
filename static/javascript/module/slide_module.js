@@ -84,6 +84,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                             //counter for promiseList
                             let listItemCounter = -1;
                             let index = -1;
+                            self.slideData[slides.name]=[];
                             slides.pages.forEach(function (url) {
                                 index++;
                                 listItemCounter++;
@@ -97,7 +98,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                                         canvas.height = img.height;
                                         canvas.getContext('2d').drawImage(img, 0, 0);
 
-                                        self.slideData[self.slidesName][i] = {
+                                        self.slideData[slides.slidesName][i] = {
                                             slide64: canvas.toDataURL("image/png"),
                                             id: i
                                         };
