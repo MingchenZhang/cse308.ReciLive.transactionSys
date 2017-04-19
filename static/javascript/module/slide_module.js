@@ -79,7 +79,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                     if (element.type == "slide") {
                         //get all slides list
                         let payload = element.content;
-                        let promiseList = [];
                         payload.forEach(function (slides) {
                             //counter for promiseList
                             let listItemCounter = -1;
