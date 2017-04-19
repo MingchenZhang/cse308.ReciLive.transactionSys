@@ -102,6 +102,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                                             slide64: canvas.toDataURL("image/png"),
                                             id: i
                                         };
+                                        resolve();
                                     };
                                     img.src = url.url;
                                 });
