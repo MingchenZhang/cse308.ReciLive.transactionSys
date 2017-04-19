@@ -186,6 +186,7 @@ exports.session = function () {
             if(flags.binary){
                 //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
                 //log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
+                if(self.status == "ENDED") return;
                 s.transactionRecord.addSound({sessionID:self.sessionID, createdAt: new Date(), data: message});
                 soundClients.forEach((client) => {
                     if(client.nextSoundFrame) return; // client is in playback mode
@@ -246,6 +247,9 @@ exports.session = function () {
 
         if (self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)
             return When.reject({reason: 2});
+
+        if(self.status == "ENDED")
+            return When.reject({reason: 10});
 
         transaction.sessionID = self.sessionID;
         transaction.createdAt = new Date();
@@ -322,6 +326,9 @@ exports.session = function () {
                 if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
                 else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
             });
+        } else if(transaction.module == 'admin' && transaction.description.command == "end_recitation"){
+            self.status = "ENDED";
+            s.transactionRecord.setSessionState({sessionID: self.sessionID, status: "ENDED"});
         } else {
             return false;
         }
