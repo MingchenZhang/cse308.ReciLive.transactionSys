@@ -151,14 +151,13 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                     console.log("no next slide\n");
                 }
             });
-            Promise.all(self.loadAllSlides()).then(function (resolve,reject) {
+            Promise.all(self.loadAllSlides()).then(function (responce) {
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
                     self.newSlide(self.slideData['first slide'][++self.currentSlidesNumber]);
                     resolve();
                 } else {
                     console.log("reconnect to classroom and instructor and get previous slides");
-                    reject();
                 }
             });
 
