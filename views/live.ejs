@@ -8,9 +8,9 @@
     <!--Import Google Icon Font-->
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- CSS Library -->
-    <link href="/static/css/library/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="/static/css/library/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+    <link href="/static/css/library/bootstrap.min.css" rel="stylesheet" type="text/css">
     <!-- JS Library -->
     <script src="/static/javascript/jquery-3.1.1.js"></script>
     <script src="../static/javascript/bootstrap.min.js"></script>
@@ -62,10 +62,15 @@
             <span class="fa fa-backward fa-2x student-list"></span>
             <span class="fa fa-hand-paper-o fa-2x microphone"></span>
             <span class="fa fa-comments fa-2x chat"></span>
-            <span class="fa fa-pencil fa-2x daw"></span>
-            <span class="fa fa-undo fa-2x undo"></span>
-            <span class="fa fa-repeat fa-2x redo"></span>
-            <span class="fa fa-eraser fa-2x eraser"></span>
+            <div class="fixed-action-btn draw horizontal">
+              <span class="fa fa-pencil-square fa-2x"></span>
+              <ul id="draw-control-panel">
+                <li><a class="btn-floating red"><i class="fa fa-pencil"></i></a></li>
+                <li><a class="btn-floating yellow darken-1"><i class="fa fa-undo"></i></a></li>
+                <li><a class="btn-floating green"><i class="fa fa-repeat"></i></a></li>
+                <li><a class="btn-floating blue"><i class="fa fa-eraser"></i></a></li>
+              </ul>
+            </div>
             <span class="fa fa-area-chart fa-2x quiz"></span>
             <span class="fa fa-download fa-2x download"></span>
             <img src="../static/img/shut-down.png" class="ending-controller">

@@ -15,13 +15,6 @@ body {
 .navbar-toggle span {
   background-color: #e05038;
 }
-.rec-ended-notification {
-  display: none;
-  color: #e05038;
-  position: absolute;
-  left: 40%;
-  width: 50px;
-}
 .side-bar {
   width: 4%;
   min-width: 40px;
@@ -31,6 +24,13 @@ body {
   /*temp*/
   background-color: #e05038;
 }
+.rec-ended-notification {
+  display: none;
+  color: #e05038;
+  position: absolute;
+  left: 40%;
+  width: 50px;
+}
 .side-bar span {
   display:inline-block;
   line-height: 60px;
@@ -38,6 +38,13 @@ body {
   height: 70px;
   text-align: center;
   vertical-align: bottom;
+}
+.draw {
+  position: relative;
+}
+#draw-control-panel {
+  right: auto;
+  width: 350px;
 }
 .ending-controller {
   width: 43px;
