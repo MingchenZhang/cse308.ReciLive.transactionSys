@@ -33,6 +33,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
             slidesOption.on('click', function () {
                 self.slidesIndex = parseInt($(this).attr('index'));
                 self.slidesName = $(this).attr('value');
+                self.currentSlidesNumber=0;
                 self.newSlide(self.slideData[self.slidesIndex].imgDataList[0]);
             });
             selectorDiv.append(slidesOption);
@@ -78,7 +79,12 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         previousButton.hide();
         nextButton.hide();
     }
-
+self.presetEvent=function(){
+      document.addEventListener(events.endRecitation.type,function(){
+          //review mode
+          disableHandler();
+      })
+    };
     function enableHandler() {
         previousButton.hide();
         nextButton.hide();
