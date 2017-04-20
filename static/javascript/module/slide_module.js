@@ -23,7 +23,32 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         return img[0].naturalHeight / img[0].naturalWidth;
     }
 
+    function addListenerToSelecter() {
+        selectBox.on('change', function () {
+            $( "select option:selected" ).each(function() {
+                str += $( this ).text() + " ";
+            });
+
+        });
+
+    }
+
+    function updateSelector() {
+        selectBox.find('option').remove();
+        self.slideData.forEach(function (element) {
+
+        });
+
+        for (var slides in self.slideData) {
+            if (self.slideData.hasOwnProperty(slides)) {
+                // do stuff
+                selectBox.append("<option value=\"" + slides.name + "\">" + slides.name + "</option>");
+            }
+        }
+    }
+
 //clean canvas and show given img(URL or URI)
+
     function showImage(imgBase64, showDiv) {
         let img = $('<img id="slide-img">');
         //change the ratio and hight width
@@ -77,7 +102,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
             //as controller of slides
             self.loadAllSlides = function () {
                 //TODO: delete IDToken
-                var promiseList=[];
+                var promiseList = [];
                 resource.forEach(function (element) {
                     if (element.type == "slide") {
                         //get all slides list
@@ -86,14 +111,14 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                             //counter for promiseList
                             let listItemCounter = -1;
                             let index = -1;
-                            self.slideData[slides.name]=[];
+                            self.slideData[slides.name] = [];
                             slides.pages.forEach(function (url) {
                                 index++;
                                 listItemCounter++;
                                 let i = index;
                                 promiseList[listItemCounter] = new Promise(function (resolve, reject) {
                                     var img = document.createElement('img');
-                                    img.crossOrigin='anonymous';
+                                    img.crossOrigin = 'anonymous';
                                     img.src = url.url;
                                     img.onload = function () {
                                         let canvas = document.createElement("canvas");
