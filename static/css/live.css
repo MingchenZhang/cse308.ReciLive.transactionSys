@@ -70,10 +70,6 @@ body {
   background-size: cover;
   -o-background-size: cover;
 }
-.slide-control-panel {
-  position: relative;
-  margin: auto;
-}
 .col-md-4 {
   width: 31%;
   padding-left: 0;
@@ -122,12 +118,16 @@ body {
 }
 
 /* slider */
-.slider {
+.slide-control-panel {
+  position: absolute;
+  margin: auto;
+  width: 50%;
+}
+#slider-div {
     position: absolute;
     bottom: 20px;
     width: 100%;
 }
-
 .slider__range {
     -webkit-appearance: none;
     width: calc(100% - (73px));
