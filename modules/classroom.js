@@ -63,13 +63,13 @@ exports.getRoute = function (s) {
                             "name": "first slide",
                             "pages": [
                                 {
-                                    "url": "https://dl2.pushbulletusercontent.com/E0n0PR2WqsXhNKrKm26nTgzeTv8wYfZs/1.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/1.png"
                                 },
                                 {
-                                    "url": "https://dl2.pushbulletusercontent.com/II6cdOVMnJHZgYD1zDG44WHcujRAvS6E/2.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/2.png"
                                 },
                                 {
-                                    "url": "https://dl2.pushbulletusercontent.com/EjfP8X94JGe0YvIyW7cjba5XRb4dNdty/3.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/3.png"
                                 }
                             ]
                         },
@@ -77,13 +77,13 @@ exports.getRoute = function (s) {
                             "name": "second slide",
                             "pages": [
                                 {
-                                    "url": "https://dl2.pushbulletusercontent.com/E0n0PR2WqsXhNKrKm26nTgzeTv8wYfZs/1.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/5.png"
                                 },
                                 {
-                                    "url": "https://dl2.pushbulletusercontent.com/II6cdOVMnJHZgYD1zDG44WHcujRAvS6E/2.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/6.png"
                                 },
                                 {
-                                    "url": "https://dl2.pushbulletusercontent.com/EjfP8X94JGe0YvIyW7cjba5XRb4dNdty/3.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/7.png"
                                 }
                             ]
                         }

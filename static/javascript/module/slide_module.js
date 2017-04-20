@@ -92,8 +92,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                                 listItemCounter++;
                                 let i = index;
                                 promiseList[listItemCounter] = new Promise(function (resolve, reject) {
-                                    var img = new Image();
-                                    img.crossOrigin='Anonymous';
+                                    var img = document.createElement('img');
+                                    img.crossOrigin='anonymous';
+                                    img.src = url.url;
                                     img.onload = function () {
                                         let canvas = document.createElement("canvas");
                                         canvas.width = img.width;
@@ -106,7 +107,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                                         };
                                         resolve();
                                     };
-                                    img.src = url.url;
                                 });
                             });
                         });
