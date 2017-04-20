@@ -13,7 +13,7 @@ exports.session = function () {
     self.startDate = null;
     self.endDate = null;
     self.status = null;
-    self.slidesNumber = -1;
+
     var clients = [];
     var soundClients = [];
     var soundSpeaker = [];
@@ -27,15 +27,14 @@ exports.session = function () {
         self.startDate = param.startDate;
         self.endDate = param.endDate;
         self.status = param.status;
-        self.slidesNumber = param.slidesNumber;
+
         return s.transactionRecord.addSession({
             sessionID: self.sessionID,
             privilege: self.privilege,
             name: self.name,
             startDate: self.startDate,
             endDate: self.endDate,
-            status: self.status,
-            slidesNumber: self.slidesNumber
+            status: self.status
         }).then((value) => {
             s.wsHandler.addRoute("/room/" + self.sessionID + "/transaction", self.wsHandleTransaction);
             s.wsHandler.addRoute("/room/" + self.sessionID + "/sound", self.wsHandleSound);
@@ -51,7 +50,7 @@ exports.session = function () {
         self.startDate = param.startDate;
         self.endDate = param.endDate;
         self.status = param.status;
-        self.slidesNumber = param.slidesNumber;
+
         return s.transactionRecord.getLastTransactionIndex({sessionID: self.sessionID})
             .then((index) => {
                 lastTransactionIndex = index;
