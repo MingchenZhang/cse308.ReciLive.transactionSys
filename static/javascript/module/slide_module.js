@@ -1,4 +1,4 @@
-function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox) {
+function Slide(transactionSystem, showDiv, previousButton, nextButton, showDiv) {
 
     var self = this;
     self.moduleName = 'slides';
@@ -11,9 +11,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
     //reset ignore slidelist and clean up canvas
     self.slidesName = null;
     self.reset = function () {
+        self.slidesIndex = null;
         self.ignoreTransaction = {};
         self.slideData = {};
         self.slidesName = null;
+        self.slidesIndex = null;
         //check here for reset problem
         if (showDiv.find('#slide-img')) showDiv.find('#slide-img').remove();
         self.currentSlidesNumber = -1;
@@ -23,29 +25,18 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         return img[0].naturalHeight / img[0].naturalWidth;
     }
 
-    function addListenerToSelecter() {
-        selectBox.on('change', function () {
-            $( "select option:selected" ).each(function() {
-                str += $( this ).text() + " ";
-            });
-
-        });
-
-    }
-
-    function updateSelector() {
-        selectBox.find('option').remove();
+    self.updateSelector = function() {
+        showDiv.children('*').remove();
+        let i = 0;
         self.slideData.forEach(function (element) {
-
+            var slidesOption = $('<div class="slides element" index="'+(i++)+'" value="'+element.name+'">'+element.name+'</div>');
+            slidesOption.on('click',function () {
+                self.slidesIndex = i;
+                self.slidesName = element.name;
+                newSlide(self.slideData[i].imgDataList[0]);
+            })
         });
-
-        for (var slides in self.slideData) {
-            if (self.slideData.hasOwnProperty(slides)) {
-                // do stuff
-                selectBox.append("<option value=\"" + slides.name + "\">" + slides.name + "</option>");
-            }
-        }
-    }
+    };
 
 //clean canvas and show given img(URL or URI)
 
@@ -78,6 +69,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
         showImage(payload.slideImage, showDiv);
         self.currentSlidesNumber = payload.slideIndex;
         self.slidesName = payload.slidesName;
+        self.slidesIndex = payload.slidesIndex;
     };
     function enrollEvent() {
         document.addEventListener(events.switchToPlayBack.type, disableHandler);
@@ -111,7 +103,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                             //counter for promiseList
                             let listItemCounter = -1;
                             let index = -1;
-                            self.slideData[slides.name] = [];
+                            self.slideData[listItemCounter] = {name: slides.name, imgDataList: []};
                             slides.pages.forEach(function (url) {
                                 index++;
                                 listItemCounter++;
@@ -125,8 +117,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                                         canvas.width = img.width;
                                         canvas.height = img.height;
                                         canvas.getContext('2d').drawImage(img, 0, 0);
-
-                                        self.slideData[slides.name][i] = {
+                                        self.slideData[listItemCounter].imgDataList[i] = {
                                             slide64: canvas.toDataURL("image/png"),
                                             id: i
                                         };
@@ -151,7 +142,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                 }, {
                     slideImage: slideDataObj.slide64,
                     slideIndex: slideDataObj.id,
-                    slidesName: self.slidesName
+                    slidesName: self.slidesName,
+                    slidesIndex: self.slidesIndex
                 })
                     .then(function (result) {
                         showImage(slideDataObj.slide64, showDiv);
@@ -164,7 +156,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
 
             previousButton.on('click', function () {
                 if (self.currentSlidesNumber - 1 > -1) {
-                    self.newSlide(self.slideData[self.slidesName][--self.currentSlidesNumber]);
+                    self.newSlide(self.slideData[self.slidesIndex].imgDataList[--self.currentSlidesNumber]);
                     console.log("previous slide\n current slide number :", self.currentSlidesNumber);
                 }
                 else {
@@ -172,8 +164,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
                 }
             });
             nextButton.on('click', function () {
-                if (self.currentSlidesNumber + 1 < self.slideData[self.slidesName].length) {
-                    self.newSlide(self.slideData[self.slidesName][++self.currentSlidesNumber]);
+                if (self.currentSlidesNumber + 1 < self.slideData[self.slidesIndex].imgDataList.length) {
+                    self.newSlide(self.slideData[self.slidesIndex].imgDataList[++self.currentSlidesNumber]);
                     console.log("next slide\n current slide number :", self.currentSlidesNumber);
                 }
                 else {
@@ -183,8 +175,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectBox
             Promise.all(self.loadAllSlides()).then(function (responce) {
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
-                    self.slidesName = Object.keys(self.slideData)[0];
-                    self.newSlide(self.slideData[self.slidesName][++self.currentSlidesNumber]);
+                    self.slidesIndex = 0;
+                    self.slidesName = self.slideData[self.slidesIndex].name;
+                    self.newSlide(self.slideData[self.slidesIndex].imgDataList[++self.currentSlidesNumber]);
                 } else {
                     console.log("reconnect to classroom and instructor and get previous slides");
                 }

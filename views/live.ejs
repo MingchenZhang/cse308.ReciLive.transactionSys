@@ -69,9 +69,8 @@
             <a href="#modal1"><span class="fa fa-window-restore fa-2x slides"></span></a>
             <!-- Modal Structure For Slides-->
             <div id="modal1" class="modal bottom-sheet">
-              <div class="modal-content">
-                <h4>Modal Header</h4>
-                <p>A bunch of text</p>
+              <div class="modal-content" id="slides-selector">
+
               </div>
               <div class="modal-footer">
                 <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
@@ -144,7 +143,7 @@ $(document).ready(function() {
     soundControlSystem = new SoundControl(transactionSystem);
     viewManager = new ViewManager($('.stage-view'));
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'));
+    slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'),$('#slides-selector'));
     transactionSystem.registerModule(chatModule.moduleName, chatModule);
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
