@@ -160,7 +160,7 @@
     });
     //promiselist wait for the respose for vps(privilege and resource)
     var promiseList = [$.ajax({
-        url: window.location.href + '/my_privilege',
+        url: window.location.href.split('?')[0] + '/my_privilege',
         type: 'get',
         dataType: 'json',
     }), $.ajax({

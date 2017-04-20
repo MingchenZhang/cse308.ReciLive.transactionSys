@@ -80,10 +80,10 @@ exports.getRoute = function (s) {
                                     "url": "https://room.recilive.stream/static/dummy_data/slides/5.png"
                                 },
                                 {
-                                    "url": "https://room.recilive.stream/static/dummy_data/slides/6.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/6.jpg"
                                 },
                                 {
-                                    "url": "https://room.recilive.stream/static/dummy_data/slides/7.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/7.jpg"
                                 }
                             ]
                         }

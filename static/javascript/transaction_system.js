@@ -211,7 +211,7 @@ function TransactionSystem(path) {
                     payload: payload
                 };
                 $.ajax({
-                    url: window.location.href + '/transaction_post',
+                    url: window.location.href.split('?')[0] + '/transaction_post',
                     type: 'post',
                     data: JSON.stringify(transaction),
                     contentType: "application/json; charset=utf-8",
