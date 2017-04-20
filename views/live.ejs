@@ -65,12 +65,10 @@
             <span class="fa fa-comments fa-2x chat"></span>
             <span class="fa fa-area-chart fa-2x quiz"></span>
             <span class="fa fa-download fa-2x download"></span>
-            <span class="fa fa-window-restore fa-2x slides"></span>
             <!-- Modal Trigger For Slides-->
-            <!-- <span class="fa fa-window-restore fa-2x slides"><a href="#modal1"></a></span> -->
-            <!-- <a class="waves-effect waves-light btn" href="#modal1">Modal</a> -->
+            <a href="#modal1"><span class="fa fa-window-restore fa-2x slides"></span></a>
             <!-- Modal Structure For Slides-->
-            <!-- <div id="modal1" class="modal bottom-sheet">
+            <div id="modal1" class="modal bottom-sheet">
               <div class="modal-content">
                 <h4>Modal Header</h4>
                 <p>A bunch of text</p>
@@ -78,7 +76,7 @@
               <div class="modal-footer">
                 <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
               </div>
-            </div> -->
+            </div>
             <div class="fixed-action-btn draw horizontal">
               <span class="fa fa-pencil-square fa-3x"></span>
               <ul id="draw-control-panel">
@@ -112,6 +110,10 @@
 </div>
 
 <script>
+$(document).ready(function() {
+    $('.modal').modal();
+});
+
     eventRate = 2048;
 
     function createEventConstructor(type) {
