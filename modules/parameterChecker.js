@@ -2,8 +2,8 @@ const Validator = require("better-validator");
 
 const validator = new Validator();
 
-const getResourceRule = (object) => {
-    object.required().isObject((obj)=>{
+const getResourceRule = (obj) => {
+    obj.required().isObject((obj)=>{
         obj('resources').required().isObjectArray((obj)=>{
             obj("type").required().isString();
             obj("content").required()
@@ -11,27 +11,33 @@ const getResourceRule = (object) => {
     });
 };
 
+const privilegeObjectRule = (obj) =>{
+    obj.required().isObject((obj)=>{
+        obj('*').isArray((obj)=>{
+            obj().isString();
+        });
+    });
+};
+
+const dispatchClassroomRule = (obj)=>{
+    obj.required().isObject((obj)=>{
+        obj('classNumber').required().isNumber().isPositive();
+        obj('privilege').required().check(privilegeObjectRule);
+        obj('name').required().isString();
+        obj('startDate').required().isString().isISO8601();
+        obj('endDate').required().isString().isISO8601();
+        obj('status').required().isString();
+        obj().strict()
+    });
+};
+
 exports.privilegeObjectTest = function (privilege) {
-    if (typeof privilege != "object") return false;
-    for (var key in privilege) {
-        if (!privilege.hasOwnProperty(key)) continue;
-        if (typeof key != "string") return false;
-        var obj = privilege[key];
-        if (obj != "all" && !Array.isArray(obj)) {
-            return false;
-        }
-    }
-    return true;
+    var result = validator(privilege, privilegeObjectRule);
+    return result.length == 0;
 };
 exports.dispatchRequest = function (req) {
-    return (
-        exports.privilegeObjectTest(req.privilege) &&
-        typeof req.classNumber == "number" &&
-        typeof req.name == "string" &&
-        typeof req.startDate == "string" &&
-        typeof req.endDate == "string" &&
-        typeof req.status == "string"
-    );
+    var result = validator(req, dispatchClassroomRule);
+    return result.length == 0;
 };
 
 exports.transactionPush = function (req) {
