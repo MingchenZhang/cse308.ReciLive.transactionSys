@@ -42,9 +42,9 @@
         WantedBy=multi-user.target
   
   gather_facts: no
-  pre_tasks:
-  - name: install python
-    raw: sudo apt-get update && sudo apt-get -y install python-simplejson
+#  pre_tasks:
+#  - name: install python
+#    raw: sudo apt-get update && sudo apt-get -y install python-simplejson
 
   tasks:
 #  - name: ensure git is installed
