@@ -132,11 +132,13 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             slider.change('change', function () {
                 //user change time
                 //slider.val will get int
-                if (parseInt(slider.val() == 100) && !classEnd) {
+                if (parseInt(slider.val() > 99) ) {
                     //jump to live
                     notReviewMode = true;
                     playedTime = totalTime;
                     document.dispatchEvent(events.switchToLive);
+                    transactionSystem.switchTime();
+                    soundTransactionSystem.jumpTo();
                 } else {
                     notReviewMode = false;
                     playedTime = new Date(slider.val() * (totalTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
