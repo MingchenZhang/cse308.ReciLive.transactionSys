@@ -69,21 +69,21 @@
             <a href="#modal1"><span class="fa fa-window-restore fa-2x slides"></span></a>
             <!-- Modal Structure For Slides-->
             <div id="modal1" class="modal bottom-sheet">
-              <div class="modal-content" id="slides-selector">
+                <div class="modal-content" id="slides-selector">
 
-              </div>
-              <div class="modal-footer">
-                <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-              </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+                </div>
             </div>
             <div class="fixed-action-btn draw horizontal">
-              <span class="fa fa-pencil-square fa-3x"></span>
-              <ul id="draw-control-panel">
-                <li><a class="btn-floating red"><i class="fa fa-pencil"></i></a></li>
-                <li><a class="btn-floating yellow darken-1"><i class="fa fa-undo"></i></a></li>
-                <li><a class="btn-floating green"><i class="fa fa-repeat"></i></a></li>
-                <li><a class="btn-floating blue"><i class="fa fa-eraser"></i></a></li>
-              </ul>
+                <span class="fa fa-pencil-square fa-3x"></span>
+                <ul id="draw-control-panel">
+                    <li><a class="btn-floating red"><i class="fa fa-pencil"></i></a></li>
+                    <li><a class="btn-floating yellow darken-1"><i class="fa fa-undo"></i></a></li>
+                    <li><a class="btn-floating green"><i class="fa fa-repeat"></i></a></li>
+                    <li><a class="btn-floating blue"><i class="fa fa-eraser"></i></a></li>
+                </ul>
             </div>
             <img src="../static/img/shut-down.png" class="ending-controller">
         </div>
@@ -98,20 +98,21 @@
             </div>
         </div>
         <div class="col-md-4" id="info-board">
-          <div class="fixed-action-btn horizontal">
-            <a class="btn-floating btn-large waves-effect waves-light red" id="submit"><i class="material-icons">add</i></a>
-            <ul>
-              <li><input type="text" name="text" id="send"></input></li>
-            </ul>
-          </div>
+            <div class="fixed-action-btn horizontal">
+                <a class="btn-floating btn-large waves-effect waves-light red" id="submit"><i
+                            class="material-icons">add</i></a>
+                <ul>
+                    <li><input type="text" name="text" id="send"></input></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-$(document).ready(function() {
-    $('.modal').modal();
-});
+    $(document).ready(function () {
+        $('.modal').modal();
+    });
 
     eventRate = 2048;
 
@@ -143,13 +144,12 @@ $(document).ready(function() {
     soundControlSystem = new SoundControl(transactionSystem);
     viewManager = new ViewManager($('.stage-view'));
     chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
-    slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'),$('#slides-selector'));
+    slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'), $('#slides-selector'));
     transactionSystem.registerModule(chatModule.moduleName, chatModule);
     transactionSystem.registerModule(slideModule.moduleName, slideModule);
     transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
     canvasController = new canvasontroller($('#CursorLayer'));
     sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'));
-
     $('.ending-controller').click(transactionSystem.endRecitation);
 
     var loadingDialog;
@@ -175,7 +175,7 @@ $(document).ready(function() {
             transactionSystem.privilege = result[0].privilege;
         } else throw result[0];
         //handle the resource
-            resource = result[1].resources;
+        resource = result[1].resources;
     }).then(transactionSystem.init).then(function () {
         if (!transactionSystem.firstTransactionTime()) {
             // no transaction posted

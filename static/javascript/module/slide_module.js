@@ -5,7 +5,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     //slideList get all transaction in order
     self.isNotIncremental = true;
     //instructor img tag list
-    self.slideData = {};
+    self.slideData = [];
     self.ignoreTransaction = {};
     self.currentSlidesNumber = -1;
     //reset ignore slidelist and clean up canvas
@@ -13,7 +13,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     self.reset = function () {
         self.slidesIndex = null;
         self.ignoreTransaction = {};
-        self.slideData = {};
+        self.slideData = [];
         self.slidesName = null;
         self.slidesIndex = null;
         //check here for reset problem
@@ -25,16 +25,17 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         return img[0].naturalHeight / img[0].naturalWidth;
     }
 
-    self.updateSelector = function() {
+    function updateSelector() {
         selectorDiv.children('*').remove();
         let i = 0;
         self.slideData.forEach(function (element) {
-            var slidesOption = $('<div class="slides element" index="'+(i++)+'" value="'+element.name+'">'+element.name+'</div>');
-            slidesOption.on('click',function () {
-                self.slidesIndex = i;
-                self.slidesName = element.name;
-                newSlide(self.slideData[i].imgDataList[0]);
-            })
+            var slidesOption = $('<div class="slides element" index="' + (i++) + '" value="' + element.name + '">' + element.name + '</div>');
+            slidesOption.on('click', function () {
+                self.slidesIndex = parseInt($(this).attr('index'));
+                self.slidesName = $(this).attr('value');
+                self.newSlide(self.slideData[self.slidesIndex].imgDataList[0]);
+            });
+            selectorDiv.append(slidesOption);
         });
     };
 
@@ -55,9 +56,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         showDiv.append(img);
     }
 
-    function getSlidesName() {
-
-    }
 
     //update all the slides to front end transaction system
     self.update = function (index, description, createdBy, createdAt, payload) {
@@ -113,7 +111,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                                     var img = document.createElement('img');
                                     img.crossOrigin = 'anonymous';
                                     img.src = url.url;
-                                    let j = slidesCounter-1;
+                                    let j = slidesCounter - 1;
                                     img.onload = function () {
                                         let canvas = document.createElement("canvas");
                                         canvas.width = img.width;
@@ -175,6 +173,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                 }
             });
             Promise.all(self.loadAllSlides()).then(function (responce) {
+                updateSelector();
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
                     self.slidesIndex = 0;
