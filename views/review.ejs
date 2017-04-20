@@ -109,7 +109,7 @@
         overlayClosesOnClick: false
     })
     $.ajax({
-        url: window.location.href.split('?')[0] + '/my_privilege',
+        url: window.location.href.split(/\?|#/)[0] + '/my_privilege',
         type: 'get',
         dataType: 'json',
     }).then((result) => {
