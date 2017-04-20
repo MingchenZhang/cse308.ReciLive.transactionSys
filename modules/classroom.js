@@ -77,13 +77,13 @@ exports.getRoute = function (s) {
                             "name": "second slide",
                             "pages": [
                                 {
-                                    "url": "https://room.recilive.stream/static/dummy_data/slides/1.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/5.png"
                                 },
                                 {
-                                    "url": "https://room.recilive.stream/static/dummy_data/slides/2.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/6.png"
                                 },
                                 {
-                                    "url": "https://room.recilive.stream/static/dummy_data/slides/3.png"
+                                    "url": "https://room.recilive.stream/static/dummy_data/slides/7.png"
                                 }
                             ]
                         }
