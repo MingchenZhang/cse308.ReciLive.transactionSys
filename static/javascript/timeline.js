@@ -29,6 +29,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             if (!startTime && !transactionSystem.firstTransactionTime()) {
                 //there isn't any transaction system first transaction
                 setTimeout(sliderUpdater, 1000);
+                slider.val(100.0);
                 return;
             }
             else if (!startTime && transactionSystem.firstTransactionTime()) {
@@ -40,6 +41,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                     attachListener(slider);
                     sliderUpdater();
                 });
+                slider.val(100.0);
             }
             else if (classEnd) {
                 if(notReviewMode)return;
@@ -102,7 +104,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         }
 
         function classEndFunc() {
-//TODO: need maek sure last transaction be set up before this function called
+            //TODO: need maek sure last transaction be set up before this function called
             classEnd = true;
             slider.off();
             //no one should change total time after this
@@ -132,11 +134,11 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             slider.change('change', function () {
                 //user change time
                 //slider.val will get int
-                if (parseInt(slider.val() > 99) ) {
+                if (slider.val() > 99 ) {
                     //jump to live
                     notReviewMode = true;
                     playedTime = totalTime;
-                    document.dispatchEvent(events.switchToLive);
+                    document.dispatchEvent(events.switchToLive());
                     transactionSystem.switchTime();
                     soundTransactionSystem.jumpTo();
                 } else {

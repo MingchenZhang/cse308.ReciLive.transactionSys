@@ -78,7 +78,8 @@ function TransactionSystem(path) {
     }
 
     this.switchTime = function (time) {
-        console.log("transaction time switch to: "+time);
+        if(time) console.log("transaction time switch to: "+time);
+        else console.log("transaction time switch to live");
         function findKeyTransaction(moduleName, time, isNotIncremental) {
             if (isNotIncremental) {
                 for (var i = transactions.length - 1; i >= 0; i--) {
