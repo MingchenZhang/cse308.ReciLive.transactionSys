@@ -65,7 +65,8 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
     };
 
     this.jumpTo = function (date) {
-        console.log('sound jump to: '+date);
+        if(date) console.log('sound jump to: '+date);
+        else console.log('sound jump to live');
         connection.send(JSON.stringify({type:"jump_to", startAt: date}));
         receiverBuffer.empty();
     };
