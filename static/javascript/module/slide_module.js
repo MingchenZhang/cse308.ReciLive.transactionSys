@@ -1,4 +1,4 @@
-function Slide(transactionSystem, showDiv, previousButton, nextButton, showDiv) {
+function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorDiv) {
 
     var self = this;
     self.moduleName = 'slides';
@@ -26,7 +26,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, showDiv) 
     }
 
     self.updateSelector = function() {
-        showDiv.children('*').remove();
+        selectorDiv.children('*').remove();
         let i = 0;
         self.slideData.forEach(function (element) {
             var slidesOption = $('<div class="slides element" index="'+(i++)+'" value="'+element.name+'">'+element.name+'</div>');
@@ -99,11 +99,12 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, showDiv) 
                     if (element.type == "slide") {
                         //get all slides list
                         let payload = element.content;
+                        let slidesCounter = 0;
                         payload.forEach(function (slides) {
                             //counter for promiseList
                             let listItemCounter = -1;
                             let index = -1;
-                            self.slideData[listItemCounter] = {name: slides.name, imgDataList: []};
+                            self.slideData[slidesCounter++] = {name: slides.name, imgDataList: []};
                             slides.pages.forEach(function (url) {
                                 index++;
                                 listItemCounter++;
@@ -112,12 +113,13 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, showDiv) 
                                     var img = document.createElement('img');
                                     img.crossOrigin = 'anonymous';
                                     img.src = url.url;
+                                    let j = slidesCounter-1;
                                     img.onload = function () {
                                         let canvas = document.createElement("canvas");
                                         canvas.width = img.width;
                                         canvas.height = img.height;
                                         canvas.getContext('2d').drawImage(img, 0, 0);
-                                        self.slideData[listItemCounter].imgDataList[i] = {
+                                        self.slideData[j].imgDataList[i] = {
                                             slide64: canvas.toDataURL("image/png"),
                                             id: i
                                         };
