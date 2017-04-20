@@ -151,6 +151,11 @@
     canvasController = new canvasontroller($('#CursorLayer'));
     sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'));
     $('.ending-controller').click(transactionSystem.endRecitation);
+    document.addEventListener(events.endRecitation.type, (e) => {
+        // if class has ended
+        $(".rec-ended-notification").css("display", "block");
+        // show the ended image
+    }, false);
 
     var loadingDialog;
     var prestartDialog;
@@ -213,12 +218,6 @@
         sliderController.init();
         viewManager.init();
 
-        document.addEventListener(events.endRecitation.type, (e) => {
-            // if class has ended
-            $(".rec-ended-notification").css("display", "block");
-            // show the ended image
-        }, false);
-
         return activateSound();
     }).then(() => {
         if (loadingDialog) vex.close(loadingDialog);
@@ -232,18 +231,18 @@
             if (!soundControlSystem.asSpeaker) return start_microphone();
             if (!navigator.getUserMedia)
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                    navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                        navigator.mozGetUserMedia || navigator.msGetUserMedia;
             if (navigator.getUserMedia) {
                 navigator.getUserMedia({
-                        audio: true
-                    },
-                    function (stream) {
-                        start_microphone(stream);
-                    },
-                    function (e) {
-                        alert('Error capturing audio.');
-                        reject({reason: 'audio permission rejected'});
-                    }
+                            audio: true
+                        },
+                        function (stream) {
+                            start_microphone(stream);
+                        },
+                        function (e) {
+                            alert('Error capturing audio.');
+                            reject({reason: 'audio permission rejected'});
+                        }
                 );
             } else {
                 alert('getUserMedia not supported in this browser.');
@@ -275,7 +274,7 @@
                     var outputBuffer = audioProcessingEvent.outputBuffer;
                     var inputData = inputBuffer.getChannelData(0);
                     var outputData = outputBuffer.getChannelData(0);
-                    if (soundControlSystem.asSpeaker)
+                    if (soundControlSystem.asSpeaker && transactionSystem.liveFlag)
                         soundSystem.send(inputData);
                     if (soundControlSystem.asListener)
                         soundSystem.writeNextSoundBuffer(outputData);

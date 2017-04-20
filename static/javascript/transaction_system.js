@@ -13,8 +13,9 @@ function TransactionSystem(path) {
     var currentTime = null;// current time when user click on replay or review button
     var currentPlayedIndex = -1;
     //TODO: change current time to relative time soon™
-    this.privilege = null; // assign by outside
-    this.userID = null; // assign by outside
+    self.liveFlag = true;
+    self.privilege = null; // assign by outside
+    self.userID = null; // assign by outside
 
     this.firstTransactionTime = function () {
         if (transactions[0])return transactions[0].createdAt;
@@ -38,6 +39,13 @@ function TransactionSystem(path) {
         connection.connect();
 
         self.registerModule('admin', new AdminModule(self));
+
+        document.addEventListener(events.switchToPlayBack.type, function (e) {
+            self.liveFlag = false;
+        }, false);
+        document.addEventListener(events.switchToLive.type, function (e) {
+            self.liveFlag = true;
+        }, false);
 
         return latestReady;
     };
@@ -232,8 +240,10 @@ function TransactionSystem(path) {
             return new Promise(function (resolve, reject) {
                 if (err.reason == 1)
                     console.log('transaction conflict, retrying. ');
-                else
-                    console.error('failDelay captured error: ' + err.toString());
+                else{
+                    console.error('failDelay captured error: ');
+                    console.error(err);
+                }
                 setTimeout(reject.bind(null, err), attemptInterval);
             });
         }
@@ -250,11 +260,12 @@ function TransactionSystem(path) {
     };
 
     this.startRecitation = function () {
-        return this.newTransaction('admin', {command: 'start_recitation'}, {});
+        return self.newTransaction('admin', {command: 'start_recitation'}, {});
     };
 
     this.endRecitation = function () {
-        return this.newTransaction('admin', {command: 'end_recitation'}, {});
+        console.log('end pressed');
+        return self.newTransaction('admin', {command: 'end_recitation'}, {});
     };
 }
 
