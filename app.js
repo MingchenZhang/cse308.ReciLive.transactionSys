@@ -60,7 +60,7 @@ app.use(function (req, res, next) {
             res.locals.userLoginInfo = userInfo;
             next();
         }).catch((err)=> {
-            res.status(403).send("google login failed");
+            res.status(403).send("google login failed: "+err.toString());
         });
     } else next();
 });
