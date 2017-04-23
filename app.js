@@ -42,9 +42,9 @@ if(s.role == 'support'){
 }else if(s.role == 'live'){
     s.transactionRecord = require('./database/transaction_record.js');
     s.transactionRecord.initDatabase(readyList);
-
-    s.sessionManager = require('./live_modules/sessionManager');
 }
+
+s.sessionManager = require('./live_modules/sessionManager');
 
 var app = Express();
 
