@@ -7,7 +7,9 @@ exports.getRoute = function (s) {
 
     var urlParser = BodyParser.urlencoded({extended: false, limit: '10kb'});
 
-    router.get('/', urlParser, function (req, res, next) {});
+    router.get('/', urlParser, function (req, res, next) {
+      res.render('home.ejs');
+    });
 
     return router;
 };

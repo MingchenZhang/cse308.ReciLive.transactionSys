@@ -1,0 +1,15 @@
+body {
+    background-color: #173e43;
+}
+
+h1 {
+    color: #e05038;
+}
+
+.center {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+}
+
