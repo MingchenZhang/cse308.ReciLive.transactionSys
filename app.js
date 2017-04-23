@@ -7,11 +7,11 @@ if(Os.platform() == 'win32'){
     npmResult = ChildProcess.spawnSync('npm', ['install'], {stdio: 'inherit'});
 }
 if(npmResult.status != 0){
-    console.error('modules install failed, app.js cannot proceed. exiting...');
+    console.error('live_modules install failed, app.js cannot proceed. exiting...');
     process.exit(1);
 }
 
-global.log = require('./modules/logging');var Express = require('express');
+global.log = require('./live_modules/logging');var Express = require('express');
 var Http = require('http');
 var Https = require('https');
 var CookieParser = require('cookie-parser');
@@ -22,22 +22,23 @@ var Ejs = require('ejs');
 var Fs = require('fs');
 var WSWebSocket = require("ws").Server;
 
-var WSHandle = require('./modules/websocket');
+var WSHandle = require('./live_modules/websocket');
 var Tools = require('./tools.js');
 var readyList = [];
 global.s = {
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb,
     dbPath: process.env.DB_PATH || 'mongodb://localhost:27017/',
-    googleLoginTool: require('./modules/google_login'),
+    googleLoginTool: require('./live_modules/google_login'),
     inProduction: process.env.NODE_ENV === 'production',
     googleLoginClientID: process.env.GOOGLE_LOGIN_CLIENT_ID,
+    role: process.env.ROLE,
 };
 
 s.transactionRecord = require('./database/transaction_record.js');
 s.transactionRecord.initDatabase(readyList);
 
-s.sessionManager = require('./modules/sessionManager');
+s.sessionManager = require('./live_modules/sessionManager');
 
 var app = Express();
 
@@ -60,11 +61,15 @@ app.use(function (req, res, next) {
             res.locals.userLoginInfo = userInfo;
             next();
         }).catch((err)=> {
-            res.status(403).send("google login failed: "+err.message?err.message:"unknown error");
+            res.status(403).send("google login failed: "+(err.message?err.message:"unknown error"));
         });
     } else next();
 });
-app.use('/', require('./modules/rest').getRoute(s));
+
+// ---------------all available role section -----------
+if(s.role == 'support') app.use('/', require('./support_routes').getRoute(s));
+else if(s.role == 'live') app.use('/', require('./live_modules/rest').getRoute(s));
+else console.error('WARNING: no role assigned');
 
 // ---------------error handling section ---------------
 // 404 error
