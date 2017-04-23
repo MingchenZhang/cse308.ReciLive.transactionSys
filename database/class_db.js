@@ -45,13 +45,17 @@ exports.getClassesByStudent = function (student) {
             proList[index] = new When.Promise((resolve, reject)=>{
                 classDB.classesColl.findOne({_id: clazz.class}, function (err, result) {
                     if(err) return reject(err);
-                    if(!result) return rejcet('no result found');
+                    if(!result) return reject('no result found');
                     return resolve(result);
                 });
             });
         });
         return proList;
     });
+};
+
+exports.addStudentToClass = function(student, clazz){
+    return classDB.classEnrollColl.insertOne({'user':student, 'class':clazz});
 };
 
 exports.addClass = function (name, startDate, endDate, owner) {
