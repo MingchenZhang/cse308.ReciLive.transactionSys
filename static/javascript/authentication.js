@@ -5,12 +5,6 @@ $( document ).ready(function() {
     $("#sign-up-modal").animatedModal();
 });
 
-function onLoad() {
-    gapi.load('auth2', function () {
-        gapi.auth2.init();
-    });
-}
-
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
@@ -42,4 +36,14 @@ function onSignIn(googleUser) {
     // document.cookie = "email=" + profile.getEmail() + ";";
     // document.cookie = "name=" + profile.getName() + ";";
     // document.cookie = "ID=" + profile.getId() + ";";
+
+    // if()
+    vex.dialog.confirm({
+      message: 'What is your role?',
+      callback: function (value) {
+        console.log(value)
+      }
+    });
+    vex.dialog.buttons.YES.text = 'Instructor'
+    vex.dialog.buttons.NO.text = 'Student'
 }
