@@ -20,6 +20,10 @@ exports.initDatabase = function (readyList) {
             classDB.classesColl.createIndex({createdAt:-1});
             classDB.classesColl.createIndex({numericID:1}, {unique: true});
 
+            classDB.classEnrollColl = db.collection('classEnroll');
+            classDB.classEnrollColl.createIndex({'class':1});
+            classDB.classEnrollColl.createIndex({'user':1});
+
             classDB.recitationColl = db.collection('recitation');
             classDB.recitationColl.createIndex({owner:1});
 
@@ -31,7 +35,23 @@ exports.initDatabase = function (readyList) {
 //class: name, startDate, endDate, createdAt, owner
 //recitation: numericID, name, startDate, endDate, createdAt, parentClass
 exports.getClassesByOwner = function (owner) {
-    return classDB.classesColl.find({owner}, {sort: [['createdAt', -1]]}).toArray();
+    return classDB.classesColl.find({owner}).sort({'createdAt':-1}).toArray();
+};
+
+exports.getClassesByStudent = function (student) {
+    return classDB.classEnrollColl.find({user:student}).sort({'createdAt':-1}).toArray().then((classesList)=>{
+        var proList = [];
+        classesList.forEach((clazz, index)=>{
+            proList[index] = new When.Promise((resolve, reject)=>{
+                classDB.classesColl.findOne({_id: clazz.class}, function (err, result) {
+                    if(err) return reject(err);
+                    if(!result) return rejcet('no result found');
+                    return resolve(result);
+                });
+            });
+        });
+        return proList;
+    });
 };
 
 exports.addClass = function (name, startDate, endDate, owner) {
@@ -57,6 +77,6 @@ exports.addRecitation = function (name, startDate, endDate, createdAt, parentCla
 };
 
 exports.getRecitationsByClass = function (parentClass) {
-    return classDB.recitationColl.find({parentClass}, {sort: [['createdAt', -1]]}).toArray();
+    return classDB.recitationColl.find({parentClass}).sort({'createdAt':-1}).toArray();
 };
 
