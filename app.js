@@ -33,12 +33,18 @@ global.s = {
     inProduction: process.env.NODE_ENV === 'production',
     googleLoginClientID: process.env.GOOGLE_LOGIN_CLIENT_ID,
     role: process.env.ROLE,
+
+    userConn: null,
 };
+if(s.role == 'support'){
+    s.userConn = require('./database/user_db');
+    s.userConn.initDatabase(readyList);
+}else if(s.role == 'live'){
+    s.transactionRecord = require('./database/transaction_record.js');
+    s.transactionRecord.initDatabase(readyList);
 
-s.transactionRecord = require('./database/transaction_record.js');
-s.transactionRecord.initDatabase(readyList);
-
-s.sessionManager = require('./live_modules/sessionManager');
+    s.sessionManager = require('./live_modules/sessionManager');
+}
 
 var app = Express();
 
