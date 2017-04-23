@@ -1,5 +1,5 @@
 //ui controller
-var replayController = function (soundTransactionSystem, transactionSystem, slider) {
+var replayController = function (soundTransactionSystem, transactionSystem, slider, div) {
         self = this;
         var totalTime = null;
         var startTime = null;
@@ -61,10 +61,10 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                     }
                     slider.val((playedTime.getTime() - startTime.getTime()) / (totalTime.getTime() - startTime.getTime()) * 100);
                     //TODO: delete this later
-                    console.log("class end");
-                    console.log("current percentage:", slider.val());
-                    console.log("total:", totalTime);
-                    console.log("played:", playedTime);
+                    //console.log("class end");
+                    //console.log("current percentage:", slider.val());
+                    //console.log("total:", totalTime);
+                    //console.log("played:", playedTime);
                     //TODO:check if class over
                     setTimeout(sliderUpdater, updateInternvarSecond);
                 }
@@ -78,9 +78,9 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                 totalTime = new Date(totalTime.getTime() + updateInternvarSecond);
                 playedTime = totalTime;
                 //TODO: delete this later
-                console.log("current percentage:", slider.val());
-                console.log("total:", totalTime);
-                console.log("played:", playedTime);
+                //console.log("current percentage:", slider.val());
+                //console.log("total:", totalTime);
+                //console.log("played:", playedTime);
                 systemTimeUpdateCounter++;
                 //TODO:check if class over
                 setTimeout(sliderUpdater, updateInternvarSecond);
@@ -137,7 +137,7 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                 notReviewMode = true;
                 slider.off();
                 attachListener(slider);
-                setTimeout(sliderUpdater,updateInternvarSecond);
+                setTimeout(sliderUpdater, updateInternvarSecond);
             } else {
                 //no first transaction teacher haven't get in to room
                 console.error("class end without any content");
@@ -195,12 +195,27 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                     document.dispatchEvent(events.switchToLive());
                     transactionSystem.switchTime();
                     soundTransactionSystem.jumpTo();
+                    setTimeout(function () {
+                        div.find('thumb active').remove();
+                    }, 1000);
+                    div.find('value').html(
+                        totalTime.getMinutes() + ":" + totalTime.getSeconds()
+                    );
                 } else {
                     notReviewMode = false;
                     playedTime = new Date(slider.val() * (totalTime.getTime() - startTime.getTime()) / 100 + startTime.getTime());
                     transactionSystem.switchTime(playedTime);
                     soundTransactionSystem.jumpTo(playedTime);
                     document.dispatchEvent(events.switchToPlayBack());
+                    setTimeout(function () {
+                        div.find('.thumb').remove();
+                    }, 1000);
+                    setTimeout(function () {
+                        div.find('.value').html(
+                            playedTime.getMinutes() + ":" + playedTime.getSeconds()
+                        );
+                    },50);
+
                 }
             });
         }
