@@ -22,7 +22,6 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/check-user', jsonParser, function (req, res, next) {
-
         s.userConn.getUserByGoogleID(s.userLoginInfo.userID).then((response) => {
             if (response) {
                 res.send({result: true, sign_up: true});
@@ -37,21 +36,16 @@ exports.getRoute = function (s) {
     });
 
 router.post('/class',jsonParser,(req,res,next)=>{
-
+    s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.name).then((response) => {
+        if (response) {
+            res.send({redirect: '/course'});
+        } else {
+            res.status(505);
+        }        
+    }).catch((e) => {
+        if (typeof e == "error")
+            res.send({result: false, reason: e.message});
+        else res.send({result: false, reason: "error get user by google login"});
+    });
 });
-    @RequestMapping(value = "/class", method = RequestMethod.POST)
-    public String addUser(@ModelAttribute("user")User user, BindingResult result, @RequestParam("role") String role, ModelMap model, @CookieValue("email") String email) throws EntityNotFoundException {
-        if(result.hasErrors()) {
-            return "error";
-        }
-        user.addUser(role, email);
-        model.addAttribute("role", user.getRole());
-        if(role.equals("Student")) {
-            return "course_student";
-        }else if (role.equals("Instructor")) {
-            return "course_instructor";
-        }
-        return "error";
-    }
-    return router;
 };
