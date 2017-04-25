@@ -22,7 +22,8 @@ exports.getUserInfo = function (tokenID) {
                 var payload = login.getPayload();
                 resolve({
                     userID: payload['sub'],
-                    name: payload['name']
+                    name: payload['name'],
+                    email: payload['email']
                 });
             });
     });
