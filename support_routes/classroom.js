@@ -52,7 +52,7 @@ exports.getRoute = function (s) {
             res.send({result: true});
         }).catch((e) => {
                 if (typeof e == "error") {
-                    res.send({reslut: false, error: e.message});
+                    res.send({result: false, error: e.message});
                 } else {
                     res.send({result: false, error: "error in class DB add class"});
                 }
