@@ -29,7 +29,7 @@ exports.getRoute = function (s) {
         s.classConn.addRecitation(req.body.name, req.body.startDate, req.body.endDate, req.body.createdAt, req.body.class).then((recitation) => {
             if (recitation) {
                 var privilege = {};
-                privilege[s.userLoginInfo.userID] = ["admin", "slides", "sound_control"];
+                privilege[req.userLoginInfo.userID] = ["admin", "slides", "sound_control"];
                 s.classConn.getStudentsByClass(req.body.class).then((response)=>{
                     response.foreach((student)=>{
                         privilege[student.googleID] = []

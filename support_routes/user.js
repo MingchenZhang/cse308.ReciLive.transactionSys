@@ -22,7 +22,7 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/check-user', jsonParser, function (req, res, next) {
-        s.userConn.getUserByGoogleID(s.userLoginInfo.userID).then((response) => {
+        s.userConn.getUserByGoogleID(req.userLoginInfo.userID).then((response) => {
             if (response) {
                 res.send({result: true, sign_up: false});
             } else {
@@ -37,7 +37,7 @@ exports.getRoute = function (s) {
 
 
     router.post('/ajax/sign_up', jsonParser, (req, res, next) => {
-        s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.username).then(() => {
+        s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, req.body.role, req.userLoginInfo.username).then(() => {
             res.send({result: true});
         }).catch((e) => {
             if (typeof e == "error")
@@ -47,7 +47,7 @@ exports.getRoute = function (s) {
     });
 
     router.post('/class', jsonParser, (req, res, next) => {
-        s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.name).then((response) => {
+        s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, req.body.role, req.userLoginInfo.name).then((response) => {
             if (response) {
                 res.send({redirect: '/course'});
             } else {
