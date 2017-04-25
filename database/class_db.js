@@ -39,7 +39,7 @@ exports.getClassesByOwner = function (owner) {
 };
 
 exports.getClassesByStudent = function (student) {
-    return classDB.classEnrollColl.find({user:student}).sort({'createdAt':-1}).toArray().then((classesList)=>{
+    return classDB.classEnrollColl.find({user:student}).sort({_id:-1}).toArray().then((classesList)=>{
         var proList = [];
         classesList.forEach((clazz, index)=>{
             proList[index] = new When.Promise((resolve, reject)=>{
@@ -52,6 +52,10 @@ exports.getClassesByStudent = function (student) {
         });
         return proList;
     });
+};
+
+exports.getStudentsByClass = function(clazz){
+    return classDB.classEnrollColl.find({class:s.mongodb.ObjectID(clazz)}).sort({_id:-1}).toArray();
 };
 
 exports.addStudentToClass = function(student, clazz){
