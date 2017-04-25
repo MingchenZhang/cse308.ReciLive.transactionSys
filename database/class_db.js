@@ -70,14 +70,15 @@ exports.addClass = function (name, startDate, endDate, owner) {
 
 exports.addRecitation = function (name, startDate, endDate, createdAt, parentClass) {
     var numericID = Math.floor(Math.random()*10000000);
-    return classDB.recitationColl.insertOne({
+    var insert = {
         numericID,
         name,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         createdAt: new Date(),
         parentClass: s.mongodb.ObjectID(parentClass),
-    });
+    };
+    return classDB.recitationColl.insertOne(insert).then(()=>{return insert});
 };
 
 exports.getRecitationsByClass = function (parentClass) {
