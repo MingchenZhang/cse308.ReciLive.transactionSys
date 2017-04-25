@@ -113,9 +113,8 @@ if (process.env.HTTPS_PORT) {
 }
 
 // start up server
-When.all(readyList)
-    .then(s.sessionManager.initSession)
-    .then(function () {
+if (s.role == 'support'){
+    When.all(readyList).then(function () {
         var httpPort = process.env.HTTP_PORT || 3000;
         var httpsPort = process.env.HTTPS_PORT;
         httpServer.listen(httpPort);
@@ -125,3 +124,17 @@ When.all(readyList)
         }
         console.log('http ready on ' + httpPort);
     });
+} else if (s.role == 'live'){
+    When.all(readyList).then(s.sessionManager.initSession).then(function () {
+        var httpPort = process.env.HTTP_PORT || 3000;
+        var httpsPort = process.env.HTTPS_PORT;
+        httpServer.listen(httpPort);
+        if (httpsPort) {
+            httpsServer.listen(httpsPort);
+            console.log('https ready on ' + httpsPort);
+        }
+        console.log('http ready on ' + httpPort);
+    });
+} else {
+    console.error('WARNING: no role assigned');
+}
