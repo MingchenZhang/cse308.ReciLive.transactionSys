@@ -178,7 +178,7 @@ self.presetEvent=function(){
                     console.log("no next slide\n");
                 }
             });
-            Promise.all(self.loadAllSlides()).then(function (responce) {
+            Promise.all(self.loadAllSlides()).then(function (response) {
                 updateSelector();
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
