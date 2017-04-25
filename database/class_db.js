@@ -61,10 +61,10 @@ exports.addStudentToClass = function(student, clazz){
 exports.addClass = function (name, startDate, endDate, owner) {
     return classDB.classesColl.insertOne({
         name,
-        startDate,
-        endDate,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
         createdAt: new Date(),
-        owner,
+        owner: s.mongodb.ObjectID(owner),
     });
 };
 
@@ -73,14 +73,16 @@ exports.addRecitation = function (name, startDate, endDate, createdAt, parentCla
     return classDB.recitationColl.insertOne({
         numericID,
         name,
-        startDate,
-        endDate,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
         createdAt: new Date(),
-        parentClass,
+        parentClass: s.mongodb.ObjectID(parentClass),
     });
 };
 
 exports.getRecitationsByClass = function (parentClass) {
-    return classDB.recitationColl.find({parentClass}).sort({'createdAt':-1}).toArray();
+    return classDB.recitationColl.find({
+        parentClass: s.mongodb.ObjectID(parentClass)
+    }).sort({'createdAt':-1}).toArray();
 };
 
