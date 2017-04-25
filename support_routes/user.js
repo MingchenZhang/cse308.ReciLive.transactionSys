@@ -38,7 +38,8 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/sign_up', jsonParser, (req, res, next) => {
         s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.username).then(() => {
-            res.send({result: true});
+            // res.send({result: true});
+            res.send({redirect: '/course'});
         }).catch((e) => {
             if (typeof e == "error")
                 res.send({result: false, reason: e.message});
@@ -46,19 +47,19 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.post('/class', jsonParser, (req, res, next) => {
-        s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.name).then((response) => {
-            if (response) {
-                res.send({redirect: '/course'});
-            } else {
-                res.status(505);
-            }
-        }).catch((e) => {
-            if (typeof e == "error")
-                res.send({result: false, reason: e.message});
-            else res.send({result: false, reason: "error get user by google login"});
-        });
-    });
+    // router.post('/class', jsonParser, (req, res, next) => {
+    //     s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.name).then((response) => {
+    //         if (response) {
+    //             res.send({redirect: '/course'});
+    //         } else {
+    //             res.status(505);
+    //         }
+    //     }).catch((e) => {
+    //         if (typeof e == "error")
+    //             res.send({result: false, reason: e.message});
+    //         else res.send({result: false, reason: "error get user by google login"});
+    //     });
+    // });
 
     return router;
 };

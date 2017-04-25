@@ -37,13 +37,41 @@ function onSignIn(googleUser) {
     // document.cookie = "name=" + profile.getName() + ";";
     // document.cookie = "ID=" + profile.getId() + ";";
 
-    // if()
-    vex.dialog.confirm({
-      message: 'What is your role?',
-      callback: function (value) {
-        console.log(value)
-      }
+    $.ajax({
+        type: "POST",
+        url: "/ajax/check-user",
+        success: function (data) {
+            if(data.sign_up) {
+                vex.dialog.buttons.YES.text = 'Student';
+                vex.dialog.buttons.NO.text = 'Instructor';
+                vex.dialog.confirm({
+                    message: 'What is your role?',
+                    callback: function (value) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/ajax/sign_up",
+                            data: JSON.stringify({role: value}),
+                            success: function (data) {
+                                if(data.result) {
+                                    if (data.redirect)
+                                        window.location = data.redirect;
+                                        // window.location.href = window.location.origin;
+                                }else {
+                                    // ERROR handling
+                                }
+                            },
+                            error: function(ts) {
+                                console.log(ts.responseText);
+                            }
+                        });
+                    }
+                });
+            }else {
+
+            }
+        },
+        error: function(ts) {
+            console.log(ts.responseText);
+        }
     });
-    vex.dialog.buttons.YES.text = 'Instructor'
-    vex.dialog.buttons.NO.text = 'Student'
 }
