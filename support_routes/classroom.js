@@ -4,7 +4,6 @@ var When = require('when'); // used by sequential callback
 
 exports.getRoute = function (s) {
     var router = Express.Router();
-
     var jsonParser = BodyParser.json({limit: '10kb'});
 
     router.post('/ajax/list-class-list', jsonParser, function (req, res, next) {

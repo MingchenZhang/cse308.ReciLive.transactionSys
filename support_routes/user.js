@@ -24,9 +24,9 @@ exports.getRoute = function (s) {
     router.post('/ajax/check-user', jsonParser, function (req, res, next) {
         s.userConn.getUserByGoogleID(s.userLoginInfo.userID).then((response) => {
             if (response) {
-                res.send({result: true, sign_up: true});
-            } else {
                 res.send({result: true, sign_up: false});
+            } else {
+                res.send({result: true, sign_up: true});
             }
         }).catch((e) => {
             if (typeof e == "error")
