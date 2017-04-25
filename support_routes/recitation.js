@@ -25,7 +25,6 @@ exports.getRoute = function (s) {
         });
     });
 
-
     router.post('/ajax/add-recitation', jsonParser,  (req, res, next)=> {
         s.classConn.addRecitation(req.body.name, req.body.startDate, req.body.endDate, req.body.createdAt, req.body.class).then((recitation) => {
             if (recitation) {

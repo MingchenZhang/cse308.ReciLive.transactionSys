@@ -35,7 +35,18 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.post('/class', jsonParser, (req, res, next)=> {
+
+    router.post('/ajax/sign_up', jsonParser, (req, res, next) => {
+        s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.username).then(() => {
+            res.send({result: true});
+        }).catch((e) => {
+            if (typeof e == "error")
+                res.send({result: false, reason: e.message});
+            else res.send({result: false, reason: "error add user to db"});
+        });
+    });
+
+    router.post('/class', jsonParser, (req, res, next) => {
         s.userConn.addUser(s.userLoginInfo.userID, s.userLoginInfo.email, req.body.role, s.userLoginInfo.name).then((response) => {
             if (response) {
                 res.send({redirect: '/course'});
