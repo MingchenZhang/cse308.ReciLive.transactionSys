@@ -10,7 +10,7 @@ exports.initDatabase = function (readyList) {
 
     s.mongodb.MongoClient.connect(classDBPath, function (err, db) {
         if (err) {
-            console.error('MongodbClient connection ' + classDBPath + ' failed');
+            console.error('MongodbClient connection ' + classDBPath + ' failed')
             process.exit(1);
         } else {
             console.log('MongodbClient connection to ' + classDBPath + ' has been established');

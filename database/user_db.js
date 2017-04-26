@@ -33,7 +33,7 @@ exports.getUserByGoogleID = function (id) {
 };
 
 exports.getUserByEmail = function (email) {
-    return userDB.usersColl.findOne({email: id});
+    return userDB.usersColl.findOne({email});
 };
 
 exports.addUser = function (googleID, email, role, username) {
