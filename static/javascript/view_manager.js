@@ -1,4 +1,9 @@
-//view manager control the ratio of the whole div and the push message to different module
+//
+/**
+ * view manager control the ratio of all view div
+ * @param stageDiv
+ * @constructor
+ */
 function ViewManager(stageDiv) {
     var ratio = 0.5625; // default to 16:9
     var views = [];

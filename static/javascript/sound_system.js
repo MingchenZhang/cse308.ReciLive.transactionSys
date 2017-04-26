@@ -1,3 +1,9 @@
+/**
+ * Create a sound system that provide sound data and send sound data to remote
+ * @param path (String) Websocket sound end point to connect to
+ * @param nativeSampleRate (Number) The sample rate of the AudioContext
+ * @param eventRate (Number) The rate which writeNextSoundBuffer and send will be called (Hz).
+ */
 SoundSystem = function(path, nativeSampleRate, eventRate){
     var self = this;
     var connection;
@@ -6,6 +12,9 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
     var consumeRate = eventRate || 16384;
     var senderResampler = new Resampler(nativeSampleRate, transmitionRate, 1, Math.ceil(consumeRate*transmitionRate/nativeSampleRate)+1);
     var receiveResamplerSet = {};
+    var receiverBuffer = new Queue();
+    this.receiveFlag = false;
+
     function getReceiveResampler(senderSampleRate){
         if(receiveResamplerSet[senderSampleRate]) return receiveResamplerSet[senderSampleRate];
         var appendByte = nativeSampleRate/senderSampleRate*consumeRate;
@@ -13,9 +22,6 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         return receiveResamplerSet[senderSampleRate];
     }
 
-    var receiverBuffer = new Queue();
-
-    this.receiveFlag = false;
     var receiveHandle = function (e) {
         if(!self.receiveFlag) return false;
         var array = new Float32Array(e.data);
@@ -32,13 +38,20 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         //console.log('tailing 2: ' + receiverBuffer.getLength());
     };
 
-    this.connect = function () {
+    /**
+     * start to establish the connection
+     */
+    self.connect = function () {
         if(connection) return;
         connection = new wsConnection(path, ()=>{}, receiveHandle, false);
         connection.connect();
     };
 
-    this.send = function(inputBuffer){
+    /**
+     * send sound to remote
+     * @param inputBuffer (Float32Array) The data to be transmitted.
+     */
+    self.send = function(inputBuffer){
         var inputData = senderResampler.resampler(inputBuffer, consumeRate);
         var tobeSent = Float32Array.from({length: inputData.length+1}, (v,k)=>{
             if(k<inputData.length)return inputData[k];return nativeSampleRate; // append source sample rate
@@ -47,7 +60,12 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         //console.log(tobeSent[0]);
     };
 
-    this.writeNextSoundBuffer = function (bufferToWrite) {
+    /**
+     * write buffered sound data to an array
+     * @param bufferToWrite An number array to write to
+     * @returns {boolean} True if buffer has been poped successfully
+     */
+    self.writeNextSoundBuffer = function (bufferToWrite) {
         var bufferLength = receiverBuffer.getLength();
         if(bufferLength > consumeRate){
             for(var i=0; i<consumeRate; i++){
@@ -64,80 +82,91 @@ SoundSystem = function(path, nativeSampleRate, eventRate){
         }
     };
 
-    this.jumpTo = function (date) {
+    /**
+     * Send jump instruction to remote. Remote should later start transmitting sound data in playback mode
+     * @param date (Date) The point in time the playback should start from (When sound is recorded).
+     */
+    self.jumpTo = function (date) {
         if(date) console.log('sound jump to: '+date);
         else console.log('sound jump to live');
         connection.send(JSON.stringify({type:"jump_to", startAt: date}));
         receiverBuffer.empty();
     };
 
-    this.disconnect = function () {
+    /**
+     * disconnect the system
+     */
+    self.disconnect = function () {
         connection.close();
         connection = null;
         receiverBuffer.empty();
     };
+
+    /**
+     * Object to manage the connection
+     */
+    function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
+        var self = this;
+        var ws;
+        var reconnectPending = false;
+
+        self.connect = function () {
+            // console.error('connect called');
+            ws = createWebSocket(destination);
+            ws.binaryType = "arraybuffer";
+            ws.addEventListener("open", function (e) {
+                onConnectCallback(e);
+            });
+            ws.addEventListener("message", function (e) {
+                receiveCallback(e);
+            });
+            ws.addEventListener('close', function () {
+                if(!reconnectPending){
+                    console.log('connection to %s closed, reconnect in 1 second', destination);
+                    setTimeout(()=>{self.connect(); reconnectPending = false;}, 1000);
+                    reconnectPending = true;
+                }
+            });
+            ws.addEventListener('error', function () {
+                if(!reconnectPending) {
+                    console.log('connection to %s failed, reconnect in 3 second', destination);
+                    ws.close();
+                    setTimeout(()=>{self.connect(); reconnectPending = false;}, 3000);
+                    reconnectPending = true;
+                }
+            });
+        };
+
+        function createWebSocket(path) {
+            var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+            return new WebSocket(protocolPrefix + '//' + location.host + path, 'transaction');
+        }
+
+        self.send = function (data) {
+            if (ws.readyState != ws.OPEN && ws.readyState != ws.CONNECTING) {
+                console.log('writing while websocket is not opened, reconnect in 0.5 second');
+                if(!reconnectPending) {
+                    setTimeout(()=>{self.connect(); reconnectPending = false;}, 500);
+                    reconnectPending = true;
+                }
+                if (resend) {
+                    ws.addEventListener('open', function (e) {
+                        // remove current event listener
+                        e.target.removeEventListener(e.type, arguments.callee);
+                        ws.send(data);
+                    });
+                }
+            } else {
+                ws.send(data);
+            }
+        };
+
+        self.reset = function () {
+            ws.close();
+
+        };
+    }
 };
 
 
 
-function wsConnection(destination, onConnectCallback, receiveCallback, resend) {
-    var self = this;
-    var ws;
-    var reconnectPending = false;
-
-    this.connect = function () {
-        // console.error('connect called');
-        ws = createWebSocket(destination);
-        ws.binaryType = "arraybuffer";
-        ws.addEventListener("open", function (e) {
-            onConnectCallback(e);
-        });
-        ws.addEventListener("message", function (e) {
-            receiveCallback(e);
-        });
-        ws.addEventListener('close', function () {
-            if(!reconnectPending){
-                console.log('connection to %s closed, reconnect in 1 second', destination);
-                setTimeout(()=>{self.connect(); reconnectPending = false;}, 1000);
-                reconnectPending = true;
-            }
-        });
-        ws.addEventListener('error', function () {
-            if(!reconnectPending) {
-                console.log('connection to %s failed, reconnect in 3 second', destination);
-                ws.close();
-                setTimeout(()=>{self.connect(); reconnectPending = false;}, 3000);
-                reconnectPending = true;
-            }
-        });
-    };
-
-    function createWebSocket(path) {
-        var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
-        return new WebSocket(protocolPrefix + '//' + location.host + path, 'transaction');
-    }
-
-    this.send = function (data) {
-        if (ws.readyState != ws.OPEN && ws.readyState != ws.CONNECTING) {
-            console.log('writing while websocket is not opened, reconnect in 0.5 second');
-            if(!reconnectPending) {
-                setTimeout(()=>{self.connect(); reconnectPending = false;}, 500);
-                reconnectPending = true;
-            }
-            if (resend) {
-                ws.addEventListener('open', function (e) {
-                    // remove current event listener
-                    e.target.removeEventListener(e.type, arguments.callee);
-                    ws.send(data);
-                });
-            }
-        } else {
-            ws.send(data);
-        }
-    };
-
-    this.reset = function () {
-        ws.close();
-
-    };
-}

@@ -1,4 +1,4 @@
-// dependence: jquery, bluebird
+// dependency: jquery
 
 function TransactionSystem(path) {
     var self = this;
@@ -17,16 +17,28 @@ function TransactionSystem(path) {
     self.privilege = null; // assign by outside
     self.userID = null; // assign by outside
 
+    /**
+     * get the time the first transaction is created
+     * @returns {Date} Null if the first transaction does not exist
+     */
     this.firstTransactionTime = function () {
         if (transactions[0])return transactions[0].createdAt;
         return null;
     };
 
+    /**
+     * get the time the last transaction is created
+     * @returns {Date} Null if the last transaction does not exist
+     */
     this.lastTransactionTime = function(){
         if(transactions.length>0) return transactions[transactions.length-1].createdAt;
         return null;
     };
 
+    /**
+     * start the connection to remote
+     * @returns {Promise} to get connected
+     */
     this.init = function () {
         connection = new WSConnection(path, sendStart, receive, false);
         var ready, fail;
@@ -85,6 +97,10 @@ function TransactionSystem(path) {
         clearInterval(watchdog);
     }
 
+    /**
+     * switch to playback mode
+     * @param time (Date) The point in time the playback should start from (When transaction is made).
+     */
     this.switchTime = function (time) {
         if(time) console.log("transaction time switch to: "+time);
         else console.log("transaction time switch to live");
@@ -203,10 +219,22 @@ function TransactionSystem(path) {
         // TODO: process error message
     }
 
+    /**
+     * register a new module
+     * @param moduleName (String) the name of module
+     * @param module (Module) Module to be registered
+     */
     this.registerModule = function (moduleName, module) {
         modules[moduleName] = module;
     };
 
+    /**
+     * Create and send a new transaction. There is a 10 time retry build in.
+     * @param module (String) name of module
+     * @param description (Object) An object to be recorded along with the transaction. Transaction system might see it.
+     * @param payload (Object) An object that store all data for the transaction.
+     * @returns {Promise.<*>} resolve if server accept the transaction.
+     */
     this.newTransaction = function (module, description, payload) {
         var attemptInterval = 200;
 
@@ -259,94 +287,97 @@ function TransactionSystem(path) {
         return p;
     };
 
+    /**
+     * Send special transaction for action "start recitation". Server will only accept it if the user has "admin" privilege.
+     * @returns {Promise.<*>} resolve if server accept the transaction.
+     */
     this.startRecitation = function () {
         return self.newTransaction('admin', {command: 'start_recitation'}, {});
     };
 
+    /**
+     * Send special transaction for action "end recitation". Server will only accept it if the user has "admin" privilege.
+     * No transaction will be accepted beyond this point
+     * @returns {Promise.<*>} resolve if server accept the transaction.
+     */
     this.endRecitation = function () {
         console.log('end pressed');
         return self.newTransaction('admin', {command: 'end_recitation'}, {});
     };
-}
 
-function transaction() {
-    this.index = null;
-    this.createdAt = null;
-    this.createdBy = null;
-    this.module = null;
-    this.description = {};
-    this.payload = null;
-}
+    function WSConnection(destination, onConnectCallback, receiveCallback, resend) {
+        var self = this;
+        var ws;
+        var reconnectPending = false;
 
-function WSConnection(destination, onConnectCallback, receiveCallback, resend) {
-    var self = this;
-    var ws;
-    var reconnectPending = false;
+        this.connect = function () {
+            // console.error('connect called');
+            ws = createWebSocket(destination);
+            ws.addEventListener("open", function (e) {
+                onConnectCallback(e);
+            });
+            ws.addEventListener("message", function (e) {
+                receiveCallback(e);
+            });
+            ws.addEventListener('close', function () {
+                if (!reconnectPending) {
+                    console.log('connection to %s closed, reconnect in 1 second', destination);
+                    setTimeout(() => {
+                        self.connect();
+                        reconnectPending = false;
+                    }, 1000);
+                    reconnectPending = true;
+                }
+            });
+            ws.addEventListener('error', function () {
+                if (!reconnectPending) {
+                    console.log('connection to %s failed, reconnect in 3 second', destination);
+                    ws.close();
+                    setTimeout(() => {
+                        self.connect();
+                        reconnectPending = false;
+                    }, 3000);
+                    reconnectPending = true;
+                }
+            });
+        };
 
-    this.connect = function () {
-        // console.error('connect called');
-        ws = createWebSocket(destination);
-        ws.addEventListener("open", function (e) {
-            onConnectCallback(e);
-        });
-        ws.addEventListener("message", function (e) {
-            receiveCallback(e);
-        });
-        ws.addEventListener('close', function () {
-            if (!reconnectPending) {
-                console.log('connection to %s closed, reconnect in 1 second', destination);
-                setTimeout(() => {
-                    self.connect();
-                    reconnectPending = false;
-                }, 1000);
-                reconnectPending = true;
-            }
-        });
-        ws.addEventListener('error', function () {
-            if (!reconnectPending) {
-                console.log('connection to %s failed, reconnect in 3 second', destination);
-                ws.close();
-                setTimeout(() => {
-                    self.connect();
-                    reconnectPending = false;
-                }, 3000);
-                reconnectPending = true;
-            }
-        });
-    };
-
-    function createWebSocket(path) {
-        var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
-        return new WebSocket(protocolPrefix + '//' + location.host + path, 'transaction');
-    }
-
-    this.send = function (data) {
-        if (ws.readyState != ws.OPEN && ws.readyState != ws.CONNECTING) {
-            console.log('writing while websocket is not opened, reconnect in 0,5 second');
-            if (!reconnectPending) {
-                setTimeout(() => {
-                    self.connect();
-                    reconnectPending = false;
-                }, 500);
-                reconnectPending = true;
-            }
-            if (resend) {
-                ws.addEventListener('open', function (e) {
-                    // remove current event listener
-                    e.target.removeEventListener(e.type, arguments.callee);
-                    ws.send(data);
-                });
-            }
-        } else {
-            ws.send(data);
+        function createWebSocket(path) {
+            var protocolPrefix = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+            return new WebSocket(protocolPrefix + '//' + location.host + path, 'transaction');
         }
-    };
 
-    this.reset = function () {
-        ws.close();
-    };
+        this.send = function (data) {
+            if (ws.readyState != ws.OPEN && ws.readyState != ws.CONNECTING) {
+                console.log('writing while websocket is not opened, reconnect in 0,5 second');
+                if (!reconnectPending) {
+                    setTimeout(() => {
+                        self.connect();
+                        reconnectPending = false;
+                    }, 500);
+                    reconnectPending = true;
+                }
+                if (resend) {
+                    ws.addEventListener('open', function (e) {
+                        // remove current event listener
+                        e.target.removeEventListener(e.type, arguments.callee);
+                        ws.send(data);
+                    });
+                }
+            } else {
+                ws.send(data);
+            }
+        };
+
+        this.reset = function () {
+            ws.close();
+        };
+    }
 }
 
+/**
+ * An example of module object
+ */
 function module(transactionSystem) {
     var moduleName;
     var isNotIncremental;
@@ -359,6 +390,9 @@ function module(transactionSystem) {
     };
 }
 
+/**
+ * special module to process special recitation administration action.
+ */
 function AdminModule(transactionSystem) {
     var moduleName = 'admin';
     var isNotIncremental = false;
