@@ -38,6 +38,7 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/sign_up', jsonParser, (req, res, next) => {
         s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, req.body.role, req.userLoginInfo.username).then(() => {
+            console.log(req.body.role);
             res.send({result: true});
         }).catch((e) => {
             if (typeof e == "error")

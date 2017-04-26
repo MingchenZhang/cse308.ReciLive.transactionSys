@@ -1,13 +1,13 @@
 /**
  * Created by jieliang on 4/5/17.
  */
-$( document ).ready(function() {
+$(document).ready(function() {
     $("#sign-up-modal").animatedModal();
 });
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
+    auth2.signOut().then(function() {
         console.log('User signed out.');
         window.location.href = window.location.origin;
     });
@@ -22,7 +22,7 @@ function onSignIn(googleUser) {
     console.log('Name: ' + profile.getName());
     console.log('Image URL: ' + profile.getImageUrl());
     console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-    console.log('Token: '+id_token);
+    console.log('Token: ' + id_token);
     $('.sign-in').hide();
     $('#sign-out').show();
 
@@ -37,40 +37,44 @@ function onSignIn(googleUser) {
     document.cookie = "name=" + profile.getName() + ";";
     document.cookie = "ID=" + profile.getId() + ";";
 
-    $.ajax({
+    var checkUser = $.ajax({
         type: "POST",
-        url: "/ajax/check-user",
-        success: function (data) {
-            if(data.sign_up) {
-                vex.dialog.buttons.YES.text = 'Student';
-                vex.dialog.buttons.NO.text = 'Instructor';
-                vex.dialog.confirm({
-                    message: 'What is your role?',
-                    callback: function (value) {
-                        $.ajax({
-                            type: "POST",
-                            url: "/ajax/sign_up",
-                            data: JSON.stringify({role: value}),
-                            success: function (data) {
-                                if(data.result) {
-                                    if (data.redirect)
-                                        window.location.href = window.location.origin + data.redirect;
-                                }else {
-                                    // TODO ERROR handling
-                                }
-                            },
-                            error: function(ts) {
-                                console.log(ts.responseText);
+        url: "/ajax/check-user"
+    });
+    checkUser.done(function(data) {
+        if (data.sign_up) {
+            vex.dialog.buttons.YES.text = 'Student';
+            vex.dialog.buttons.NO.text = 'Instructor';
+            vex.dialog.confirm({
+                message: 'What is your role?',
+                callback: function(value) {
+                  if(value) {
+                    var role = 'Student';
+                  }else {
+                    role = 'Instructor';
+                  }
+                    $.ajax({
+                        type: "POST",
+                        url: "/ajax/sign_up",
+                        data: JSON.stringify({
+                            role: role
+                        }),
+                        success: function(data) {
+                            if (data.result) {
+                                if (data.redirect)
+                                    window.location.href = window.location.origin + data.redirect;
+                            } else {
+                                // TODO ERROR handling
                             }
-                        });
-                    }
-                });
-            }else {
-                window.location.href = window.location.origin + data.redirect;
-            }
-        },
-        error: function(ts) {
-            console.log(ts.responseText);
+                        },
+                        error: function(ts) {
+                            console.log(ts.responseText);
+                        }
+                    });
+                }
+            });
+        } else {
+            window.location.href = window.location.origin + data.redirect;
         }
     });
 }
