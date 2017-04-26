@@ -56,6 +56,7 @@ function onSignIn(googleUser) {
                     $.ajax({
                         type: "POST",
                         url: "/ajax/sign_up",
+                        contentType: "application/json",
                         data: JSON.stringify({
                             role: role
                         }),
