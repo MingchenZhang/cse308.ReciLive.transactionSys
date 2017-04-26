@@ -8,7 +8,7 @@ exports.getRoute = function (s) {
     var jsonParser = BodyParser.json({limit: '10kb'});
 
     router.get('/course', jsonParser, function (req, res, next) {
-        s.userConn.getUserByEmail(req.body.userEmail).then((response) => {
+        s.userConn.getUserByEmail(req.userLoginInfo.email).then((response) => {
             if (response) {
                 if (response.role == "Instructor") {
                     res.render("course_instructor.ejs");
@@ -24,7 +24,7 @@ exports.getRoute = function (s) {
     router.post('/ajax/check-user', jsonParser, function (req, res, next) {
         s.userConn.getUserByGoogleID(req.userLoginInfo.userID).then((response) => {
             if (response) {
-                res.send({result: true, sign_up: false});
+                res.send({result: true, sign_up: false, redirect: '/course'});
             } else {
                 res.send({result: true, sign_up: true});
             }

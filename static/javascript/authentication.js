@@ -28,14 +28,14 @@ function onSignIn(googleUser) {
 
     var current_date = new Date();
     current_date.setMonth(current_date.getMonth() + 1);
-    document.cookie = "IDToken=" + id_token + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    document.cookie = "email=" + profile.getEmail() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    document.cookie = "name=" + profile.getName() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    document.cookie = "ID=" + profile.getId() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    // document.cookie = "IDToken=" + id_token + ";";
-    // document.cookie = "email=" + profile.getEmail() + ";";
-    // document.cookie = "name=" + profile.getName() + ";";
-    // document.cookie = "ID=" + profile.getId() + ";";
+    // document.cookie = "IDToken=" + id_token + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
+    // document.cookie = "email=" + profile.getEmail() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
+    // document.cookie = "name=" + profile.getName() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
+    // document.cookie = "ID=" + profile.getId() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
+    document.cookie = "IDToken=" + id_token + ";";
+    document.cookie = "email=" + profile.getEmail() + ";";
+    document.cookie = "name=" + profile.getName() + ";";
+    document.cookie = "ID=" + profile.getId() + ";";
 
     $.ajax({
         type: "POST",
@@ -54,10 +54,9 @@ function onSignIn(googleUser) {
                             success: function (data) {
                                 if(data.result) {
                                     if (data.redirect)
-                                        window.location = data.redirect;
-                                        // window.location.href = window.location.origin;
+                                        window.location.href = window.location.origin + data.redirect;
                                 }else {
-                                    // ERROR handling
+                                    // TODO ERROR handling
                                 }
                             },
                             error: function(ts) {
@@ -67,7 +66,7 @@ function onSignIn(googleUser) {
                     }
                 });
             }else {
-
+                window.location.href = window.location.origin + data.redirect;
             }
         },
         error: function(ts) {
