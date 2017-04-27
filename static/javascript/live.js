@@ -22,6 +22,7 @@ events = {
     switchToLive: createEventConstructor('switchToLive'),
     workAreaRatioChange: createEventConstructor('workAreaRatioChange'),
     switchToSpeaker: createEventConstructor('switchToSpeaker'),
+    switchToListener: createEventConstructor('switchToListener'),
 };
 
 $(document).ready(function () {
@@ -184,3 +185,7 @@ function activateSound() {
         }
     });
 }
+
+// attach handler to change speaker role
+document.addEventListener(events.switchToSpeaker.type, activateSound, false);
+document.addEventListener(events.switchToListener.type, activateSound, false);

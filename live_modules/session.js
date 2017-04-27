@@ -244,7 +244,7 @@ exports.session = function () {
 
         if (index != lastTransactionIndex + 1) return When.reject({reason: 1});
 
-        if (self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)
+        if (self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)// if sender has no priviledge
             return When.reject({reason: 2});
 
         if(self.status == "ENDED")
@@ -322,8 +322,11 @@ exports.session = function () {
     function understandTransaction(transaction) {
         if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
             transaction.description.speakerChange.forEach((tuple)=> {
-                if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) soundSpeaker.push(tuple[0]);
-                else soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
+                if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) { // speaker need to be removed
+                    soundSpeaker.push(tuple[0]);
+                } else {
+                    soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
+                }
             });
         } else if(transaction.module == 'admin' && transaction.description.command == "end_recitation"){
             self.status = "ENDED";
