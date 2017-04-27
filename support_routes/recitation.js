@@ -11,7 +11,7 @@ exports.getRoute = function (s) {
         var current_class = req.body.class;
         s.classConn.getRecitationsByClass(current_class).then((response) => {
                 if (response) {
-                    res.send({result: true, list: respnse, id: current_class});
+                    res.send({result: true, list: response, id: current_class});
                 } else {
                     res.send({result: false, error: "nothing find in database"});
                 }
