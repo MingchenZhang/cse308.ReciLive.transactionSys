@@ -5,7 +5,7 @@ RecitationGenerator = function () {
     function getViewPromise() {
         return new Promise(function (resolve, reject) {
             $.ajax({
-                url: '/template/recitation.html',
+                url: 'static/template/recitation.html',
                 dataType: 'html'
             }).done(function (result) {
                 var temps = $(result);
@@ -17,7 +17,7 @@ RecitationGenerator = function () {
                 resolve();
             }).fail(function (err) {
                 console.error(err);
-                return reject('FFFail from get /template/recitation.html');
+                return reject('FFFail from get recitation.html');
             });
         });
     }
@@ -45,4 +45,3 @@ RecitationGenerator = function () {
         return this.refresh(divToOperate, info, id);
     };
 };
-

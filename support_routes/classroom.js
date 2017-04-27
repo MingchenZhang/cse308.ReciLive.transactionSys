@@ -11,7 +11,11 @@ exports.getRoute = function (s) {
             if (response) {
                 if (response.role == "Instructor") {
                     s.classConn.getClassesByOwner(response._id).then((r) => {
-                        res.send({result: true, list: r});
+                      let names = [];
+                      r.forEach(function(element) {
+                        names.push(element.name);
+                      });
+                      res.send({result: true, list: names});
                     }).catch((e) => {
                             if (typeof e == "error") {
                                 res.send({result: false, reason: e.message});
@@ -22,7 +26,11 @@ exports.getRoute = function (s) {
                     ;
                 } else if (response.role == "Student") {
                     s.classConn.getClassesByStudent(response._id).then((r) => {
-                        res.send({result: true, list: r});
+                      let names = [];
+                      r.forEach(function(element) {
+                        names.push(element.name);
+                      });
+                      res.send({result: true, list: names});
                     }).catch((e) => {
                             if (typeof e == "error") {
                                 res.send({result: false, reason: e.message});
@@ -46,17 +54,26 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/add-class', jsonParser, function (req, res, next) {
-        s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, req.body.owner).then((response) => {
+      // TODO handle students
+      s.userConn.getUserByGoogleID(req.userLoginInfo.userID).then((response) => {
+        s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, response._id).then((r) => {
             res.send({result: true});
         }).catch((e) => {
                 if (typeof e == "error") {
-                    res.send({result: false, error: e.message});
+                    res.send({result: false, reason: e.message});
                 } else {
-                    res.send({result: false, error: "error in class DB add class"});
+                    res.send({result: false, reason: "error in class DB add class"});
                 }
             }
         );
-        res.send({result: true});
+      }).catch((e) => {
+              if (typeof e == "error") {
+                  res.send({result: false, reason: e.message});
+              } else {
+                  res.send({result: false, reason: "google auth fail"});
+              }
+          }
+      );
     });
     return router;
 };

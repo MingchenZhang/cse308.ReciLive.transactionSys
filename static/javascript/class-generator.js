@@ -5,7 +5,7 @@ ClassGenerator = function () {
     function getViewPromise() {
         return new Promise(function (resolve, reject) {
             $.ajax({
-                url: '/template/class.html',
+                url: 'static/template/class.html',
                 dataType: 'html'
             }).done(function (result) {
                 var temps = $(result);
@@ -17,7 +17,7 @@ ClassGenerator = function () {
                 resolve();
             }).fail(function (err) {
                 console.error(err);
-                return reject('FFFail from get /template/class.html');
+                return reject('FFFail from get class.html');
             });
         });
     }
@@ -44,4 +44,3 @@ ClassGenerator = function () {
         return this.refresh(divToOperate, info);
     };
 };
-
