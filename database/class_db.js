@@ -72,7 +72,7 @@ exports.addClass = function (name, startDate, endDate, owner) {
     });
 };
 
-exports.addRecitation = function (name, startDate, endDate, createdAt, parentClass) {
+exports.addRecitation = function (name, startDate, endDate, parentClass) {
     var numericID = Math.floor(Math.random()*10000000);
     var insert = {
         numericID,
@@ -90,4 +90,3 @@ exports.getRecitationsByClass = function (parentClass) {
         parentClass: s.mongodb.ObjectID(parentClass)
     }).sort({'createdAt':-1}).toArray();
 };
-

@@ -92,10 +92,7 @@ function listClasses() {
 
     $.ajax({
         url: '/ajax/list-class-list',
-        type: 'post',
-        data: JSON.stringify({email: getCookie("email")}),
-        contentType: "application/json; charset=utf-8",
-        dataType: 'json'
+        type: 'post'
     }).done(function (data) {
         if(data.result === true) {
             var lists = data.list;
@@ -107,7 +104,7 @@ function listClasses() {
                 listTemplate.init(div, lists[i]);
             }
         }else {
-            console.error(data.error);
+            console.error(data.reason);
         }
     }).fail(function (err) {
         console.error(err);
@@ -118,7 +115,6 @@ function addClass() {
     var name = $(".class-name").val();
     var startDate = $("#class-date-start-display").text();
     var endDate = $("#class-date-end-display").text();
-    var createAt = new Date();
     var students = [];
     $('.student-email').each(function() {
         if($(this).val() !== '') {
@@ -129,7 +125,7 @@ function addClass() {
     $.ajax({
         type: "POST",
         url: "/ajax/add-class",
-        data: JSON.stringify({name: name, owner: getCookie("email"), startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt), students: students}),
+        data: JSON.stringify({name: name, owner: getCookie("email"), startDate: new Date(startDate), endDate: new Date(endDate), students: students}),
         success: function(data){
             if(data.result === true) {
                 $('#class-detail').modal('hide');

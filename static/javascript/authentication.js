@@ -1,9 +1,6 @@
 /**
  * Created by jieliang on 4/5/17.
  */
-$(document).ready(function() {
-    $("#sign-up-modal").animatedModal();
-});
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
