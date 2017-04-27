@@ -31,7 +31,8 @@ ClassGenerator = function () {
         }
         CLASS_VIEW.then(function () {
             var list_info = {
-                class_name: info,
+                class_name: info[1],
+                class_id: info[0]
             };
             var div1 = $('<div/>');
             var html = Mustache.to_html(TEMP_CLASS_VIEW, list_info);

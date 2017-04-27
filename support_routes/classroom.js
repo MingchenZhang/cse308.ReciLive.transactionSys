@@ -13,7 +13,7 @@ exports.getRoute = function (s) {
                     s.classConn.getClassesByOwner(response._id).then((r) => {
                       let names = [];
                       r.forEach(function(element) {
-                        names.push(element.name);
+                        names.push([element._id, element.name]);
                       });
                       res.send({result: true, list: names});
                     }).catch((e) => {
@@ -28,7 +28,7 @@ exports.getRoute = function (s) {
                     s.classConn.getClassesByStudent(response._id).then((r) => {
                       let names = [];
                       r.forEach(function(element) {
-                        names.push(element.name);
+                        names.push([element._id, element.name]);
                       });
                       res.send({result: true, list: names});
                     }).catch((e) => {
