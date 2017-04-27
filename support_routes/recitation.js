@@ -17,7 +17,7 @@ exports.getRoute = function (s) {
                 }
             }
         ).catch((e) => {
-            if (typeof e == "error") {
+            if (e.message) {
                 res.send({result: false, error: e.message});
             } else {
                 res.send({result: false, error: "error in class DB add class"});
