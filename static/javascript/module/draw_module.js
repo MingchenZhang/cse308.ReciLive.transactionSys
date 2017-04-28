@@ -9,7 +9,8 @@ function Draw(transactionSystem, canvas, controlPanel) {
         undo = controlPanel.find('.fa fa-undo'),
         redo = controlPanel.find('.fa fa-repeat'),
         eraser = controlPanel.find('.fa fa-eraser'),
-        clear = controlPanel.find('.fa fa-clear');
+        clear = controlPanel.find('.fa fa-window-close'),
+        colorPicker = controlPanel.find('#draw-color-picker');
 
     /**
      * init after transaction system
@@ -18,9 +19,21 @@ function Draw(transactionSystem, canvas, controlPanel) {
         canvas.setAttribute('id', 'draw-canvas')
         fabricCanvas = new new fabric.Canvas('draw-canvas', {isDrawingMode: true});
         fabric.Object.prototype.transparentCorners = false;
+        canvas.freeDrawingBrush.color = colorPicker.value;
+        canvas.freeDrawingBrush.width = 5;
         canvas.on('object:added', function () {            //add handler to event add obj
             self.newStroke(JSON.stringify(canvas));
         })
+        document.addEventListener(events.slidesChange, function () {
+            drawList=[];
+            currentIndex = -1;
+        })
+    };
+    /**
+     * change color when value of color picker change
+     */
+    colorPicker.onChange = function () {
+        canvas.freeDrawingBrush.color = colorPicker.value;
     };
     /**
      * clear all content on the canvas
@@ -29,6 +42,7 @@ function Draw(transactionSystem, canvas, controlPanel) {
         canvas.clear();
         self.newStroke(JSON.stringify(canvas));
     };
+
     /**
      * click to erase selected object
      */
@@ -82,6 +96,7 @@ function Draw(transactionSystem, canvas, controlPanel) {
             type: 'stroke',
             id: id
         }, {stroke: stroke}).then(function (result) {
+            currentIndex++;
             drawList.push(stroke);
             canvas.clear();
             canvas.loadFromJSON(stroke);
@@ -118,7 +133,7 @@ function Draw(transactionSystem, canvas, controlPanel) {
     this.reset = function () {
         ignoreTransaction = {};
         drawList = [];
-        showDiv.empty();
+
     };
 
 }
