@@ -31,6 +31,7 @@ var WSHandle = require('./live_modules/websocket');
 var Tools = require('./tools.js');
 var readyList = [];
 global.s = {
+    tools: Tools,
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb,
     dbPath: process.env.DB_PATH || 'mongodb://localhost:27017/',

@@ -15,8 +15,8 @@ exports.initDatabase = function (readyList) {
         } else {
             console.log('MongodbClient connection to ' + userDBPath + ' has been established');
             userDB.usersColl = db.collection('users');
-            userDB.usersColl.createIndex({googleID: 1});
-            userDB.usersColl.createIndex({email: 1});
+            userDB.usersColl.createIndex({googleID: 1}, {unique: true});
+            userDB.usersColl.createIndex({email: 1}, {unique: true});
             userDBReady.resolve();
         }
     });
@@ -46,6 +46,7 @@ exports.addUser = function (googleID, email, role, username) {
 };
 
 exports.setUserInfo = function (_id, change) {
+    _id = s.mongodb.ObjectID(_id);
     return userDB.usersColl.updateMany({_id}, {$set: change});
 };
 

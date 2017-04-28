@@ -36,13 +36,17 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/add-class', jsonParser, function (req, res, next) {
-        s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, req.userLoginInfo.record._id,req.body.students).then((r) => {
-
+        s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, req.userLoginInfo.record._id).then((clazz) => {
+            return s.tools.listPromise(req.students, (email)=>{
+                return s.userConn.getUserByEmail(email).then((user)=>{
+                    return s.classConn.addStudentToClass(user._id, clazz._id);
+                });
+            });
+        }).then((result)=>{
             res.send({result: true});
-        }).catch((e) => {
-                res.send({result: false, reason: e.message ? e.message : "error in class DB add class"});
-            }
-        );
+        }).catch((err)=>{
+            res.status(400).send({result: false, reason: err.message?err.message:'unknown error'});
+        });
     });
     return router;
 };

@@ -1,4 +1,5 @@
 var GoogleAuth = require('google-auth-library');
+var When = require('When');
 
 var auth = new GoogleAuth;
 
@@ -14,15 +15,13 @@ exports.getToolSet = function (s) {
         return true;
     };
 
-    // tools.nosqlSafeTest = function(object){
-    //     if(typeof object != 'object') return true;
-    //     for(var key in object){
-    //         console.log('testing:'+key);
-    //         if(key[0] == '$') return false;
-    //         if(typeof object[key] == 'object' && !tools.nosqlSafeTest(object[key])) return false;
-    //     }
-    //     return true;
-    // };
+    tools.listPromise = function(sourceList, queryFunction){
+        var promiseList = [];
+        sourceList.forEach((source, index)=>{
+            promiseList[index] = queryFunction(source);
+        });
+        return When.all(promiseList);
+    };
 
     return tools;
 };
