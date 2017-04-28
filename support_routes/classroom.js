@@ -29,16 +29,15 @@ exports.getRoute = function (s) {
             }).catch((e) => {
                     res.send({result: false, reason: e.message ? e.message : 'get classese by student error'});
                 }
-            )
-            ;
+            );
         } else {
             res.send({result: false, reason: "no such role"});
         }
     });
 
     router.post('/ajax/add-class', jsonParser, function (req, res, next) {
-        // TODO handle students
-        s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, req.userLoginInfo.record._id).then((r) => {
+        s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, req.userLoginInfo.record._id,req.body.students).then((r) => {
+
             res.send({result: true});
         }).catch((e) => {
                 res.send({result: false, reason: e.message ? e.message : "error in class DB add class"});

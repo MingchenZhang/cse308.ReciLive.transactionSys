@@ -119,6 +119,7 @@ function addClass() {
     $('.student-email').each(function() {
         if($(this).val() !== '') {
             students.push($(this).val());
+
         }
     });
 
