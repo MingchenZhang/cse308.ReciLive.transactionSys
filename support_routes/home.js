@@ -10,6 +10,5 @@ exports.getRoute = function (s) {
     router.get('/', urlParser, function (req, res, next) {
       res.render('home.ejs');
     });
-
     return router;
 };

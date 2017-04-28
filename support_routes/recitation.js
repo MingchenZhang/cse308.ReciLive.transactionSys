@@ -17,21 +17,17 @@ exports.getRoute = function (s) {
                 }
             }
         ).catch((e) => {
-            if (e.message) {
-                res.send({result: false, error: e.message});
-            } else {
-                res.send({result: false, error: "error in class DB add class"});
-            }
+            res.send({result: false, error: e.message ? e.message : "error in class DB add class"});
         });
     });
 
-    router.post('/ajax/add-recitation', jsonParser,  (req, res, next)=> {
+    router.post('/ajax/add-recitation', jsonParser, (req, res, next) => {
         s.classConn.addRecitation(req.body.name, req.body.startDate, req.body.endDate, req.body.createdAt, req.body.class).then((recitation) => {
             if (recitation) {
                 var privilege = {};
                 privilege[req.userLoginInfo.userID] = ["admin", "slides", "sound_control"];
-                s.classConn.getStudentsByClass(req.body.class).then((response)=>{
-                    response.foreach((student)=>{
+                s.classConn.getStudentsByClass(req.body.class).then((response) => {
+                    response.foreach((student) => {
                         privilege[student.googleID] = []
                     });
                     Request({
@@ -46,25 +42,21 @@ exports.getRoute = function (s) {
                             "status": "LIVE"
                         }
                     }, (error, response, body) => {
-                        if (error) return res.status(500).send({status: "error", error, statusCode: response.statusCode});
+                        if (error) return res.status(500).send({
+                            status: "error",
+                            error,
+                            statusCode: response.statusCode
+                        });
                         return res.send(body);
                     });
                 }).catch((e) => {
-                    if (typeof e == "error") {
-                        res.send({result: false, error: e.message});
-                    } else {
-                        res.send({result: false, error: "error in db get students list"});
-                    }
+                    res.send({result: false, error: e.message ? e.message : "error in db get students list"});
                 });
             } else {
-                res.send({result:false,error:'no response from database'});
+                res.send({result: false, error: 'no response from database'});
             }
         }).catch((e) => {
-            if (typeof e == "error") {
-                res.send({result: false, error: e.message});
-            } else {
-                res.send({result: false, error: "error in class DB add class"});
-            }
+            res.send({result: false, error: e.message ? e.message : "error in class DB add class"});
         });
     });
 
