@@ -27,7 +27,7 @@ exports.getRoute = function (s) {
                 });
                 res.send({result: true, list: names});
             }).catch((e) => {
-                    res.send({result: false, reason: e.message ? e.message : 'get classese by student error'});
+                    res.send({result: false, reason: e.message || 'get classese by student error'});
                 }
             );
         } else {
@@ -37,9 +37,16 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/add-class', jsonParser, function (req, res, next) {
         s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, req.userLoginInfo.record._id).then((clazz) => {
-            return s.tools.listPromise(req.students, (email)=>{
+            return s.tools.listPromise(req.body.students, (email)=>{
                 return s.userConn.getUserByEmail(email).then((user)=>{
-                    return s.classConn.addStudentToClass(user._id, clazz._id);
+                    if(user){
+                        return s.classConn.addStudentToClass(user._id, clazz._id);
+                    }else{
+                        var userID = s.mongodb.ObjectID();
+                        return s.userConn.addUser(null, email, null, null, userID).then(()=>{
+                            return s.classConn.addStudentToClass(userID, clazz._id);
+                        });
+                    }
                 });
             });
         }).then((result)=>{

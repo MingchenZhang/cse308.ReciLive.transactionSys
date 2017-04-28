@@ -7,6 +7,7 @@ exports.getRoute = function (s) {
     var jsonParser = BodyParser.json({limit: '10kb'});      //json parser parse the request before router run it's content
 
     router.get('/course', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
+        if(!req.userLoginInfo) return res.status(400).send('please login first');
         if (req.userLoginInfo.record.role == "Instructor") {
             res.render("course_instructor.ejs");
         } else if (req.userLoginInfo.record.role == "Student") {
@@ -25,7 +26,7 @@ exports.getRoute = function (s) {
     router.post('/ajax/sign_up', jsonParser, (req, res, next) => {          //new user sign_up
         s.userConn.setUserInfo(req.userLoginInfo.record._id,{role:req.body.role}).then(() => {
             res.send({result: true, redirect: '/course'});
-        }).catch((e) => {req.body.role
+        }).catch((e) => {
             res.send({result: false, reason: e.message ? e.message : "error add user to db"});
         });
     });

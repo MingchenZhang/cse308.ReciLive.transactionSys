@@ -31,7 +31,6 @@ var WSHandle = require('./live_modules/websocket');
 var Tools = require('./tools.js');
 var readyList = [];
 global.s = {
-    tools: Tools,
     wsHandler: new WSHandle.WSHandler(),
     mongodb: Mongodb,
     dbPath: process.env.DB_PATH || 'mongodb://localhost:27017/',
@@ -42,6 +41,7 @@ global.s = {
     classConn: null,
     userConn: null,
 };
+s.tools = Tools.getToolSet(s);
 if(s.role == 'support'){
     s.userConn = require('./database/user_db');
     s.userConn.initDatabase(readyList);
@@ -83,16 +83,20 @@ app.use(function (req, res, next) {
 if(s.role == 'support'){
     app.use((req, res, next)=>{
         if(!req.userLoginInfo) return next();
-        s.userConn.getUserByGoogleID(req.userLoginInfo.userID).then((record)=>{
+        s.userConn.getUserByEmail(req.userLoginInfo.email).then((record)=>{
             if(!record){ // user is not in database
-                s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, null, req.userLoginInfo.name).then(next);
+                s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, null, req.userLoginInfo.name).then(()=>next()).catch(()=>{
+                    res.status(400).send('database error (89)');
+                });
                 req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
             }else if(validator(record, s.userConn.basicUserInfoRule).length == 0){ // user has complete info
                 req.userLoginInfo.record = record;
                 next();
             }else{// user info is incomplete
                 req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
-                s.userConn.setUserInfo(req.userLoginInfo.userID, req.userLoginInfo.record).then(next);
+                s.userConn.setUserInfo(req.userLoginInfo.userID, req.userLoginInfo.record).then(()=>next()).catch((err)=>{
+                    res.status(400).send('database error (96)');
+                });
             }
         });
     });
@@ -123,7 +127,7 @@ app.all('*', function (req, res, next) {
 });
 // default error handling
 app.use(function (err, req, res, next) {
-    console.error(err.stack);
+    console.error(err.stack || err);
     res.status(500).send("500 SERVER ERROR");
 });
 

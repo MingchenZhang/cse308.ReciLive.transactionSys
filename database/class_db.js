@@ -18,7 +18,6 @@ exports.initDatabase = function (readyList) {
             classDB.classesColl = db.collection('classes');
             classDB.classesColl.createIndex({owner:1});
             classDB.classesColl.createIndex({createdAt:-1});
-            classDB.classesColl.createIndex({numericID:1}, {unique: true});
 
             classDB.classEnrollColl = db.collection('classEnroll');
             classDB.classEnrollColl.createIndex({'class':1});
@@ -26,6 +25,7 @@ exports.initDatabase = function (readyList) {
 
             classDB.recitationColl = db.collection('recitation');
             classDB.recitationColl.createIndex({owner:1});
+            classDB.recitationColl.createIndex({numericID:1}, {unique: true});
 
             classDBReady.resolve();
         }
@@ -45,12 +45,12 @@ exports.getClassesByStudent = function (student) {
             proList[index] = new When.Promise((resolve, reject)=>{
                 classDB.classesColl.findOne({_id: clazz.class}, function (err, result) {
                     if(err) return reject(err);
-                    if(!result) return reject('no result found');
+                    if(!result) return reject(new Error('no result found'));
                     return resolve(result);
                 });
             });
         });
-        return proList;
+        return When.all(proList);
     });
 };
 
@@ -63,13 +63,14 @@ exports.addStudentToClass = function(student, clazz){
 };
 
 exports.addClass = function (name, startDate, endDate, owner) {
-    return classDB.classesColl.insertOne({
+    var insertObj = {
         name,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
         createdAt: new Date(),
         owner: s.mongodb.ObjectID(owner),
-    });
+    };
+    return classDB.classesColl.insertOne(insertObj).then(()=>insertObj);
 };
 
 exports.addRecitation = function (name, startDate, endDate, parentClass) {
