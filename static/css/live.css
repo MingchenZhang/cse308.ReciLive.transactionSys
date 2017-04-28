@@ -58,6 +58,14 @@ body {
   margin: 0 auto;
 }
 
+.col-md-2 {
+  background-color: #3fb0ac;
+}
+
+.student-microphone {
+  float: right;
+}
+
 .col-md-6 {
   width: 65%;
   padding-left: 0;
