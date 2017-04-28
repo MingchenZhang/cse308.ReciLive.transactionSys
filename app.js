@@ -101,9 +101,8 @@ if(s.role == 'support'){
         Request({
             method: 'GET',
             url:"https://recilive.stream/ajax/live_get_user_info?id="+encodeURIComponent(req.userLoginInfo.userID),
-            json: {classNumber: req.classroomNumber}
         }, (error, response, body)=>{
-            if(error) return res.status(500).send({status:"error", error, statusCode: response.statusCode});
+            if(error) return res.status(500).send('login info cannot be verified');
             req.userLoginInfo.userID = body._id;
             req.userLoginInfo.record = body;
             return next();
