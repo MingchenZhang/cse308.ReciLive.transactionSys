@@ -23,9 +23,9 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/sign_up', jsonParser, (req, res, next) => {          //new user sign_up
-        s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, req.body.role, req.userLoginInfo.name).then(() => {
+        s.userConn.setUserInfo(req.userLoginInfo.record._id,{role:req.body.role}).then(() => {
             res.send({result: true, redirect: '/course'});
-        }).catch((e) => {
+        }).catch((e) => {req.body.role
             res.send({result: false, reason: e.message ? e.message : "error add user to db"});
         });
     });
@@ -35,19 +35,6 @@ exports.getRoute = function (s) {
             res.send(userInfo);
         }).catch((e) => {
             res.status(400).send({result: false, reason: e.message ? e.message : "error get user by google id"});
-        });
-    });
-
-    router.post('/class', jsonParser, (req, res, next) => {     //TODO:add comment
-        s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, req.body.role, req.userLoginInfo.name).then((response) => {
-            if (response) {
-                res.send({redirect: '/course'});
-            } else {
-                res.status(505);
-            }
-        }).catch((e) => {
-            if (e.message)
-                res.send({result: false, reason: e.message ? e.message : "error get user by google login"});
         });
     });
 

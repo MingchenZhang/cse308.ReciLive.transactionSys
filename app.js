@@ -84,15 +84,15 @@ if(s.role == 'support'){
         if(!req.userLoginInfo) return next();
         s.userConn.getUserByGoogleID(req.userLoginInfo.userID).then((record)=>{
             if(!record){ // user is not in database
-                s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, null, req.userLoginInfo.name);
+                s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, null, req.userLoginInfo.name).then(next);
                 req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
             }else if(validator(record, s.userConn.basicUserInfoRule).length == 0){ // user has complete info
                 req.userLoginInfo.record = record;
+                next();
             }else{// user info is incomplete
                 req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
-                s.userConn.setUserInfo(req.userLoginInfo.userID, req.userLoginInfo.record);
+                s.userConn.setUserInfo(req.userLoginInfo.userID, req.userLoginInfo.record).then(next);
             }
-            next();
         });
     });
 }else if(s.role == 'live'){

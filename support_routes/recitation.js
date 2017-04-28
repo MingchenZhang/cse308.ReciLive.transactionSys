@@ -1,7 +1,7 @@
 var Express = require('express');
 var BodyParser = require('body-parser');
-var When = require('when'); // used by sequential callback
-
+var When = require('when');              // used by sequential callback
+var Request = require("request");
 exports.getRoute = function (s) {
     var router = Express.Router();
 
@@ -26,13 +26,13 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/add-recitation', jsonParser, (req, res, next) => {
-        s.classConn.addRecitation(req.body.name, req.body.startDate, req.body.endDate, req.body.createdAt, req.body.class).then((recitation) => {
+        s.classConn.addRecitation(req.body.name, req.body.startDate, req.body.endDate, req.body.class).then((recitation) => {
             if (recitation) {
                 var privilege = {};
-                privilege[req.userLoginInfo.userID] = ["admin", "slides", "sound_control"];
+                privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control"];
                 s.classConn.getStudentsByClass(req.body.class).then((response) => {
-                    response.foreach((student) => {
-                        privilege[student.googleID] = []
+                    response.forEach((student) => {
+                        privilege[student._id] = []
                     });
                     Request({
                         method: 'POST',

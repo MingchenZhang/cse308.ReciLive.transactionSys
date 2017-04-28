@@ -18,10 +18,16 @@ function Draw(transactionSystem, canvas, controlPanel) {
         canvas.setAttribute('id', 'draw-canvas')
         fabricCanvas = new new fabric.Canvas('draw-canvas', {isDrawingMode: true});
         fabric.Object.prototype.transparentCorners = false;
+        canvas.on('object:added', function () {            //add handler to event add obj
+            self.newStroke(JSON.stringify(canvas));
+        })
     };
-
+    /**
+     * clear all content on the canvas
+     */
     clear.onclick = function () {
         canvas.clear();
+        self.newStroke(JSON.stringify(canvas));
     };
     /**
      * click to erase selected object
@@ -30,6 +36,7 @@ function Draw(transactionSystem, canvas, controlPanel) {
         canvas.isDrawMode = false;
         canvas.on('object:selected', function () {
             canvas.getActiveObject().remove();
+            self.newStroke(JSON.stringify(canvas));
         })
     };
 
@@ -47,6 +54,8 @@ function Draw(transactionSystem, canvas, controlPanel) {
         if (currentIndex > 0) {
             canvas.clear();
             canvas.loadFromJSON(drawList[--currentIndex]);
+            canvas.renderAll();
+            self.newStroke(JSON.stringify(canvas));
         }
     };
 
@@ -57,6 +66,8 @@ function Draw(transactionSystem, canvas, controlPanel) {
         if (currentIndex < drawList.length - 1) {
             canvas.clear();
             canvas.loadFromJSON(drawList[++currentIndex]);
+            canvas.renderAll();
+            self.newStroke(JSON.stringify(canvas));
         }
     };
 
@@ -72,7 +83,9 @@ function Draw(transactionSystem, canvas, controlPanel) {
             id: id
         }, {stroke: stroke}).then(function (result) {
             drawList.push(stroke);
-            showDiv.prepend($('<p/>').html(stroke));
+            canvas.clear();
+            canvas.loadFromJSON(stroke);
+            canvas.renderAll();
         }).catch(function (err) {
             console.error('fail to new transaction');
             console.error(err);
@@ -94,7 +107,9 @@ function Draw(transactionSystem, canvas, controlPanel) {
             return;
         }
         drawList.push(payload.stroke);
-        showDiv.prepend($('<p/>').html(payload.stroke));
+        canvas.clear();
+        canvas.loadFromJSON(payload.stroke);
+        canvas.clear();
     };
 
     /**

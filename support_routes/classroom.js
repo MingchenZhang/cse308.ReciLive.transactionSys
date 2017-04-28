@@ -8,7 +8,7 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/list-class-list', jsonParser, function (req, res, next) {
         if (req.userLoginInfo.record.role == "Instructor") {
-            s.classConn.getClassesByOwner(response._id).then((r) => {
+            s.classConn.getClassesByOwner(req.userLoginInfo.record._id).then((r) => {
                 let names = [];
                 r.forEach(function (element) {
                     names.push([element._id, element.name]);
@@ -20,7 +20,7 @@ exports.getRoute = function (s) {
             )
             ;
         } else if (req.userLoginInfo.record.role == "Student") {
-            s.classConn.getClassesByStudent(response._id).then((r) => {
+            s.classConn.getClassesByStudent(req.userLoginInfo.record._id).then((r) => {
                 let names = [];
                 r.forEach(function (element) {
                     names.push([element._id, element.name]);
