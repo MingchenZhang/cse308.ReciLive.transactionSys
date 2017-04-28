@@ -44,3 +44,15 @@ exports.addUser = function (googleID, email, role, username) {
         username,
     });
 };
+
+exports.setUserInfo = function (_id, change) {
+    return userDB.usersColl.updateMany({_id}, {$set: change});
+};
+
+exports.basicUserInfoRule = (obj) => {
+    obj.required().isObject((obj)=>{
+        obj('googleID').required().isString();
+        obj('email').required().isString();
+        obj('username').required().isString();
+    });
+};

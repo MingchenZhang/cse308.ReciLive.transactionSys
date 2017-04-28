@@ -54,7 +54,7 @@ exports.getRoute = function (s) {
     });
 
     router.get('/get_resource', function (req, res, next) {
-        res.send({
+        return res.send({
             "resources": [
                 {
                     "type": "slide",
@@ -142,14 +142,14 @@ exports.getRoute = function (s) {
                 }
             ]
         });
-        // Request({
-        //     method: 'POST',
-        //     url:"https://recilive.stream/get_resource",
-        //     json: {classNumber: req.classroomNumber}
-        // }, (error, response, body)=>{
-        //     if(error) return res.status(500).send({status:"error", error, statusCode: response.statusCode});
-        //     return res.send(body);
-        // });
+        Request({
+            method: 'POST',
+            url:"https://recilive.stream/get_resource",
+            json: {classNumber: req.classroomNumber}
+        }, (error, response, body)=>{
+            if(error) return res.status(500).send({status:"error", error, statusCode: response.statusCode});
+            return res.send(body);
+        });
     });
 
     return router;

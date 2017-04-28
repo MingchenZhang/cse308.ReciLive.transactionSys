@@ -1,5 +1,6 @@
 const ChildProcess = require('child_process');
 const Os = require('os');
+
 var npmResult;
 if(Os.platform() == 'win32'){
     npmResult = ChildProcess.spawnSync('npm.cmd', ['install'], {stdio: 'inherit'});
@@ -12,15 +13,19 @@ if(npmResult.status != 0){
 }
 
 global.log = require('./live_modules/logging');var Express = require('express');
-var Http = require('http');
-var Https = require('https');
-var CookieParser = require('cookie-parser');
-var Helmet = require('helmet');
-var Mongodb = require('mongodb');
-var When = require('when');
-var Ejs = require('ejs');
-var Fs = require('fs');
-var WSWebSocket = require("ws").Server;
+const Http = require('http');
+const Https = require('https');
+const CookieParser = require('cookie-parser');
+const Helmet = require('helmet');
+const Mongodb = require('mongodb');
+const When = require('when');
+const Ejs = require('ejs');
+const Fs = require('fs');
+const WSWebSocket = require("ws").Server;
+const Validator = require("better-validator");
+const Request = require("request");
+
+const validator = new Validator();
 
 var WSHandle = require('./live_modules/websocket');
 var Tools = require('./tools.js');
@@ -73,6 +78,38 @@ app.use(function (req, res, next) {
         });
     } else next();
 });
+
+if(s.role == 'support'){
+    app.use((req, res, next)=>{
+        if(!req.userLoginInfo) return next();
+        s.userConn.getUserByGoogleID(req.userLoginInfo.userID).then((record)=>{
+            if(!record){ // user is not in database
+                s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, null, req.userLoginInfo.name);
+                req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
+            }else if(validator(record, s.userConn.basicUserInfoRule).length == 0){ // user has complete info
+                req.userLoginInfo.record = record;
+            }else{// user info is incomplete
+                req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
+                s.userConn.setUserInfo(req.userLoginInfo.userID, req.userLoginInfo.record);
+            }
+            next();
+        });
+    });
+}else if(s.role == 'live'){
+    app.use((req, res, next)=>{
+        if(!req.userLoginInfo) return next();
+        Request({
+            method: 'GET',
+            url:"https://recilive.stream/ajax/live_get_user_info?id="+encodeURIComponent(req.userLoginInfo.userID),
+            json: {classNumber: req.classroomNumber}
+        }, (error, response, body)=>{
+            if(error) return res.status(500).send({status:"error", error, statusCode: response.statusCode});
+            req.userLoginInfo.userID = body._id;
+            req.userLoginInfo.record = body;
+            return next();
+        });
+    });
+}
 
 // ---------------all available role section -----------
 if(s.role == 'support') app.use('/', require('./support_routes').getRoute(s));

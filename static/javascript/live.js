@@ -1,8 +1,10 @@
 console.assert(classroomNumber, 'classroomNumber needed to be provided');
 console.assert(userID, 'userID needed to be provided');
 
+
 eventRate = 2048;
 microphone_stream = null;
+audioCtx = new AudioContext();
 soundSystem = new SoundSystem("/room/"+classroomNumber+"/sound", audioCtx.sampleRate, eventRate);
 resource = null;
 
@@ -123,7 +125,6 @@ Promise.all(promiseList).then(function (result) {
 });
 
 // initialize the audio processing
-audioCtx = new AudioContext();
 script_processor_node = audioCtx.createScriptProcessor(eventRate, 1, 1);
 script_processor_node.onaudioprocess = function (audioProcessingEvent) {
     var inputBuffer = audioProcessingEvent.inputBuffer;
