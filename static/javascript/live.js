@@ -29,6 +29,7 @@ events = {
 
 $(document).ready(function () {
     $('.modal').modal();
+    $('#draw-color-picker').colorPicker({pickerDefault: "ffffff"});
 });
 
 transactionSystem = new TransactionSystem("/room/"+classroomNumber+"/transaction");
