@@ -11,11 +11,15 @@ exports.getRoute = function (s) {
         var current_class = req.body.class;
         s.classConn.getRecitationsByClass(current_class).then((response) => {
                 if (response) {
-                    res.send({result: true, list: response, id: current_class});
+                  let recitations = [];
+                  response.forEach(function (element) {
+                    recitations.push([element._id, element.name]);
+                  });
+                  res.send({result: true, list: recitations});
                 } else {
                     res.send({result: false, error: "nothing find in database"});
                 }
-            }
+          }
         ).catch((e) => {
             res.send({result: false, error: e.message ? e.message : "error in class DB add class"});
         });

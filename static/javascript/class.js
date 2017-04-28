@@ -162,7 +162,7 @@ function listRecitation(current_class) {
                 var listTemplate = new RecitationGenerator();
                 var div = $("<div class='col-md-3 col-sm-6'></div>");
                 listDiv.append(div);
-                listTemplate.init(div, lists[i], i);
+                listTemplate.init(div, lists[i]);
             }
         }else {
             console.error(data.error);
