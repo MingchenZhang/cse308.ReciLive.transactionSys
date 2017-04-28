@@ -31,7 +31,12 @@ events = {
 $(document).ready(function () {
     $('.modal').modal();
     $('#draw-color-picker').colorPicker({pickerDefault: "ffffff"});
+    $('.col-md-2').hide();
 });
+
+function showStudentList() {
+  $('.col-md-2').show();
+}
 
 transactionSystem = new TransactionSystem("/room/"+classroomNumber+"/transaction");
 transactionSystem.roomNumber = classroomNumber;

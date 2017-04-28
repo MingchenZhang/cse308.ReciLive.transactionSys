@@ -63,7 +63,7 @@
     <div class="row">
         <div class="col-md-1 side-bar">
             <span class="fa fa-backward fa-2x student-list"></span>
-            <span class="fa fa-hand-paper-o fa-2x microphone"></span>
+            <span class="fa fa-hand-paper-o fa-2x microphone" onclick="showStudentList()"></span>
             <span class="fa fa-comments fa-2x chat"></span>
             <span class="fa fa-area-chart fa-2x quiz"></span>
             <span class="fa fa-download fa-2x download"></span>
@@ -90,6 +90,9 @@
                 </ul>
             </div>
             <img src="../static/img/shut-down.png" class="ending-controller">
+        </div>
+        <div class="col-md-2 student-list">
+          <h4>student<i class="fa fa-microphone student-microphone"></i></h4>
         </div>
         <div class="col-md-6" id="slide-stage">
             <div class="stage-view"></div>
