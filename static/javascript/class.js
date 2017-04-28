@@ -89,6 +89,7 @@ function listClasses() {
     $(".add-class").css("display","inline-block");
     $(".add-recitation").css("display","none");
     var listDiv = $('.class-list');
+    $(".class-name").remove();
 
     $.ajax({
         url: '/ajax/list-class-list',
@@ -143,15 +144,16 @@ function addClass() {
     });
 }
 
-function listRecitation(current_class) {
+function listRecitation(current_class_id, current_class_name) {
     $(".add-class").css("display","none");
     $(".add-recitation").css("display","inline-block");
     var listDiv = $('.class-list');
+    $('.class-info').prepend("<h1 class='class-name'>"+current_class_name+"</h1>");
 
     $.ajax({
         url: '/ajax/list-recitation-list',
         type: 'post',
-        data: JSON.stringify({class: current_class}),
+        data: JSON.stringify({class: current_class_id}),
         contentType: "application/json; charset=utf-8",
         dataType: 'json'
     }).done(function (data) {
