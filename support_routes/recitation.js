@@ -17,11 +17,11 @@ exports.getRoute = function (s) {
                   });
                   res.send({result: true, list: recitations});
                 } else {
-                    res.send({result: false, error: "nothing find in database"});
+                    res.send({result: false, reason: "nothing find in database"});
                 }
           }
         ).catch((e) => {
-            res.send({result: false, error: e.message ? e.message : "error in class DB add class"});
+            res.send({result: false, reason: e.message ? e.message : "error in class DB add class"});
         });
     });
 
@@ -54,13 +54,13 @@ exports.getRoute = function (s) {
                         return res.send(body);
                     });
                 }).catch((e) => {
-                    res.send({result: false, error: e.message ? e.message : "error in db get students list"});
+                    res.send({result: false, reason: e.message ? e.message : "error in db get students list"});
                 });
             } else {
-                res.send({result: false, error: 'no response from database'});
+                res.send({result: false, reason: 'no response from database'});
             }
         }).catch((e) => {
-            res.send({result: false, error: e.message ? e.message : "error in class DB add class"});
+            res.send({result: false, reason: e.message ? e.message : "error in class DB add class"});
         });
     });
 

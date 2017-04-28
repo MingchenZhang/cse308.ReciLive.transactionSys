@@ -133,7 +133,7 @@ function addClass() {
                 $('#class-detail').modal('hide');
                 listClasses();
             }else {
-                console.error(data.error);
+                console.error(data.reason);
             }
         },
         error: function(ts) {
@@ -158,7 +158,7 @@ function listRecitation(current_class_id, current_class_name) {
         dataType: 'json'
     }).done(function (data) {
         if(data.result === true) {
-            currentClass = current_class;
+            currentClass = current_class_id;
             var lists = data.list;
             listDiv.empty();
             for(var i in lists) {
@@ -168,7 +168,7 @@ function listRecitation(current_class_id, current_class_name) {
                 listTemplate.init(div, lists[i]);
             }
         }else {
-            console.error(data.error);
+            console.error(data.reason);
         }
     }).fail(function (err) {
         console.error(err);
@@ -190,7 +190,7 @@ function addRecitation() {
                 $('#recitation-detail').modal('hide');
                 listRecitation(currentClass);
             }else {
-                console.error(data.error);
+                console.error(data.reason);
             }
         },
         error: function(ts) {
