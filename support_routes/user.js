@@ -12,6 +12,8 @@ exports.getRoute = function (s) {
             res.render("course_instructor.ejs");
         } else if (req.userLoginInfo.record.role == "Student") {
             res.render("course_student.ejs");
+        } else {
+            res.status(400).send('please choose role from home page first');
         }
     });
 

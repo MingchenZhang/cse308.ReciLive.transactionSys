@@ -16,16 +16,16 @@ exports.initDatabase = function (readyList) {
             console.log('MongodbClient connection to ' + classDBPath + ' has been established');
 
             classDB.classesColl = db.collection('classes');
-            classDB.classesColl.createIndex({owner:1});
-            classDB.classesColl.createIndex({createdAt:-1});
+            classDB.classesColl.createIndex({owner: 1});
+            classDB.classesColl.createIndex({createdAt: -1});
 
             classDB.classEnrollColl = db.collection('classEnroll');
-            classDB.classEnrollColl.createIndex({'class':1});
-            classDB.classEnrollColl.createIndex({'user':1});
+            classDB.classEnrollColl.createIndex({'class': 1});
+            classDB.classEnrollColl.createIndex({'user': 1});
 
             classDB.recitationColl = db.collection('recitation');
-            classDB.recitationColl.createIndex({owner:1});
-            classDB.recitationColl.createIndex({numericID:1}, {unique: true});
+            classDB.recitationColl.createIndex({owner: 1});
+            classDB.recitationColl.createIndex({numericID: 1}, {unique: true});
 
             classDBReady.resolve();
         }
@@ -35,17 +35,17 @@ exports.initDatabase = function (readyList) {
 //class: name, startDate, endDate, createdAt, owner
 //recitation: numericID, name, startDate, endDate, createdAt, parentClass
 exports.getClassesByOwner = function (owner) {
-    return classDB.classesColl.find({owner}).sort({'createdAt':-1}).toArray();
+    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray();
 };
 
 exports.getClassesByStudent = function (student) {
-    return classDB.classEnrollColl.find({user:student}).sort({_id:-1}).toArray().then((classesList)=>{
+    return classDB.classEnrollColl.find({user: student}).sort({_id: -1}).toArray().then((classesList) => {
         var proList = [];
-        classesList.forEach((clazz, index)=>{
-            proList[index] = new When.Promise((resolve, reject)=>{
+        classesList.forEach((clazz, index) => {
+            proList[index] = new When.Promise((resolve, reject) => {
                 classDB.classesColl.findOne({_id: clazz.class}, function (err, result) {
-                    if(err) return reject(err);
-                    if(!result) return reject(new Error('no result found'));
+                    if (err) return reject(err);
+                    if (!result) return reject(new Error('no result found'));
                     return resolve(result);
                 });
             });
@@ -54,12 +54,28 @@ exports.getClassesByStudent = function (student) {
     });
 };
 
-exports.getStudentsByClass = function(clazz){
-    return classDB.classEnrollColl.find({class:s.mongodb.ObjectID(clazz)}).sort({_id:-1}).toArray();
+/**
+ *
+ * @param classID class moongo id(_id)
+ * @param owner owner mongo id
+ * @returns {Promise.<TResult>|Promise}
+ */
+exports.getClassByMongoID = (classID, owner) => {
+    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
+        classList.forEach((clazz, index) => {
+            if (clazz._id == classID) return classDB.classesColl.findOne({id: classID}).then((result) => {
+                return result;
+            })      //all the error send to controller to handle
+        })
+    })
 };
 
-exports.addStudentToClass = function(student, clazz){
-    return classDB.classEnrollColl.insertOne({'user':student, 'class':clazz});
+exports.getStudentsByClass = function (clazz) {
+    return classDB.classEnrollColl.find({class: s.mongodb.ObjectID(clazz)}).sort({_id: -1}).toArray();
+};
+
+exports.addStudentToClass = function (student, clazz) {
+    return classDB.classEnrollColl.insertOne({'user': student, 'class': clazz});
 };
 
 exports.addClass = function (name, startDate, endDate, owner) {
@@ -70,11 +86,11 @@ exports.addClass = function (name, startDate, endDate, owner) {
         createdAt: new Date(),
         owner: s.mongodb.ObjectID(owner),
     };
-    return classDB.classesColl.insertOne(insertObj).then(()=>insertObj);
+    return classDB.classesColl.insertOne(insertObj).then(() => insertObj);
 };
 
 exports.addRecitation = function (name, startDate, endDate, parentClass) {
-    var numericID = Math.floor(Math.random()*10000000);
+    var numericID = Math.floor(Math.random() * 10000000);
     var insert = {
         numericID,
         name,
@@ -83,11 +99,13 @@ exports.addRecitation = function (name, startDate, endDate, parentClass) {
         createdAt: new Date(),
         parentClass: s.mongodb.ObjectID(parentClass),
     };
-    return classDB.recitationColl.insertOne(insert).then(()=>{return insert});
+    return classDB.recitationColl.insertOne(insert).then(() => {
+        return insert
+    });
 };
 
 exports.getRecitationsByClass = function (parentClass) {
     return classDB.recitationColl.find({
         parentClass: s.mongodb.ObjectID(parentClass)
-    }).sort({'createdAt':-1}).toArray();
+    }).sort({'createdAt': -1}).toArray();
 };

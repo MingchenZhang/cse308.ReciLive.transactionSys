@@ -35,7 +35,7 @@ exports.getRoute = function (s) {
             if (req.classroomSession.userInSession(req.userLoginInfo.userID)) {
                 next();
             } else {
-                res.status(401);
+                res.status(401).send('user is not in this session');
             }
         } else {
             res.status(400).send("classroom not found");

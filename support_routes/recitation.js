@@ -13,7 +13,7 @@ exports.getRoute = function (s) {
                 if (response) {
                   let recitations = [];
                   response.forEach(function (element) {
-                    recitations.push([element._id, element.name]);
+                    recitations.push([element.numericID, element.name]);
                   });
                   res.send({result: true, list: recitations});
                 } else {
@@ -47,11 +47,11 @@ exports.getRoute = function (s) {
                         }
                     }, (error, response, body) => {
                         if (error) return res.status(500).send({
-                            status: "error",
+                            result: "error",
                             error,
                             statusCode: response.statusCode
                         });
-                        return res.send(body);
+                        return res.send({result: true, body});
                     });
                 }).catch((e) => {
                     res.send({result: false, reason: e.message ? e.message : "error in db get students list"});
