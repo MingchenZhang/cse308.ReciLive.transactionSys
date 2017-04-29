@@ -15,7 +15,7 @@ exports.initDatabase = function (readyList) {
         } else {
             console.log('MongodbClient connection to ' + userDBPath + ' has been established');
             userDB.usersColl = db.collection('users');
-            userDB.usersColl.createIndex({googleID: 1}, {unique: true});
+            userDB.usersColl.createIndex({googleID: 1});
             userDB.usersColl.createIndex({email: 1}, {unique: true});
             userDBReady.resolve();
         }

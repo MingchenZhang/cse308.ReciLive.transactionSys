@@ -49,7 +49,6 @@ drawModule = new Draw(transactionSystem,viewManager.getCanvas(),$('#draw-control
 transactionSystem.registerModule(chatModule.moduleName, chatModule);
 transactionSystem.registerModule(slideModule.moduleName, slideModule);
 transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
-canvasController = new canvasontroller($('#CursorLayer'));
 sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'),$('#slider-div'));
 $('.ending-controller').click(transactionSystem.endRecitation);
 document.addEventListener(events.endRecitation.type, (e) => {

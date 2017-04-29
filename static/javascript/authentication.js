@@ -37,7 +37,7 @@ function onSignIn(googleUser) {
     // document.cookie = "email=" + profile.getEmail() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
     // document.cookie = "name=" + profile.getName() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
     // document.cookie = "ID=" + profile.getId() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    document.cookie = "IDToken=" + id_token + ";";
+    document.cookie = "IDToken=" + id_token + ";domain=.recilive.stream;path=/";
     document.cookie = "email=" + profile.getEmail() + ";";
     document.cookie = "name=" + profile.getName() + ";";
     document.cookie = "ID=" + profile.getId() + ";";
