@@ -15,16 +15,11 @@ $(function() {
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
-<<<<<<< HEAD
-    auth2.signOut().then(function() {
-      window.location.href = window.location.origin;
-=======
     auth2.signOut().then(function () {
         console.log('User signed out.');
         window.location.href = window.location.origin;
         var cookies = document.cookie.split(";");
         $.removeCookie('the_cookie', {path: '/'});
->>>>>>> f9408c93863809c7f5dbda9825058d1d4d71043d
     });
 }
 
