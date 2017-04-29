@@ -38,6 +38,13 @@ function showStudentList() {
   $('.col-md-2').show();
 }
 
+function updateStudentList(students) {
+  $(".student-list").empty();
+  students.forEach(function(student) {
+    $(".student-list").append("<h4>" + student + "<i class='fa fa-microphone student-microphone'></i></h4>");
+  });
+}
+
 transactionSystem = new TransactionSystem("/room/"+classroomNumber+"/transaction");
 transactionSystem.roomNumber = classroomNumber;
 transactionSystem.userID = userID;

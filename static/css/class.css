@@ -74,6 +74,9 @@ body {
 }
 
 /* modal */
+.modal-title {
+  display: inline;
+}
 .student-email {
   width:100%;
 }
