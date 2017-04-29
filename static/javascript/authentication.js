@@ -10,9 +10,11 @@
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function() {
+    auth2.signOut().then(function () {
         console.log('User signed out.');
         window.location.href = window.location.origin;
+        var cookies = document.cookie.split(";");
+        $.removeCookie('the_cookie', {path: '/'});
     });
 }
 
@@ -44,39 +46,64 @@ function onSignIn(googleUser) {
         type: "POST",
         url: "/ajax/check-user"
     });
-    checkUser.done(function(data) {
+    checkUser.done(function (data) {
         if (data.sign_up) {
             vex.dialog.buttons.YES.text = 'Student';
             vex.dialog.buttons.NO.text = 'Instructor';
-            vex.dialog.confirm({
+
+            prestartDialog = vex.dialog.open({
                 message: 'What is your role?',
-                callback: function(value) {
-                  if(value) {
-                    var role = 'Student';
-                  }else {
-                    role = 'Instructor';
-                  }
-                    $.ajax({
-                        type: "POST",
-                        url: "/ajax/sign_up",
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            role: role
-                        }),
-                        success: function(data) {
-                            if (data.result) {
-                                if (data.redirect)
-                                    window.location.href = window.location.origin + data.redirect;
-                            } else {
-                                // TODO ERROR handling
+                buttons: [{
+                    text: 'Student', type: 'button', className: 'vex-dialog-button-primary',
+                    click: function () {
+                        $.ajax({
+                            type: "POST",
+                            url: "/ajax/sign_up",
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                role: 'Student'
+                            }),
+                            success: function (data) {
+                                if (data.result) {
+                                    if (data.redirect)
+                                        window.location.href = window.location.origin + data.redirect;
+                                } else {
+                                    // TODO ERROR handling
+                                }
+                            },
+                            error: function (ts) {
+                                console.log(ts.responseText);
                             }
-                        },
-                        error: function(ts) {
-                            console.log(ts.responseText);
-                        }
-                    });
-                }
+                        });
+                    }
+                }, {
+                    text: 'Instructor', type: 'button', className: 'vex-dialog-button-primary',
+                    click: function () {
+                        $.ajax({
+                            type: "POST",
+                            url: "/ajax/sign_up",
+                            contentType: "application/json",
+                            data: JSON.stringify({
+                                role: 'Instructor'
+                            }),
+                            success: function (data) {
+                                if (data.result) {
+                                    if (data.redirect)
+                                        window.location.href = window.location.origin + data.redirect;
+                                } else {
+                                    // TODO ERROR handling
+                                }
+                            },
+                            error: function (ts) {
+                                console.log(ts.responseText);
+                            }
+                        });
+                    }
+                }],
+                overlayClosesOnClick: false,
             });
+
+
         } else {
             window.location.href = window.location.origin + data.redirect;
         }
