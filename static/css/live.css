@@ -1,6 +1,8 @@
 body {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .navbar {
   background: #f2b632 url("../img/crossword.png") repeat;
@@ -18,14 +20,11 @@ body {
 .recitation-info {
   display: flex;
 	align-items: stretch;
+  min-height: calc(100vh - 45px);
 }
 .side-bar {
   width: 4%;
   min-width: 40px;
-  padding-left: 0;
-  padding-right: 0;
-  /*min-height: calc(100vh - 52px);*/
-  /*temp*/
   background-color: #e05038;
 }
 .rec-ended-notification {
@@ -59,7 +58,8 @@ body {
   margin: 0 auto;
 }
 
-.col-md-2 {
+.student-list {
+  min-width: 150px;
   background-color: #3fb0ac;
 }
 .student-microphone {
@@ -68,9 +68,6 @@ body {
 
 .col-md-6 {
   width: 65%;
-  padding-left: 0;
-  padding-right: 0;
-  background-size: 65%;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
@@ -78,47 +75,9 @@ body {
 }
 .col-md-4 {
   width: 31%;
-  padding-left: 0;
-  padding-right: 0;
-  min-height: calc(100vh - 52px);
   background-color: #173e43;
 }
-.add-message {
-	position:fixed;
-	width:50px;
-	height:50px;
-	bottom:20px;
-	right:30px;
-	background-color:#0C9;
-	color:#FFF;
-	border-radius:50px;
-	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-  border: none;
-  font-size: 24px;
-}
 
-.col-md-10 {
-    width: 96%;
-    padding-left: 0;
-    padding-right: 0;
-    min-height: calc(100vh - 52px);
-    background-color: #173e43;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    background-size: cover;
-    -o-background-size: cover;
-}
-.sidebar-toggle {
-    position:fixed;
-    width:50px;
-    height:50px;
-    bottom:20px;
-    right:30px;
-    background-color:#0C9;
-    border-radius:50px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-    border: none;
-}
 .navbar-toggle span {
     background-color: #e05038;
 }
