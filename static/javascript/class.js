@@ -113,10 +113,16 @@ function listClasses() {
 }
 
 function addClass() {
-    var name = $(".class-name").val();
-    var startDate = $("#class-date-start-display").text();
-    var endDate = $("#class-date-end-display").text();
-    var students = [];
+  // init modal
+  $(".class-name").val('');
+  $('.class-name').prop('disabled', false);
+  $(".student-list").empty();
+  add_student();
+  //get value
+  var name = $(".class-name").val();
+  var startDate = $("#class-date-start-display").text();
+  var endDate = $("#class-date-end-display").text();
+  var students = [];
     $('.student-email').each(function() {
         if($(this).val() !== '') {
             students.push($(this).val());
@@ -153,7 +159,16 @@ function editClass(current_class_id) {
       dataType: 'json'
   }).done(function (data) {
       if(data.result === true) {
-        console.log(data);
+        $(".class-name").val(data.classInfo.name);
+        $('.class-name').prop('disabled', true);
+        $("#class-date-start-display").text(data.classInfo.startDate);
+        // $('#class-date-start-display').text(data.classInfo.startDate.data('date'));
+        $('#class-date-end-display').text($('#class-date-end').data('date'));
+      }else {
+          console.error(data.reason);
+      }
+      if(data.result4Privilege) {
+          display_students(data.privilegeList);
       }else {
           console.error(data.reason);
       }
@@ -223,11 +238,11 @@ function addRecitation() {
 function add_student() {
     $(".student-list").append("<input type='text' class='student-email'>");
 }
-// function display_students(student_list) {
+function display_students(student_list) {
 //   student_list.forEach(fucntion(student) {
 //     $(".student-list").append("<input type='text' class='student-email' value= '"+ student + "'>");
 //   });
-// }
+}
 
 function import_student() {
     var file = $('.bulk-import-student')[0].files[0];
