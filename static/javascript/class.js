@@ -2,7 +2,8 @@
  * Created by jieliang on 4/5/17.
  */
 
-var currentClass = null;
+var currentClassId = null;
+var currentClassName = null;
 
 $(document).ready(function(){
     listClasses();
@@ -122,6 +123,7 @@ function initClassModal() {
   $('#class-date-end-display').text($('#class-date-end').data('date'));
   $(".student-list").empty();
   add_student();
+  $(".delete-class-btn").hide();
 }
 function addClass() {
   var name = $(".class-name").val();
@@ -167,6 +169,7 @@ function editClass(current_class_id) {
         $('.class-name').prop('disabled', true);
         $("#class-date-start-display").text(data.classInfo.startDate.split("T")[0]);
         $('#class-date-end-display').text(data.classInfo.endDate.split("T")[0]);
+        $(".delete-class-btn").show();
       }else {
           console.error(data.reason);
       }
@@ -198,6 +201,7 @@ function listRecitation(current_class_id, current_class_name) {
     $(".add-class").css("display","none");
     $(".add-recitation").css("display","inline-block");
     var listDiv = $('.class-list');
+    $(".current-class-name").remove();
     $('.class-info').prepend("<h1 class='current-class-name'>"+current_class_name+"</h1>");
 
     $.ajax({
@@ -208,7 +212,8 @@ function listRecitation(current_class_id, current_class_name) {
         dataType: 'json'
     }).done(function (data) {
         if(data.result === true) {
-            currentClass = current_class_id;
+            currentClassId = current_class_id;
+            currentClassName = current_class_name;
             var lists = data.list;
             listDiv.empty();
             for(var i in lists) {
@@ -234,11 +239,11 @@ function addRecitation() {
     $.ajax({
         type: "POST",
         url: "/ajax/add-recitation",
-        data: JSON.stringify({class: currentClass, name: name, startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt)}),
+        data: JSON.stringify({class: currentClassId, name: name, startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt)}),
         success: function(data){
             if(data.result === true) {
                 $('#recitation-detail').modal('hide');
-                listRecitation(currentClass);
+                listRecitation(currentClassId, currentClassName);
             }else {
                 console.error(data.reason);
             }
