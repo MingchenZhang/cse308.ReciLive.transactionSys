@@ -41,7 +41,7 @@ function showStudentList() {
 function updateStudentList(students) {
   $(".student-list").empty();
   students.forEach(function(student) {
-    $(".student-list").append("<h4>" + student + "<i class='fa fa-microphone student-microphone'></i></h4>");
+    $(".student-list").append("<h4 onclick=switchMicrophone("+ student.id +")>" + student.name + "<i class='fa fa-microphone student-microphone'></i></h4>");
   });
 }
 
