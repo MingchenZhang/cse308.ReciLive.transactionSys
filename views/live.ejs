@@ -14,7 +14,6 @@
     <link href="/static/css/library/colorPicker.css" rel="stylesheet" type="text/css">
     <!-- JS Library -->
     <script src="/static/javascript/jquery-3.1.1.js"></script>
-    <!-- <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script> -->
     <script src="../static/javascript/bootstrap.min.js"></script>
     <script src="/static/javascript/library/materialize.min.js"></script>
     <script src="/static/javascript/library/fabric.js"></script>
@@ -55,7 +54,7 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="#"><%= username %></a></li>
-                <li><a href="#" id="sign-out" onclick="signOut()">Log out</a></li>
+                <li><a href="#">Log out</a></li>
             </ul>
         </div>
     </div>
@@ -120,7 +119,6 @@
     classroomNumber = parseInt('<%= classroomNumber %>');
     userID = parseInt("<%= userID %>");
 </script>
-<!-- <script src="/static/javascript/authentication.js"></script> -->
 <script src="/static/javascript/live.js"></script>
 </body>
 </html>
