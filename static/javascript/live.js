@@ -128,7 +128,7 @@ Promise.all(promiseList).then(function (result) {
     slideModule.init();
     sliderController.init();
     viewManager.init();
-
+    drawModule.init();
     return activateSound();
 }).then(() => {
     if (loadingDialog) vex.close(loadingDialog);
