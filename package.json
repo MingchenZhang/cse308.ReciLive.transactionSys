@@ -9,6 +9,7 @@
     "when": "latest",
     "better-validator": "latest",
     "body-parser": "1.17.1",
+    "busboy": "^0.2.14",
     "cookie": "0.3.1",
     "cookie-parser": "1.4.3",
     "ejs": "2.5.6",

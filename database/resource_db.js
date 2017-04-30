@@ -24,7 +24,7 @@ exports.initDatabase = function (readyList) {
             }
         }
 
-        if (s.dbAuth.username && s.dbAuth.password) {
+        if (s.dbAuth && s.dbAuth.username && s.dbAuth.password) {
             db.admin().authenticate(s.dbAuth.username, s.dbAuth.password, function (err, result) {
                 ready(db, err, result);
             });

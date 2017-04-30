@@ -1,4 +1,6 @@
 var Express = require('express');
+var Busboy = require('busboy');
+var When = require('When');
 
 exports.getRoute = function (s) {
     var router = Express.Router();
@@ -13,6 +15,7 @@ exports.getRoute = function (s) {
 
         var fields = {};
         fields.attachmentList = [];
+        var attachmentPromises = [];
         var boy = new Busboy({
             headers: req.headers,
             limits:{fields:50, fieldSize:40*1024, files:100, fileSize: 10*1024*1024, headerPairs:1}
@@ -25,25 +28,18 @@ exports.getRoute = function (s) {
             var fileID = s.mongodb.ObjectID();
             var uploadStream = s.resourceConn.getResourceFileBucket()
                 .openUploadStreamWithId(fileID, filename, {metadata:{}, contentType:mimetype});
-            file.on('end', function () {
-                if(ended) console.error('WTF: ended!!');
-                fields.attachmentList.push({name:filename, id:fileID});
+            var uploadP = When.promise((resolve, reject)=>{
+                file.on('limit', function(){
+                    writeError(400, 'file is too large');
+                    uploadStream.abort(function () {});
+                    return reject();
+                });
+                file.pipe(uploadStream).once('finish', function () {
+                    fields.attachmentList.push({name:filename, id:fileID});
+                    return resolve();
+                });
             });
-            file.on('limit', function(){
-                writeError(400, 'file is too large');
-                uploadStream.abort(function () {});
-            });
-            file.pipe(uploadStream).once('finish', function () {
-                if(ended) return s.resourceConn.getResourceFileBucket().delete(fileID); // in case the dropFiles() failed to delete file because the file is not ready
-                function dropFiles(){
-                    for(var file of fields.attachmentList){
-                        s.resourceConn.getResourceFileBucket().delete(file.id);
-                    }
-                    fields.attachmentList = [];
-                    ended = true;
-                }
-                res.send({result: true, id: fields.attachmentList});
-            });
+            attachmentPromises.push(uploadP);
         });
         boy.on('filesLimit', function() {
             writeError(400, 'too many files')
@@ -54,13 +50,19 @@ exports.getRoute = function (s) {
         boy.on('fieldsLimit', function() {
             writeError(400, 'too many fields')
         });
+        boy.on('finish', function () {
+            if(ended) return;
+            When.all(attachmentPromises).then(()=>{
+                res.send({result: true, files: fields.attachmentList});
+            });
+        });
         //boy.once('finish', function() {});
 
         req.pipe(boy);
     });
 
-    router.get('/get_resources', function (req, res, next) {
-        var cursor = s.resourceConn.getResourceFileBucket().find({_id:s.mongodb.ObjectID(req.params.id)}, {}).limit(1);
+    router.get('/get_resource', function (req, res, next) {
+        var cursor = s.resourceConn.getResourceFileBucket().find({_id:s.mongodb.ObjectID(req.query.id)}, {}).limit(1);
         cursor.next(function (err, doc) {
             if(err) return res.status(400).send({result: false, error:'database error', detail: err.message});
             if(doc == null) return res.status(400).send({result: false, error:'file not found'});
