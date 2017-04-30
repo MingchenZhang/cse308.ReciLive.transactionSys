@@ -32,11 +32,15 @@ events = {
 $(document).ready(function () {
     $('.modal').modal();
     $('#draw-color-picker').colorPicker({pickerDefault: "ffffff"});
-    $('.col-md-2').hide();
+    $('.student-list').hide();
 });
 
-function showStudentList() {
-  $('.col-md-2').show();
+function viewStudentList() {
+  if($('.student-list').css('display') === 'none'){
+    $('.student-list').show();
+  }else {
+    $('.student-list').hide();
+  }
 }
 
 function updateStudentList(students) {
