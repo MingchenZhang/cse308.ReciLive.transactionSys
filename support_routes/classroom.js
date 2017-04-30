@@ -61,7 +61,7 @@ exports.getRoute = function (s) {
         promiseList = [];
         promiseList[0] = s.classConn.getClassByMongoID(req.body.classId, req.userLoginInfo.record._id).then((clazz) => {
             response.result4classInfo =true;
-            response.ClassInfo = clazz;
+            response.classInfo = clazz;
         }).catch((err) => {      //catch all the error from db
             response.result4classInfo = false;
             response.reason4classInfo = err || "error in get edit class info db operation";

@@ -60,8 +60,8 @@ body {
 
 .col-md-2 {
   background-color: #3fb0ac;
+  min-height: calc(100vh - 52px);
 }
-
 .student-microphone {
   float: right;
 }

@@ -144,6 +144,24 @@ function addClass() {
     });
 }
 
+function editClass(current_class_id) {
+  $.ajax({
+      url: '/ajax/get-edit-class-info',
+      type: 'post',
+      data: JSON.stringify({classId: current_class_id}),
+      contentType: "application/json; charset=utf-8",
+      dataType: 'json'
+  }).done(function (data) {
+      if(data.result === true) {
+        console.log(data);
+      }else {
+          console.error(data.reason);
+      }
+  }).fail(function (err) {
+      console.error(err);
+  });
+}
+
 function listRecitation(current_class_id, current_class_name) {
     $(".add-class").css("display","none");
     $(".add-recitation").css("display","inline-block");
@@ -205,20 +223,19 @@ function addRecitation() {
 function add_student() {
     $(".student-list").append("<input type='text' class='student-email'>");
 }
+// function display_students(student_list) {
+//   student_list.forEach(fucntion(student) {
+//     $(".student-list").append("<input type='text' class='student-email' value= '"+ student + "'>");
+//   });
+// }
 
 function import_student() {
     var file = $('.bulk-import-student')[0].files[0];
-
     Papa.parse(file, {
         complete: function(results) {
-            console.log(results.data);
-
             for(count = 0; count < results.data.length; count++){
                 $(".student-list").append("<input type='text' class='student-email' value= '"+ results.data[count][1] + "'>");
-
             }
-
         }
     });
-
 }
