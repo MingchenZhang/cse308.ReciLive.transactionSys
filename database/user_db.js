@@ -32,6 +32,10 @@ exports.getUserByGoogleID = function (id) {
     return userDB.usersColl.findOne({googleID: id});
 };
 
+exports.getUserByMongoID = (mongoId)=>{
+    return userDB.usersColl.findOne({_id:mongoId});
+}
+
 exports.getUserByEmail = function (email) {
     return userDB.usersColl.findOne({email});
 };

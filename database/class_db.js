@@ -99,19 +99,25 @@ exports.editClassByMongoID = (classID, classInfo, owner) => {
  * @returns {Promise|Promise.<TResult>}
  */
 exports.getPrivilegeList = (classID, owner) => {
-    privilegeList = []
+    var privilegeList = []
     return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        classList.forEach((clazz, index) => {
-            if (clazz._id == classID) {
-                classDB.classEnrollColl.find({class: classID}).toArray().then((studentList) => {
-                    studentList.forEach((student, index) => {
-                        privilegeList[index] = {_id: student._id, email: student.email};
+        for (clazz in classList) {
+            if (classList[clazz]._id == classID) {
+                return classDB.classEnrollColl.find({class: classList[clazz]._id}).toArray().then((studentList) => {
+                    var primiseList = [];
+                    for (index in studentList) {
+                        primiseList[index] =
+                            s.userConn.getUserByMongoID(studentList[index].user).then((user) => {
+                                privilegeList[index] = {_id: studentList[index].user, email: user.email};
+                            });
+                    }
+                    return When.all(primiseList).then(() => {
+                        return privilegeList;
                     });
-                    return privilegeList;
                 })
             }
-        })
-    })
+        }
+    })///
 };
 
 exports.getStudentsByClass = function (clazz) {
