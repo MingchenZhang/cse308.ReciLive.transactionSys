@@ -47,6 +47,8 @@ if(s.role == 'support'){
     s.userConn.initDatabase(readyList);
     s.classConn = require('./database/class_db');
     s.classConn.initDatabase(readyList);
+    s.resourceConn = require('./database/resource_db');
+    s.resourceConn.initDatabase(readyList)
 }else if(s.role == 'live'){
     s.transactionRecord = require('./database/transaction_record.js');
     s.transactionRecord.initDatabase(readyList);

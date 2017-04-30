@@ -7,6 +7,7 @@ exports.getRoute = function (s) {
     router.use('/', require('./classroom').getRoute(s));
     router.use('/', require('./user').getRoute(s));
     router.use('/', require('./recitation').getRoute(s));
-    router.use('/',require('./resource').getRoute(s));
+    router.use('/', require('./file').getRoute(s));
+
     return router;
 };
