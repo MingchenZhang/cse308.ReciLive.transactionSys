@@ -15,15 +15,16 @@ body {
 .navbar-toggle span {
   background-color: #e05038;
 }
-.row {
-  margin-bottom: 0;
+.recitation-info {
+  display: flex;
+	align-items: stretch;
 }
 .side-bar {
   width: 4%;
   min-width: 40px;
   padding-left: 0;
   padding-right: 0;
-  min-height: calc(100vh - 52px);
+  /*min-height: calc(100vh - 52px);*/
   /*temp*/
   background-color: #e05038;
 }
@@ -60,7 +61,6 @@ body {
 
 .col-md-2 {
   background-color: #3fb0ac;
-  min-height: calc(100vh - 52px);
 }
 .student-microphone {
   float: right;
@@ -70,8 +70,6 @@ body {
   width: 65%;
   padding-left: 0;
   padding-right: 0;
-  height: calc(100vh - 52px);
-  /*background-color: #173e43;*/
   background-size: 65%;
   -webkit-background-size: cover;
   -moz-background-size: cover;
