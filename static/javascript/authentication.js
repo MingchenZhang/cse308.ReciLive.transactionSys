@@ -58,7 +58,7 @@ function onSignIn(googleUser) {
                     click: function () {
                         $.ajax({
                             type: "POST",
-                            url: "/ajax/sign_up",
+                            url: "/ajax/sign-up",
                             contentType: "application/json",
                             data: JSON.stringify({
                                 role: 'Student'
@@ -81,7 +81,7 @@ function onSignIn(googleUser) {
                     click: function () {
                         $.ajax({
                             type: "POST",
-                            url: "/ajax/sign_up",
+                            url: "/ajax/sign-up",
                             contentType: "application/json",
                             data: JSON.stringify({
                                 role: 'Instructor'
