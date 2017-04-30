@@ -14,6 +14,7 @@ function ViewManager(stageDiv) {
 
     function parentChangeHandler(){
         resizeElem($( $.map(views, a => [...a]) ), ratio, stageDiv);
+        document.dispatchEvent(events.viewSizeChange());
     }
 
     function resizeElem(elem, ratio, parent){

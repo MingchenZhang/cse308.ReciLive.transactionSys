@@ -25,7 +25,8 @@ events = {
     workAreaRatioChange: createEventConstructor('workAreaRatioChange'),
     switchToSpeaker: createEventConstructor('switchToSpeaker'),
     switchToListener: createEventConstructor('switchToListener'),
-    slidesChange: createEventConstructor('slidesChange')
+    slidesChange: createEventConstructor('slidesChange'),
+    viewSizeChange: createEventConstructor('viewSizeChange'),
 };
 
 $(document).ready(function () {
