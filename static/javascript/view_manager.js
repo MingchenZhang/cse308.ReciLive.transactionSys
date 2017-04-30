@@ -68,6 +68,8 @@ function ViewManager(stageDiv) {
         ratio = newRatio;
         parentChangeHandler();
     };
+
+
 }
 
 

@@ -1,6 +1,7 @@
-function Draw(transactionSystem, canvas, controlPanel) {
+function Draw(transactionSystem, div, controlPanel) {
     var self = this;
     this.moduleName = 'draw';    //enroll module name in transaction system
+    var canvas = $('<canvas id="draw-canvas" ></canvas>');
     var drawList = [];           //record all the draw history in this class
     var currentIndex = -1;
     var ignoreTransaction = {};  //Instructor ignore the draw transaction that himself made
@@ -12,89 +13,138 @@ function Draw(transactionSystem, canvas, controlPanel) {
         clear = null,
         colorPicker = null;
 
+    var scale = 1;
+    var lastHeight = 0;
+    div.append(canvas);
+    div.attr('id', 'canvas-div');
+
     /**
      * init after transaction system
      */
     this.init = function () {
-        pen = controlPanel.find('.fa fa-pencil'),      //init all the button
-            undo = controlPanel.find('.fa fa-undo'),
-            redo = controlPanel.find('.fa fa-repeat'),
-            eraser = controlPanel.find('.fa fa-eraser'),
-            clear = controlPanel.find('.fa fa-window-close'),
+        pen = controlPanel.find('#pencil-box'),      //init all the button
+            undo = controlPanel.find('#undo-box'),
+            redo = controlPanel.find('#repeat-box'),
+            eraser = controlPanel.find('#eraser-box'),
+            clear = controlPanel.find('#clear-box'),
             colorPicker = controlPanel.find('#draw-color-picker');
-        $(canvas).attr('id', 'draw-canvas');
         canvas = new fabric.Canvas('draw-canvas', {isDrawingMode: true});
+        div.find('.canvas-container').css('position', 'absolute');
+        div.find('.canvas-container').css('height', '100%');
+        div.find('.canvas-container').css('width', '100%');
+        div.find('canvas').css('position', 'absolute');
+        div.find('canvas').css('height', '100%');
+        div.find('canvas').css('width', '100%');
         fabric.Object.prototype.transparentCorners = false;
-        canvas.freeDrawingBrush.color = colorPicker.value;
-        canvas.freeDrawingBrush.width = 5;
+        canvas.setHeight(div.height());
+        canvas.isDrawingMode = false;
+        canvas.freeDrawingBrush.color = colorPicker.val();
+        canvas.setWidth(div.width());
+        lastHeight  = div.height();
         canvas.on('object:added', function () {            //add handler to event add obj
             self.newStroke(JSON.stringify(canvas));
-        })
-        document.addEventListener(events.slidesChange, function () {
+        });
+        document.addEventListener(events.slidesChange.type, function () {
             drawList = [];
             currentIndex = -1;
-        })
+            canvas.clear();
+        });
+        document.addEventListener(events.viewSizeChange.type, function () {
+            resize();
+
+        });
         attachUIHandler();
     };
+
+    function resize() {
+        // TODO limit the max canvas zoom in
+        scaleFactor =  div.height()/lastHeight;
+
+        canvas.setHeight(canvas.getHeight() * scaleFactor);
+        canvas.setWidth(canvas.getWidth() * scaleFactor);
+
+        var objects = canvas.getObjects();
+        for (var i in objects) {
+            var scaleX = objects[i].scaleX;
+            var scaleY = objects[i].scaleY;
+            var left = objects[i].left;
+            var top = objects[i].top;
+
+            var tempScaleX = scaleX * scaleFactor;
+            var tempScaleY = scaleY * scaleFactor;
+            var tempLeft = left * scaleFactor;
+            var tempTop = top * scaleFactor;
+
+            objects[i].scaleX = tempScaleX;
+            objects[i].scaleY = tempScaleY;
+            objects[i].left = tempLeft;
+            objects[i].top = tempTop;
+
+            objects[i].setCoords();
+        }
+        lastHeight = div.height();
+        canvas.renderAll();
+    }
+
     /**
      * attach all UI Handler after all the UI init
      */
-    attachUIHandler = function () {
+    var attachUIHandler = function () {
         /**
          * change color when value of color picker change
          */
-        colorPicker.onChange = function () {
-            canvas.freeDrawingBrush.color = colorPicker.value;
-        };
+        colorPicker.change ( function () {
+            canvas.freeDrawingBrush.color = colorPicker.val();
+        });
         /**
          * clear all content on the canvas
          */
-        clear.onclick = function () {
+        clear.click(function () {
             canvas.clear();
             self.newStroke(JSON.stringify(canvas));
-        };
+        });
 
         /**
          * click to erase selected object
          */
-        eraser.onclick = function () {
-            canvas.isDrawMode = false;
+        eraser.click(function () {
+            canvas.isDrawingMode = false;
             canvas.on('object:selected', function () {
                 canvas.getActiveObject().remove();
                 self.newStroke(JSON.stringify(canvas));
             })
-        };
+        });
 
         /**
          * change to draw mode
          */
-        pen.onclick = function () {
-            canvas.isDrawMode = true;
-        };
+        pen.click(function () {
+            canvas.isDrawingMode = true;
+        });
 
         /**
          * undo to previous draw
          */
-        undo.onclick = function () {
+        undo.click(function () {
             if (currentIndex > 0) {
                 canvas.clear();
                 canvas.loadFromJSON(drawList[--currentIndex]);
                 canvas.renderAll();
                 self.newStroke(JSON.stringify(canvas));
             }
-        };
+        });
 
         /**
          * redo a draw
          */
-        redo.onclick = function () {
+        redo.click(function () {
             if (currentIndex < drawList.length - 1) {
                 canvas.clear();
                 canvas.loadFromJSON(drawList[++currentIndex]);
                 canvas.renderAll();
                 self.newStroke(JSON.stringify(canvas));
             }
-        };
+        });
     };
     /**
      * send the transaction to all the students
