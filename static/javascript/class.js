@@ -111,14 +111,19 @@ function listClasses() {
         console.error(err);
     });
 }
-
-function addClass() {
-  // init modal
+function initClassModal() {
   $(".class-name").val('');
   $('.class-name').prop('disabled', false);
+  var today = new Date();
+  var t = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
+  $('#class-date-start').data({date: t}).datepicker('update');
+  $('#class-date-start-display').text($('#class-date-start').data('date'));
+  $('#class-date-end').data({date: t}).datepicker('update');
+  $('#class-date-end-display').text($('#class-date-end').data('date'));
   $(".student-list").empty();
   add_student();
-  //get value
+}
+function addClass() {
   var name = $(".class-name").val();
   var startDate = $("#class-date-start-display").text();
   var endDate = $("#class-date-end-display").text();
@@ -126,7 +131,6 @@ function addClass() {
     $('.student-email').each(function() {
         if($(this).val() !== '') {
             students.push($(this).val());
-
         }
     });
 
@@ -161,9 +165,8 @@ function editClass(current_class_id) {
       if(data.result === true) {
         $(".class-name").val(data.classInfo.name);
         $('.class-name').prop('disabled', true);
-        $("#class-date-start-display").text(data.classInfo.startDate);
-        // $('#class-date-start-display').text(data.classInfo.startDate.data('date'));
-        $('#class-date-end-display').text($('#class-date-end').data('date'));
+        $("#class-date-start-display").text(data.classInfo.startDate.split("T")[0]);
+        $('#class-date-end-display').text(data.classInfo.endDate.split("T")[0]);
       }else {
           console.error(data.reason);
       }
@@ -172,6 +175,20 @@ function editClass(current_class_id) {
       }else {
           console.error(data.reason);
       }
+  }).fail(function (err) {
+      console.error(err);
+  });
+}
+
+function deleteClass() {
+  $.ajax({
+      url: '/ajax/delete-class',
+      type: 'post',
+      data: JSON.stringify({classId: current_class_id}),
+      contentType: "application/json; charset=utf-8",
+      dataType: 'json'
+  }).done(function (data) {
+
   }).fail(function (err) {
       console.error(err);
   });
