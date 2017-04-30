@@ -66,35 +66,39 @@ exports.getRoute = function (s) {
             response.result4classInfo = false;
             response.reason4classInfo = err || "error in get edit class info db operation";
         });
-        promiseList[1] = s.classConn.getPrivilegeList(req.body.classId, req.userLoginInfo.record._id).then((privilegeList)=>{
+        promiseList[1] = s.classConn.getPrivilegeList(req.body.classId, req.userLoginInfo.record._id).then((privilegeList) => {
             response.result4Privilege = true;
             response.privilegeList = privilegeList;
-        }).catch((err)=>{
+        }).catch((err) => {
             response.result4privilege = false;
             response.reason4privilege = err || "error in get privilege list";
         })
-        When.all(promiseList).then(()=>{
-            if(response.reason4classInfo||response.reason4privilege){
+        When.all(promiseList).then(() => {
+            if (response.reason4classInfo || response.reason4privilege) {
                 response.ressult = false;
-                response.reason = (response.reason4privilege || '')+'\n'+(response.reason4classInfo || '');
+                response.reason = (response.reason4privilege || '') + '\n' + (response.reason4classInfo || '');
                 res.send(response);
-            }else{
+            } else {
                 response.result = true;
                 res.send(response);
             }
         })
     });
 
-    router.post('/ajax/edit-class', jsonParser , (req,res,next)=>{
-        s.classConn.editClassByMongoID(req.body.classId,{name:req.body.name, startDate:req.body.startDate, endDate:req.body.endDate}, req.userLoginInfo.record._id).then((clazz) => {       //return a premise
+    router.post('/ajax/edit-class', jsonParser, (req, res, next) => {
+        when.all(s.classConn.editClassByMongoID(req.body.classId, {
+            name: req.body.name,
+            startDate: req.body.startDate,
+            endDate: req.body.endDate
+        }, req.userLoginInfo.record._id)).then((clazz) => {       //return a premise list clazz = [clazzMongoID, result4deleteAllPrivilege]
             return s.tools.listPromise(req.body.students, (email) => {
                 return s.userConn.getUserByEmail(email).then((user) => {
                     if (user) {
-                        return s.classConn.addStudentToClass(user._id, clazz._id);
+                        return s.classConn.addStudentToClass(user._id, clazz[0]._id);
                     } else {
                         var userID = s.mongodb.ObjectID();
                         return s.userConn.addUser(null, email, null, null, userID).then(() => {
-                            return s.classConn.addStudentToClass(userID, clazz._id);
+                            return s.classConn.addStudentToClass(userID, clazz[0]._id);
                         });
                     }
                 });

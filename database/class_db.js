@@ -62,11 +62,11 @@ exports.getClassesByStudent = function (student) {
  */
 exports.getClassByMongoID = (classID, owner) => {
     return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        classList.forEach((clazz, index) => {
-            if (clazz._id == classID) return classDB.classesColl.findOne({id: classID}).then((result) => {
+        for (clazz in classList) {
+            if (classList[clazz]._id == classID) return classDB.classesColl.findOne({_id: classList[clazz]._id}).then((result) => {
                 return result;
-            })      //all the error send to controller to handle
-        })
+            })
+        }
     })
 };
 
@@ -78,7 +78,8 @@ exports.getClassByMongoID = (classID, owner) => {
  * @returns {Promise|Promise.<TResult>}
  */
 exports.editClassByMongoID = (classID, classInfo, owner) => {
-    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
+    var primiseList = [];
+    primiseList[0] = classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
         classList.forEach((clazz, index) => {
             if (clazz._id == classID) return classDB.classesColl.updateMany({id: classID}, {    //update info
                 $set: {
@@ -88,7 +89,8 @@ exports.editClassByMongoID = (classID, classInfo, owner) => {
                 }
             })    //all the error send to controller to handle
         })
-    })
+    });
+    primiseList[1] = classDB.classEnrollColl.removeMany({class: classID}); //remove all the privilege information for rewrite
 };
 /**
  * send all the privilege back with email and student id
@@ -97,13 +99,13 @@ exports.editClassByMongoID = (classID, classInfo, owner) => {
  * @returns {Promise|Promise.<TResult>}
  */
 exports.getPrivilegeList = (classID, owner) => {
-    privilegeList=[]
+    privilegeList = []
     return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        classList.forEach((clazz,index)=>{
-            if(clazz._id == classID){
-                classDB.classEnrollColl.find({class:classID}).toArray().then((studentList)=>{
-                    studentList.forEach((student, index)=>{
-                        privilegeList[index]={_id:student._id, email:student.email};
+        classList.forEach((clazz, index) => {
+            if (clazz._id == classID) {
+                classDB.classEnrollColl.find({class: classID}).toArray().then((studentList) => {
+                    studentList.forEach((student, index) => {
+                        privilegeList[index] = {_id: student._id, email: student.email};
                     });
                     return privilegeList;
                 })

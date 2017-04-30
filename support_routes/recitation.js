@@ -64,6 +64,5 @@ exports.getRoute = function (s) {
         });
     });
 
-
     return router;
 };
