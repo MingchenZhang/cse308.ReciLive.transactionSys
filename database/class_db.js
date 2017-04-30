@@ -70,6 +70,48 @@ exports.getClassByMongoID = (classID, owner) => {
     })
 };
 
+/**
+ * change the class information by instuctor
+ * @param classID   mongoid
+ * @param classInfo     obj have all the modified info
+ * @param owner         mongoid
+ * @returns {Promise|Promise.<TResult>}
+ */
+exports.editClassByMongoID = (classID, classInfo, owner) => {
+    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
+        classList.forEach((clazz, index) => {
+            if (clazz._id == classID) return classDB.classesColl.updateMany({id: classID}, {    //update info
+                $set: {
+                    name: classInfo.name,
+                    startDate: new Date(startDate),
+                    endDate: new Date(endDate),
+                }
+            })    //all the error send to controller to handle
+        })
+    })
+};
+/**
+ * send all the privilege back with email and student id
+ * @param classID       mongoid
+ * @param owner         mongoid
+ * @returns {Promise|Promise.<TResult>}
+ */
+exports.getPrivilegeList = (classID, owner) => {
+    privilegeList=[]
+    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
+        classList.forEach((clazz,index)=>{
+            if(clazz._id == classID){
+                classDB.classEnrollColl.find({class:classID}).toArray().then((studentList)=>{
+                    studentList.forEach((student, index)=>{
+                        privilegeList[index]={_id:student._id, email:student.email};
+                    });
+                    return privilegeList;
+                })
+            }
+        })
+    })
+};
+
 exports.getStudentsByClass = function (clazz) {
     return classDB.classEnrollColl.find({class: s.mongodb.ObjectID(clazz)}).sort({_id: -1}).toArray();
 };

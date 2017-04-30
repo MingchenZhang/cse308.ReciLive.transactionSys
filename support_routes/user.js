@@ -33,7 +33,7 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.get('/ajax/live_get_user_info', (req, res, next) => {     //live send mongo id and get all user info
+    router.get('/ajax/live-get-user-info', jsonParser, (req, res, next) => {     //live send mongo id and get all user info
         s.userConn.getUserByGoogleID(req.query.id).then((userInfo) => {
             res.send(userInfo);
         }).catch((e) => {
@@ -41,5 +41,8 @@ exports.getRoute = function (s) {
         });
     });
 
+    router.get('/ajax/edit-class', jsonParser, (req, rees, next) => {   //send back edit class
+
+    })
     return router;
 };
