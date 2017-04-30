@@ -167,6 +167,6 @@ exports.getRecitationByMongoID = (recitationId)=>{
     return classDB.recitationColl.find({_id:s.mongodb.ObjectID(recitationId)}).toArray();
 };
 
-exports.editRecitation = (owner, reciationId, recitationInfo)=>{
-    return;
-};
+// exports.editRecitation = (owner, reciationId, recitationInfo)=>{
+//     return;
+// };

@@ -74,8 +74,7 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.psot('/ajax/edit-recitation',jsonParser,(req,res,next)=>{
-        s.classConn
-    });
+   // router.psot('/ajax/edit-recitation',jsonParser,(req,res,next)=>{
+    //});
     return router;
 };
