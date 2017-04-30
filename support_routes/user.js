@@ -41,8 +41,5 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.get('/ajax/edit-class', jsonParser, (req, rees, next) => {   //send back edit class
-
-    })
     return router;
 };
