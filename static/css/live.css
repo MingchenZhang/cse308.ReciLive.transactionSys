@@ -50,7 +50,7 @@ body {
 }
 #draw-control-panel {
   right: auto;
-  width: 300px;
+  width: 400px;
 }
 .ending-controller {
   width: 43px;
@@ -68,6 +68,7 @@ body {
 
 .col-md-6 {
   width: 65%;
+  padding-left: 0;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   background-size: cover;
@@ -157,7 +158,7 @@ body {
   background: transparent;
 }
 .slide-nav label {
-    width: 200px;
+    width: 40px;
     height: 100%;
     position: absolute;
 
@@ -167,7 +168,7 @@ body {
     transition: opacity .2s;
 
     color: #FFF;
-    font-size: 156pt;
+    font-size: 120pt;
     text-align: center;
     line-height: 500px;
     text-shadow: 0px 0px 15px rgb(119, 119, 119);
