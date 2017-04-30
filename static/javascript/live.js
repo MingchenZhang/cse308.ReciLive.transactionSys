@@ -43,6 +43,13 @@ function viewStudentList() {
   }
 }
 
+function viewInfoBoard() {
+  if($('#info-board').css('display') === 'none'){
+    $('#info-board').show();
+  }else {
+    $('#info-board').hide();
+  }
+}
 function updateStudentList(students) {
   $(".student-list").empty();
   students.forEach(function(student) {
