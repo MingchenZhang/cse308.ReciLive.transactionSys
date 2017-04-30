@@ -7,6 +7,21 @@
          gapi.auth2.init();
      });
  }
+// only clear cookies without domain
+function deleteAllCookies() {
+    var cookies = document.cookie.split(";");
+
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        var eqPos = cookie.indexOf("=");
+        var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        if(name === "IDToken") {
+          $.cookie('IDToken',null, {domain:'.recilive.stream'});
+        }else {
+          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        }
+    }
+}
 
 $(function() {
   // $('.sign-in').show();
@@ -16,10 +31,8 @@ $(function() {
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
-        console.log('User signed out.');
-        window.location.href = window.location.origin;
-        var cookies = document.cookie.split(";");
-        $.removeCookie('the_cookie', {path: '/'});
+      deleteAllCookies();
+        window.location.href = "http://recilive.stream";
     });
 }
 
