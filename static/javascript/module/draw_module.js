@@ -5,19 +5,25 @@ function Draw(transactionSystem, canvas, controlPanel) {
     var currentIndex = -1;
     var ignoreTransaction = {};  //Instructor ignore the draw transaction that himself made
     var fabricCanvas = null;     //fabric canvas from fabricjs lib
-    var pen = controlPanel.find('.fa fa-pencil'),      //init all the button
-        undo = controlPanel.find('.fa fa-undo'),
-        redo = controlPanel.find('.fa fa-repeat'),
-        eraser = controlPanel.find('.fa fa-eraser'),
-        clear = controlPanel.find('.fa fa-window-close'),
-        colorPicker = controlPanel.find('#draw-color-picker');
+    var pen = null,      //init all the button
+        undo = null,
+        redo = null,
+        eraser = null,
+        clear = null,
+        colorPicker = null;
 
     /**
      * init after transaction system
      */
     this.init = function () {
-        canvas.setAttribute('id', 'draw-canvas')
-        fabricCanvas = new new fabric.Canvas('draw-canvas', {isDrawingMode: true});
+        pen = controlPanel.find('.fa fa-pencil'),      //init all the button
+            undo = controlPanel.find('.fa fa-undo'),
+            redo = controlPanel.find('.fa fa-repeat'),
+            eraser = controlPanel.find('.fa fa-eraser'),
+            clear = controlPanel.find('.fa fa-window-close'),
+            colorPicker = controlPanel.find('#draw-color-picker');
+        $(canvas).attr('id', 'draw-canvas');
+        canvas = new fabric.Canvas('draw-canvas', {isDrawingMode: true});
         fabric.Object.prototype.transparentCorners = false;
         canvas.freeDrawingBrush.color = colorPicker.value;
         canvas.freeDrawingBrush.width = 5;
@@ -25,66 +31,71 @@ function Draw(transactionSystem, canvas, controlPanel) {
             self.newStroke(JSON.stringify(canvas));
         })
         document.addEventListener(events.slidesChange, function () {
-            drawList=[];
+            drawList = [];
             currentIndex = -1;
         })
+        attachUIHandler();
     };
     /**
-     * change color when value of color picker change
+     * attach all UI Handler after all the UI init
      */
-    colorPicker.onChange = function () {
-        canvas.freeDrawingBrush.color = colorPicker.value;
-    };
-    /**
-     * clear all content on the canvas
-     */
-    clear.onclick = function () {
-        canvas.clear();
-        self.newStroke(JSON.stringify(canvas));
-    };
-
-    /**
-     * click to erase selected object
-     */
-    eraser.onclick = function () {
-        canvas.isDrawMode = false;
-        canvas.on('object:selected', function () {
-            canvas.getActiveObject().remove();
-            self.newStroke(JSON.stringify(canvas));
-        })
-    };
-
-    /**
-     * change to draw mode
-     */
-    pen.onclick = function () {
-        canvas.isDrawMode = true;
-    };
-
-    /**
-     * undo to previous draw
-     */
-    undo.onclick = function () {
-        if (currentIndex > 0) {
+    attachUIHandler = function () {
+        /**
+         * change color when value of color picker change
+         */
+        colorPicker.onChange = function () {
+            canvas.freeDrawingBrush.color = colorPicker.value;
+        };
+        /**
+         * clear all content on the canvas
+         */
+        clear.onclick = function () {
             canvas.clear();
-            canvas.loadFromJSON(drawList[--currentIndex]);
-            canvas.renderAll();
             self.newStroke(JSON.stringify(canvas));
-        }
-    };
+        };
 
-    /**
-     * redo a draw
-     */
-    redo.onclick = function () {
-        if (currentIndex < drawList.length - 1) {
-            canvas.clear();
-            canvas.loadFromJSON(drawList[++currentIndex]);
-            canvas.renderAll();
-            self.newStroke(JSON.stringify(canvas));
-        }
-    };
+        /**
+         * click to erase selected object
+         */
+        eraser.onclick = function () {
+            canvas.isDrawMode = false;
+            canvas.on('object:selected', function () {
+                canvas.getActiveObject().remove();
+                self.newStroke(JSON.stringify(canvas));
+            })
+        };
 
+        /**
+         * change to draw mode
+         */
+        pen.onclick = function () {
+            canvas.isDrawMode = true;
+        };
+
+        /**
+         * undo to previous draw
+         */
+        undo.onclick = function () {
+            if (currentIndex > 0) {
+                canvas.clear();
+                canvas.loadFromJSON(drawList[--currentIndex]);
+                canvas.renderAll();
+                self.newStroke(JSON.stringify(canvas));
+            }
+        };
+
+        /**
+         * redo a draw
+         */
+        redo.onclick = function () {
+            if (currentIndex < drawList.length - 1) {
+                canvas.clear();
+                canvas.loadFromJSON(drawList[++currentIndex]);
+                canvas.renderAll();
+                self.newStroke(JSON.stringify(canvas));
+            }
+        };
+    };
     /**
      * send the transaction to all the students
      * @param stroke a json obj contain all the obj in the canvas
