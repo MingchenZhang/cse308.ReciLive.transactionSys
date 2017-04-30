@@ -85,13 +85,13 @@ exports.getRoute = function (s) {
         })
     });
 
-    router.post('/ajax/edit-class', jsonParser, (req, res, next) => {
-        when.all(s.classConn.editClassByMongoID(req.body.classId, {
+    router.post('/ajax/edit-class', jsonParser, (req, res, next) => {           //response the edit class button
+        when.all(s.classConn.editClassByMongoID(req.body.classId, {     //primise chain 0:modify class info 1:remove all privilege info
             name: req.body.name,
             startDate: req.body.startDate,
             endDate: req.body.endDate
         }, req.userLoginInfo.record._id)).then((clazz) => {       //return a premise list clazz = [clazzMongoID, result4deleteAllPrivilege]
-            return s.tools.listPromise(req.body.students, (email) => {
+            return s.tools.listPromise(req.body.students, (email) => {              //add privilege info
                 return s.userConn.getUserByEmail(email).then((user) => {
                     if (user) {
                         return s.classConn.addStudentToClass(user._id, clazz[0]._id);

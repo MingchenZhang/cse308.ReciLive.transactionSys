@@ -80,8 +80,9 @@ exports.getClassByMongoID = (classID, owner) => {
 exports.editClassByMongoID = (classID, classInfo, owner) => {
     var primiseList = [];
     primiseList[0] = classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
+        var primiseList4classList = [];
         classList.forEach((clazz, index) => {
-            if (clazz._id == classID) return classDB.classesColl.updateMany({id: classID}, {    //update info
+            if (clazz._id == classID) primiseList4classList[index] = classDB.classesColl.updateMany({id: classID}, {    //update info
                 $set: {
                     name: classInfo.name,
                     startDate: new Date(startDate),
@@ -89,8 +90,10 @@ exports.editClassByMongoID = (classID, classInfo, owner) => {
                 }
             })    //all the error send to controller to handle
         })
+        return primiseList;
     });
     primiseList[1] = classDB.classEnrollColl.removeMany({class: classID}); //remove all the privilege information for rewrite
+    return primiseList;
 };
 /**
  * send all the privilege back with email and student id
@@ -158,4 +161,12 @@ exports.getRecitationsByClass = function (parentClass) {
     return classDB.recitationColl.find({
         parentClass: s.mongodb.ObjectID(parentClass)
     }).sort({'createdAt': -1}).toArray();
+};
+
+exports.getRecitationByMongoID = (recitationId)=>{
+    return classDB.recitationColl.find({_id:s.mongodb.ObjectID(recitationId)}).toArray();
+};
+
+exports.editRecitation = (owner, reciationId, recitationInfo)=>{
+    return;
 };
