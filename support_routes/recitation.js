@@ -32,7 +32,7 @@ exports.getRoute = function (s) {
                 privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control"];
                 s.classConn.getStudentsByClass(req.body.class).then((response) => {
                     response.forEach((student) => {
-                        privilege[student._id] = []
+                        privilege[student.user] = []
                     });
                     Request({
                         method: 'POST',

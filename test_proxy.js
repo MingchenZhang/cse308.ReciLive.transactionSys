@@ -1,4 +1,18 @@
-var proxy = require('redbird')({port: 80});
-
-proxy.register("recilive.stream", "http://localhost:3000");
-proxy.register("room.recilive.stream", "http://localhost:3001");
+var redbird = require('redbird')({
+    port: 80,
+    secure: false,
+    ssl: {
+        port: 443,
+        key: "../certs/default.key",
+        cert: "../certs/default.crt",
+    }
+});
+redbird.register("recilive.stream", "http://localhost:3000", {});
+// redbird.register("room.recilive.stream", "http://localhost:3001", {});
+redbird.register("room.recilive.stream", "http://localhost:3001", {
+    ssl: {
+        key: 'room.recilive.stream.key',
+        cert: 'room.recilive.stream.cert',
+        redirect: false
+    }
+});

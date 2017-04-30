@@ -200,7 +200,7 @@ function activateSound() {
             if (stream) {
                 stream.connect(script_processor_node);
             }
-            stream.connect(audioCtx.destination);
+            script_processor_node.connect(audioCtx.destination);
             return resolve();
         }
     });

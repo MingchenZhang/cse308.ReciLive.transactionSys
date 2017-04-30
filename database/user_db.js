@@ -1,4 +1,6 @@
 const When = require('when');
+const validator = new (require('better-validator'))();
+
 const s = global.s;
 
 var userDB = {};
@@ -34,7 +36,7 @@ exports.getUserByGoogleID = function (id) {
 
 exports.getUserByMongoID = (mongoId)=>{
     return userDB.usersColl.findOne({_id:mongoId});
-}
+};
 
 exports.getUserByEmail = function (email) {
     return userDB.usersColl.findOne({email});
@@ -58,8 +60,12 @@ exports.setUserInfo = function (_id, change) {
 
 exports.basicUserInfoRule = (obj) => {
     obj.required().isObject((obj)=>{
-        obj('googleID').required().isString();
-        obj('email').required().isString();
-        obj('username').required().isString();
+        obj('googleID').isString().required();
+        obj('email').isString().required();
+        obj('username').isString().required();
     });
+};
+
+exports.matchBasicUserInfoRule = (obj)=>{
+    return !!(obj.googleID && obj.email && obj.username);
 };

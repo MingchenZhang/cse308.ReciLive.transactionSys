@@ -91,12 +91,13 @@ if(s.role == 'support'){
                     res.status(400).send('database error (89)');
                 });
                 req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
-            }else if(validator(record, s.userConn.basicUserInfoRule).length == 0){ // user has complete info
+            }else if(s.userConn.matchBasicUserInfoRule(record)){ // user has complete info
                 req.userLoginInfo.record = record;
                 next();
             }else{// user info is incomplete
-                req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
-                s.userConn.setUserInfo(req.userLoginInfo.userID, req.userLoginInfo.record).then(()=>next()).catch((err)=>{
+                Object.assign(record, {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name});
+                req.userLoginInfo.record = record;
+                s.userConn.setUserInfo(record._id, req.userLoginInfo.record).then(()=>next()).catch((err)=>{
                     res.status(400).send('database error (96)');
                 });
             }
