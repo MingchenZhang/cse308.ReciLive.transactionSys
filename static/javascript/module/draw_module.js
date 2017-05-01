@@ -14,15 +14,16 @@ function Draw(transactionSystem, div, controlPanel) {
         clear = null,
         colorPicker = null;
 
-    var scale = 1;
+    var scale = 1;      //use when resize
     var lastHeight = 0;
+
     div.append(canvas);
     div.attr('id', 'canvas-div');
 
-    this.presetMethod = function () {
-        if (transactionSystem.privilege.indexOf("admin") != -1) canvas = new fabric.Canvas('draw-canvas', {isDrawingMode: true});
-        else canvas = new fabric.Canvas('draw-canvas');
-        div.find('.canvas-container').css('position', 'absolute');
+    this.presetMethod = function () {           //setup the update method before transaction get all the old transaction for reconnect
+        if (transactionSystem.privilege.indexOf("admin") != -1) canvas = new fabric.Canvas('draw-canvas', {isDrawingMode: true});       //admin get the right for draw on the screen
+        else canvas = new fabric.Canvas('draw-canvas');             //use fabric js canvas
+        div.find('.canvas-container').css('position', 'absolute');  //make the all the canvas and div for the fabric js jit the outer div
         div.find('.canvas-container').css('height', '100%');
         div.find('.canvas-container').css('width', '100%');
         div.find('canvas').css('position', 'absolute');
@@ -39,23 +40,25 @@ function Draw(transactionSystem, div, controlPanel) {
             eraser = controlPanel.find('#eraser-box'),
             clear = controlPanel.find('#clear-box'),
             colorPicker = controlPanel.find('#draw-color-picker');
-        fabric.Object.prototype.transparentCorners = false;
+        fabric.Object.prototype.transparentCorners = false;     //fabricjs setting
         canvas.setHeight(div.height());
         canvas.isDrawingMode = false;
         canvas.freeDrawingBrush.color = colorPicker.val();
         canvas.setWidth(div.width());
         lastHeight = div.height();
-        if (transactionSystem.privilege.indexOf("admin") != -1) {
+        if (transactionSystem.privilege.indexOf("admin") != -1) {       //admin will get right for send new draw transaction and attach UI handler
             newStrokeListener();
             attachUIHandler();
-            document.addEventListener(events.slidesChange.type, function () {
+            document.addEventListener(events.slidesChange.type, function () {       //when slidesChange clear all the content on the canvas
                 drawList = [];
                 currentIndex = -1;
                 canvas.clear();
                 self.newStroke(JSON.stringify(canvas));
             });
+        }else{
+            controlPanel.hide();            //student hide the control panel
         }
-        document.addEventListener(events.viewSizeChange.type, function () {
+        document.addEventListener(events.viewSizeChange.type, function () {     //when the view size change
             resize(lastHeight,true);
         });
     };
@@ -65,6 +68,11 @@ function Draw(transactionSystem, div, controlPanel) {
         });
     }
 
+    /**
+     * resize all the draw content
+     * @param originHeight
+     * @param changeCanvas indicate resize from user resize or new transaction
+     */
     function resize(originHeight, changeCanvas) {
         // TODO limit the max canvas zoom in
         scaleFactor = div.height() / originHeight;
