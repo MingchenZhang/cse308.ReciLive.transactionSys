@@ -44,7 +44,7 @@ exports.getRoute = function (s) {
                 return userInfo._id;
             }else{ // user info is incomplete
                 hasRole = !!userInfo.role;
-                let record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
+                let record = {googleID: googleUserInfo.userID, username: googleUserInfo.name};
                 return s.userConn.setUserInfo(userInfo._id, record).then((result)=>{
                     return userInfo._id;
                 });
@@ -55,7 +55,8 @@ exports.getRoute = function (s) {
             res.cookie('login_session', session, {
                 httpOnly: true,
                 secure: !!s.inProduction,
-                expires: (new Date(Date.now() + 180 * 24 * 3600 * 1000))
+                expires: (new Date(Date.now() + 180 * 24 * 3600 * 1000)),
+                domain: '.recilive.stream'
             });
             res.send({result: true, hasRole});
         }).catch((err)=> {
@@ -81,7 +82,7 @@ exports.getRoute = function (s) {
 
     router.all('/ajax/logout', (req, res, next)=>{
         s.userConn.removeSession(req.cookies.login_session);
-        res.clearCookie('login_session');
+        res.clearCookie('login_session', {domain: '.recilive.stream'});
         res.redirect('/');
     });
 

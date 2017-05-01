@@ -24,6 +24,7 @@ const Fs = require('fs');
 const WSWebSocket = require("ws").Server;
 const Validator = require("better-validator");
 const Request = require("request");
+const Login = require('./live_modules/google_login');
 
 const validator = new Validator();
 
@@ -79,7 +80,7 @@ if(s.role == 'support'){
         if(!req.cookies.login_session) return next();
         s.userConn.getUserInfoBySession(req.cookies.login_session).then((userInfo) => {
             if(!userInfo){
-                res.clearCookie('login_session');
+                res.clearCookie('login_session', {domain: '.recilive.stream'});
                 return res.redirect('/');
             }
             req.userLoginInfo = userInfo;
@@ -94,17 +95,14 @@ if(s.role == 'support'){
 }else if(s.role == 'live'){
     app.use((req, res, next)=>{
         if(!req.cookies.login_session) return next();
-        Request({
-            method: 'GET',
-            json: true,
-            url:(s.inProduction?"https":"http")+"://recilive.stream/ajax/live-get-user-info?session="+encodeURIComponent(req.cookies.login_session),
-        }, (error, response, body)=>{
-            if(error) return res.status(500).send('login info cannot be verified');
+        Login.liveGetUserInfo(req.cookies.login_session).then((body)=>{
             req.userLoginInfo = body;
             req.userLoginInfo.userID = body._id;
             req.userLoginInfo.record = body;
             res.locals.userLoginInfo = req.userLoginInfo;
             return next();
+        }).catch((err)=>{
+            return res.status(500).send({result: false, reason: err.message});
         });
     });
 }
