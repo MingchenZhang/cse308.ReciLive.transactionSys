@@ -87,7 +87,7 @@ exports.addSession = (userID)=>{
 exports.getUserInfoBySession = (session)=>{
     return userDB.sessionColl.findOne({session}).then((doc)=>{
         if(!doc) throw new Error('session not found');
-        return userDB.usersColl.findOne({_id:doc._id});
+        return userDB.usersColl.findOne({userID:doc._id});
     });
 };
 
