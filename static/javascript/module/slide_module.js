@@ -104,9 +104,9 @@ self.presetEvent=function(){
                         //get all slides list
                         let payload = element.content;
                         let slidesCounter = 0;
+                        let listItemCounter = -1;
                         payload.forEach(function (slides) {
                             //counter for promiseList
-                            let listItemCounter = -1;
                             let index = -1;
                             self.slideData[slidesCounter++] = {name: slides.name, imgDataList: []};
                             slides.pages.forEach(function (url) {
