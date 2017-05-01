@@ -218,7 +218,7 @@ function deleteClass() {
   $.ajax({
       url: '/ajax/delete-class',
       type: 'post',
-      data: JSON.stringify({classId: current_class_id}),
+      data: JSON.stringify({classId: currentClassId}),
       contentType: "application/json; charset=utf-8",
       dataType: 'json'
   }).done(function (data) {

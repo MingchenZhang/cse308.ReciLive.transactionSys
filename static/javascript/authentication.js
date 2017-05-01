@@ -1,7 +1,3 @@
-/**
- * Created by jieliang on 4/5/17.
- */
-
  function onLoad() {
      gapi.load('auth2', function () {
          gapi.auth2.init();
@@ -31,7 +27,14 @@ $(function() {
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
     auth2.signOut().then(function () {
-      deleteAllCookies();
+      $.ajax({
+          url: '/ajax/log-out',
+          type: 'post'
+      }).done(function (data) {
+
+      }).fail(function (err) {
+          console.error(err);
+      });
       window.location.href = "http://recilive.stream";
     });
 }
@@ -41,26 +44,16 @@ function onSignIn(googleUser) {
     var name = profile.getName();
     var id_token = googleUser.getAuthResponse().id_token;
     var id = profile.getId();
-    // $('.sign-in').hide();
-    // $('#sign-out').show();
-
-    var current_date = new Date();
-    current_date.setMonth(current_date.getMonth() + 1);
-    // document.cookie = "IDToken=" + id_token + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    // document.cookie = "email=" + profile.getEmail() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    // document.cookie = "name=" + profile.getName() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    // document.cookie = "ID=" + profile.getId() + ";expires=" + current_date + ";domain=.recilive.stream;path=/";
-    document.cookie = "IDToken=" + id_token + ";domain=.recilive.stream;path=/";
-    document.cookie = "email=" + profile.getEmail() + ";";
-    document.cookie = "name=" + profile.getName() + ";";
-    document.cookie = "ID=" + profile.getId() + ";";
 
     var checkUser = $.ajax({
         type: "POST",
-        url: "/ajax/check-user"
+        url: "/ajax/login",
+        data: JSON.stringify({IDToken: id_token}),
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json'
     });
     checkUser.done(function (data) {
-        if (data.sign_up) {
+        if (!data.hasRole) {
             vex.dialog.buttons.YES.text = 'Student';
             vex.dialog.buttons.NO.text = 'Instructor';
 
@@ -78,10 +71,9 @@ function onSignIn(googleUser) {
                             }),
                             success: function (data) {
                                 if (data.result) {
-                                    if (data.redirect)
-                                        window.location.href = window.location.origin + data.redirect;
+                                  window.location.href = window.location.origin + "/course";
                                 } else {
-                                    // TODO ERROR handling
+                                    vex.dialog.alert(data.reason);
                                 }
                             },
                             error: function (ts) {
@@ -101,10 +93,9 @@ function onSignIn(googleUser) {
                             }),
                             success: function (data) {
                                 if (data.result) {
-                                    if (data.redirect)
-                                        window.location.href = window.location.origin + data.redirect;
+                                  window.location.href = window.location.origin + "/course";
                                 } else {
-                                    // TODO ERROR handling
+                                    vex.dialog.alert(data.reason);
                                 }
                             },
                             error: function (ts) {
@@ -115,10 +106,8 @@ function onSignIn(googleUser) {
                 }],
                 overlayClosesOnClick: false,
             });
-
-
         } else {
-            window.location.href = window.location.origin + data.redirect;
+            window.location.href = window.location.origin + "/course";
         }
     });
 }
