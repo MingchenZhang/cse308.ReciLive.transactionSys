@@ -47,20 +47,20 @@ exports.getRoute = function (s) {
                         }
                     }, (error, response, body) => {
                         if (error) return res.status(500).send({
-                            result: "error",
+                            result: false,
                             error,
                             statusCode: response.statusCode
                         });
                         return res.send({result: true, body});
                     });
                 }).catch((e) => {
-                    res.send({result: false, reason: e.message ? e.message : "error in db get students list"});
+                    res.send({result: false, reason: e.message || "error in db get students list"});
                 });
             } else {
                 res.send({result: false, reason: 'no response from database'});
             }
         }).catch((e) => {
-            res.send({result: false, reason: e.message ? e.message : "error in class DB add class"});
+            res.send({result: false, reason: e.message || "error in class DB - add class"});
         });
     });
 

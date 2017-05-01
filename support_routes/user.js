@@ -25,6 +25,42 @@ exports.getRoute = function (s) {
         }
     });
 
+    router.post('/ajax/login', jsonParser, function (req, res, next) {
+        if(!req.body.IDToken){
+            return res.status(400).send({result: false, reason: 'format error'});
+        }
+        var hasRole = false;
+        s.googleLoginTool.getUserInfo(req.body.IDToken).then((userInfo)=> {
+            return s.userConn.getUserByEmail(req.userLoginInfo.email);
+        }).then((userInfo)=>{
+            if(!userInfo){ // user is not in db
+                return s.userConn.addUser(userInfo.userID, userInfo.email, null, userInfo.name).then((result)=>{
+                    return result.insertedId;
+                });
+            }else if(s.userConn.matchBasicUserInfoRule(userInfo)){ // user has complete info
+                hasRole = !!userInfo.role;
+                return userInfo._id;
+            }else{ // user info is incomplete
+                hasRole = !!userInfo.role;
+                let record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
+                return s.userConn.setUserInfo(userInfo._id, record).then((result)=>{
+                    return userInfo._id;
+                });
+            }
+        }).then((userID)=>{
+            return s.userConn.addSession(userID);
+        }).then((session)=>{
+            res.cookie('login_session', session, {
+                httpOnly: true,
+                secure: !!s.inProduction,
+                expires: (new Date(Date.now() + 180 * 24 * 3600 * 1000))
+            });
+            res.send({result: true, hasRole});
+        }).catch((err)=> {
+            res.status(403).send("google login failed: "+(err.message?err.message:"unknown error"));
+        });
+    });
+
     router.post('/ajax/sign-up', jsonParser, (req, res, next) => {          //new user sign_up
         s.userConn.setUserInfo(req.userLoginInfo.record._id,{role:req.body.role}).then(() => {
             res.send({result: true, redirect: '/course'});
@@ -34,11 +70,16 @@ exports.getRoute = function (s) {
     });
 
     router.get('/ajax/live-get-user-info', jsonParser, (req, res, next) => {     //live send mongo id and get all user info
-        s.userConn.getUserByGoogleID(req.query.id).then((userInfo) => {
+        s.userConn.getUserInfoBySession(req.query.session).then((userInfo) => {
             res.send(userInfo);
         }).catch((e) => {
-            res.status(400).send({result: false, reason: e.message ? e.message : "error get user by google id"});
+            res.status(400).send({result: false, reason: e.message || "error get user by google id"});
         });
+    });
+
+    router.all('/ajax/logout', (req, res, next)=>{
+        res.clearCookie('login_session');
+        res.redirect('/');
     });
 
     return router;

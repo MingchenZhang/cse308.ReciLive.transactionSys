@@ -38,7 +38,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
             });
             selectorDiv.append(slidesOption);
         });
-    };
+    }
 
 //clean canvas and show given img(URL or URI)
 

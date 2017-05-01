@@ -1,5 +1,6 @@
 const When = require('when');
 const validator = new (require('better-validator'))();
+const RandomString = require('randomstring');
 
 const s = global.s;
 
@@ -19,6 +20,8 @@ exports.initDatabase = function (readyList) {
             userDB.usersColl = db.collection('users');
             userDB.usersColl.createIndex({googleID: 1});
             userDB.usersColl.createIndex({email: 1}, {unique: true});
+            userDB.sessionColl = db.collection('session');
+            userDB.sessionColl.createIndex({session: 1});
             userDBReady.resolve();
         }
     });
@@ -68,4 +71,26 @@ exports.basicUserInfoRule = (obj) => {
 
 exports.matchBasicUserInfoRule = (obj)=>{
     return !!(obj.googleID && obj.email && obj.username);
+};
+
+exports.addSession = (userID)=>{
+    userID = s.mongodb.ObjectID(userID);
+    var session = RandomString.generate({
+        length: 128,
+        charset: 'alphabetic'
+    });
+    return userDB.sessionColl.insertOne({session, userID}).then(()=>{
+        return session;
+    });
+};
+
+exports.getUserInfoBySession = (session)=>{
+    return userDB.sessionColl.findOne({session}).then((doc)=>{
+        if(!doc) throw new Error('session not found');
+        return userDB.usersColl.findOne({_id:doc._id});
+    });
+};
+
+exports.removeSession = (session)=>{
+    return userDB.sessionColl.removeMany({session});
 };

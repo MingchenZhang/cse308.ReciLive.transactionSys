@@ -71,49 +71,35 @@ if(!s.inProduction){
 app.use(function (req, res, next) {
     req.userLoginInfo = null;
     res.locals.userLoginInfo = null;
-    if (typeof req.cookies.IDToken == 'string') {
-        s.googleLoginTool.getUserInfo(req.cookies.IDToken).then((userInfo)=> {
-            req.userLoginInfo = userInfo;
-            res.locals.userLoginInfo = userInfo;
-            next();
-        }).catch((err)=> {
-            res.status(403).send("google login failed: "+(err.message?err.message:"unknown error"));
-        });
-    } else next();
+    next();
 });
 
 if(s.role == 'support'){
     app.use((req, res, next)=>{
-        if(!req.userLoginInfo) return next();
-        s.userConn.getUserByEmail(req.userLoginInfo.email).then((record)=>{
-            if(!record){ // user is not in database
-                s.userConn.addUser(req.userLoginInfo.userID, req.userLoginInfo.email, null, req.userLoginInfo.name).then(()=>next()).catch(()=>{
-                    res.status(400).send('database error (89)');
-                });
-                req.userLoginInfo.record = {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name};
-            }else if(s.userConn.matchBasicUserInfoRule(record)){ // user has complete info
-                req.userLoginInfo.record = record;
-                next();
-            }else{// user info is incomplete
-                Object.assign(record, {googleID: req.userLoginInfo.userID, email: req.userLoginInfo.email, username: req.userLoginInfo.name});
-                req.userLoginInfo.record = record;
-                s.userConn.setUserInfo(record._id, req.userLoginInfo.record).then(()=>next()).catch((err)=>{
-                    res.status(400).send('database error (96)');
-                });
-            }
+        if(!req.cookies.login_session) return next();
+        s.userConn.getUserInfoBySession(req.cookies.login_session).then((userInfo) => {
+            req.userLoginInfo = userInfo;
+            req.userLoginInfo.userID = userInfo._id;
+            req.userLoginInfo.record = userInfo;
+            res.locals.userLoginInfo = req.userLoginInfo;
+            return next();
+        }).catch((e) => {
+            res.status(400).send({result: false, reason: e.message || "fail to retrieve user info"});
         });
     });
 }else if(s.role == 'live'){
     app.use((req, res, next)=>{
-        if(!req.userLoginInfo) return next();
+        if(!req.cookies.login_session) return next();
         Request({
             method: 'GET',
             json: true,
-            url:(s.inProduction?"https":"http")+"://recilive.stream/ajax/live-get-user-info?id="+encodeURIComponent(req.userLoginInfo.userID),
+            url:(s.inProduction?"https":"http")+"://recilive.stream/ajax/live-get-user-info?session="+encodeURIComponent(req.cookies.login_session),
         }, (error, response, body)=>{
             if(error) return res.status(500).send('login info cannot be verified');
+            req.userLoginInfo = body;
             req.userLoginInfo.userID = body._id;
             req.userLoginInfo.record = body;
+            res.locals.userLoginInfo = req.userLoginInfo;
             return next();
         });
     });
