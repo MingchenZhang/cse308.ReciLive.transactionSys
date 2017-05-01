@@ -78,6 +78,10 @@ if(s.role == 'support'){
     app.use((req, res, next)=>{
         if(!req.cookies.login_session) return next();
         s.userConn.getUserInfoBySession(req.cookies.login_session).then((userInfo) => {
+            if(!userInfo){
+                res.clearCookie('login_session');
+                return res.redirect('/');
+            }
             req.userLoginInfo = userInfo;
             req.userLoginInfo.userID = userInfo._id;
             req.userLoginInfo.record = userInfo;
