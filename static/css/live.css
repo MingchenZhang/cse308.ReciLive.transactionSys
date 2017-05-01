@@ -64,6 +64,8 @@ body {
 }
 .student-microphone {
   float: right;
+  padding-right: 5px;
+  cursor: pointer;
 }
 
 .col-md-6 {
@@ -77,6 +79,10 @@ body {
 .col-md-4 {
   width: 31%;
   background-color: #173e43;
+}
+#info-post {
+  font-size: 20px;
+  color: #ffffff;
 }
 
 .navbar-toggle span {

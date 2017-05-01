@@ -60,6 +60,32 @@ function updateStudentList(students) {
     }
   });
 }
+function newPost() {
+  var post = $("#info-post").val();
+  var color = '#'+ Math.round(0xffffff * Math.random()).toString(16);
+  $newdiv = $('<div onclick="movePost()"><h4>'+ post +'</h4></div>').css({
+      'background-color': color
+  });
+    var divxsize = ($newdiv.width()).toFixed();
+    var divysize = ($newdiv.height()).toFixed();
+  var posx = (Math.random() * ($(".col-md-4").width()-$newdiv.width()));
+  // var posx = Math.floor(Math.random() * ($(".col-md-4").position().left+$(".col-md-4").width() - $(".col-md-4").position().left)) + $(".col-md-4").position().left;
+  var posy = (Math.random() * ($(".col-md-4").height() - divysize));
+
+  $newdiv.css({
+      'position':'absolute',
+      'left':posx+'px',
+      'top':posy+'px',
+      'display':'none'
+  }).appendTo( '.col-md-4' ).fadeIn(100, function(){
+     makePost("This is a comment!");
+  });
+  $("#info-post").val('');
+}
+
+function movePost() {
+
+}
 
 transactionSystem = new TransactionSystem("/room/"+classroomNumber+"/transaction");
 transactionSystem.roomNumber = classroomNumber;

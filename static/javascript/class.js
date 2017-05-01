@@ -114,7 +114,6 @@ function listClasses() {
 }
 function initClassModal() {
   $(".class-name").val('');
-  $('.class-name').prop('disabled', false);
   var today = new Date();
   var t = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
   $('#class-date-start').data({date: t}).datepicker('update');
@@ -124,6 +123,7 @@ function initClassModal() {
   $(".student-list").empty();
   add_student();
   $(".delete-class-btn").hide();
+  $(".save-class").attr("onclick","addClass()");
 }
 function addClass() {
   var name = $(".class-name").val();
@@ -139,7 +139,7 @@ function addClass() {
     $.ajax({
         type: "POST",
         url: "/ajax/add-class",
-        data: JSON.stringify({name: name, owner: getCookie("email"), startDate: new Date(startDate), endDate: new Date(endDate), students: students}),
+        data: JSON.stringify({name: name, startDate: new Date(startDate), endDate: new Date(endDate), students: students}),
         success: function(data){
             if(data.result === true) {
                 $('#class-detail').modal('hide');
@@ -156,7 +156,7 @@ function addClass() {
     });
 }
 
-function editClass(current_class_id) {
+function viewClassInfo(current_class_id) {
   $.ajax({
       url: '/ajax/get-edit-class-info',
       type: 'post',
@@ -166,10 +166,10 @@ function editClass(current_class_id) {
   }).done(function (data) {
       if(data.result === true) {
         $(".class-name").val(data.classInfo.name);
-        $('.class-name').prop('disabled', true);
         $("#class-date-start-display").text(data.classInfo.startDate.split("T")[0]);
         $('#class-date-end-display').text(data.classInfo.endDate.split("T")[0]);
         $(".delete-class-btn").show();
+        $(".save-class").attr("onclick","editClass('"+current_class_id+"')");
       }else {
           console.error(data.reason);
       }
@@ -181,6 +181,37 @@ function editClass(current_class_id) {
   }).fail(function (err) {
       console.error(err);
   });
+}
+
+function editClass(current_class_id) {
+  var name = $(".class-name").val();
+  var startDate = $("#class-date-start-display").text();
+  var endDate = $("#class-date-end-display").text();
+  var students = [];
+    $('.student-email').each(function() {
+        if($(this).val() !== '') {
+            students.push($(this).val());
+        }
+    });
+
+    $.ajax({
+        type: "POST",
+        url: "/ajax/edit-class",
+        data: JSON.stringify({classId: current_class_id, name: name, startDate: new Date(startDate), endDate: new Date(endDate), students: students}),
+        success: function(data){
+            if(data.result === true) {
+                $('#class-detail').modal('hide');
+                listClasses();
+            }else {
+                console.error(data.reason);
+            }
+        },
+        error: function(ts) {
+            console.log(ts.responseText);
+        },
+        dataType: "json",
+        contentType : "application/json"
+    });
 }
 
 function deleteClass() {
