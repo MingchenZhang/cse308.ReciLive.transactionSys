@@ -7,7 +7,11 @@ var redbird = require('redbird')({
         cert: "../certs/default.crt",
     }
 });
-redbird.register("recilive.stream", "http://localhost:3000", {});
+redbird.register("recilive.stream", "http://localhost:3000", {ssl: {
+    key: 'recilive.stream.key',
+    cert: 'recilive.stream.cert',
+    redirect: false
+}});
 // redbird.register("room.recilive.stream", "http://localhost:3001", {});
 redbird.register("room.recilive.stream", "http://localhost:3001", {
     ssl: {
