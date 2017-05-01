@@ -26,16 +26,16 @@ $(function() {
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
+    auth2.disconnect();
     auth2.signOut().then(function () {
       $.ajax({
-          url: '/ajax/log-out',
+          url: '/ajax/logout',
           type: 'post'
       }).done(function (data) {
-
+          window.location.href = window.location.origin;
       }).fail(function (err) {
           console.error(err);
       });
-      window.location.href = "http://recilive.stream";
     });
 }
 
@@ -54,9 +54,6 @@ function onSignIn(googleUser) {
     });
     checkUser.done(function (data) {
         if (!data.hasRole) {
-            vex.dialog.buttons.YES.text = 'Student';
-            vex.dialog.buttons.NO.text = 'Instructor';
-
             prestartDialog = vex.dialog.open({
                 message: 'What is your role?',
                 buttons: [{
@@ -71,7 +68,7 @@ function onSignIn(googleUser) {
                             }),
                             success: function (data) {
                                 if (data.result) {
-                                  window.location.href = window.location.origin + "/course";
+                                    window.location.href = window.location.origin + "/course";
                                 } else {
                                     vex.dialog.alert(data.reason);
                                 }
@@ -93,7 +90,7 @@ function onSignIn(googleUser) {
                             }),
                             success: function (data) {
                                 if (data.result) {
-                                  window.location.href = window.location.origin + "/course";
+                                    window.location.href = window.location.origin + "/course";
                                 } else {
                                     vex.dialog.alert(data.reason);
                                 }

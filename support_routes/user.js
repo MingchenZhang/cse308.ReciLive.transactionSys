@@ -30,11 +30,13 @@ exports.getRoute = function (s) {
             return res.status(400).send({result: false, reason: 'format error'});
         }
         var hasRole = false;
+        var googleUserInfo;
         s.googleLoginTool.getUserInfo(req.body.IDToken).then((userInfo)=> {
+            googleUserInfo = userInfo;
             return s.userConn.getUserByEmail(userInfo.email);
         }).then((userInfo)=>{
             if(!userInfo){ // user is not in db
-                return s.userConn.addUser(userInfo.userID, userInfo.email, null, userInfo.name).then((result)=>{
+                return s.userConn.addUser(googleUserInfo.userID, googleUserInfo.email, null, googleUserInfo.name).then((result)=>{
                     return result.insertedId;
                 });
             }else if(s.userConn.matchBasicUserInfoRule(userInfo)){ // user has complete info
@@ -65,7 +67,7 @@ exports.getRoute = function (s) {
         s.userConn.setUserInfo(req.userLoginInfo.record._id,{role:req.body.role}).then(() => {
             res.send({result: true, redirect: '/course'});
         }).catch((e) => {
-            res.send({result: false, reason: e.message ? e.message : "error add user to db"});
+            res.send({result: false, reason: e.message || "error add user to db"});
         });
     });
 
@@ -78,6 +80,7 @@ exports.getRoute = function (s) {
     });
 
     router.all('/ajax/logout', (req, res, next)=>{
+        s.userConn.removeSession(req.cookies.login_session);
         res.clearCookie('login_session');
         res.redirect('/');
     });
