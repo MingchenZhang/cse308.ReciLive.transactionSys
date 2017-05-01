@@ -62,7 +62,12 @@ exports.getRoute = function (s) {
     });
 
     router.get('/get_resource', function (req, res, next) {
-        var cursor = s.resourceConn.getResourceFileBucket().find({_id:s.mongodb.ObjectID(req.query.id)}, {}).limit(1);
+        try{
+            var id = s.mongodb.ObjectID(req.query.id);
+        } catch(e){
+            return res.status(400).send({result: true, reason: 'format error'});
+        }
+        var cursor = s.resourceConn.getResourceFileBucket().find({_id: id}, {}).limit(1);
         cursor.next(function (err, doc) {
             if(err) return res.status(400).send({result: false, error:'database error', detail: err.message});
             if(doc == null) return res.status(400).send({result: false, error:'file not found'});
