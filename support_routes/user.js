@@ -31,7 +31,7 @@ exports.getRoute = function (s) {
         }
         var hasRole = false;
         s.googleLoginTool.getUserInfo(req.body.IDToken).then((userInfo)=> {
-            return s.userConn.getUserByEmail(req.userLoginInfo.email);
+            return s.userConn.getUserByEmail(userInfo.email);
         }).then((userInfo)=>{
             if(!userInfo){ // user is not in db
                 return s.userConn.addUser(userInfo.userID, userInfo.email, null, userInfo.name).then((result)=>{
