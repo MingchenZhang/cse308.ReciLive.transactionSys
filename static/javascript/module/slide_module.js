@@ -152,7 +152,7 @@ self.presetEvent=function(){
                     slidesIndex: self.slidesIndex
                 })
                     .then(function (result) {
-                        document.dispatchEvent(events.slidesChange);    //dispatch event for the slides changing
+                        document.dispatchEvent(events.slidesChange());    //dispatch event for the slides changing
                         showImage(slideDataObj.slide64, showDiv);
                     }).catch(function (err) {
                     console.error('fail to new transaction');
