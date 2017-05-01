@@ -98,6 +98,7 @@ drawModule = new Draw(transactionSystem,viewManager.getDiv(),$('#draw-control-pa
 transactionSystem.registerModule(chatModule.moduleName, chatModule);
 transactionSystem.registerModule(slideModule.moduleName, slideModule);
 transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
+transactionSystem.registerModule(drawModule.moduleName,drawModule);
 sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'),$('#slider-div'));
 $('.ending-controller').click(transactionSystem.endRecitation);
 document.addEventListener(events.endRecitation.type, (e) => {
@@ -134,6 +135,7 @@ Promise.all(promiseList).then(function (result) {
     //set handler for review mode
     sliderController.presetEvent();
     slideModule.presetEvent();
+    drawModule.presetMethod();
 }).then(transactionSystem.init).then(function () {
     if (!transactionSystem.firstTransactionTime()) {
         // no transaction posted

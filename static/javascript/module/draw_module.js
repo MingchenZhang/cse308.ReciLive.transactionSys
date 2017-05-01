@@ -4,6 +4,7 @@ function Draw(transactionSystem, div, controlPanel) {
     var canvas = $('<canvas id="draw-canvas" ></canvas>');
     var drawList = [];           //record all the draw history in this class
     var currentIndex = -1;
+    self.isNotIncremental = false;
     var ignoreTransaction = {};  //Instructor ignore the draw transaction that himself made
     var fabricCanvas = null;     //fabric canvas from fabricjs lib
     var pen = null,      //init all the button
@@ -18,6 +19,16 @@ function Draw(transactionSystem, div, controlPanel) {
     div.append(canvas);
     div.attr('id', 'canvas-div');
 
+    this.presetMethod = function () {
+        if (transactionSystem.privilege.indexOf("admin") != -1) canvas = new fabric.Canvas('draw-canvas', {isDrawingMode: true});
+        else canvas = new fabric.Canvas('draw-canvas');
+        div.find('.canvas-container').css('position', 'absolute');
+        div.find('.canvas-container').css('height', '100%');
+        div.find('.canvas-container').css('width', '100%');
+        div.find('canvas').css('position', 'absolute');
+        div.find('canvas').css('height', '100%');
+        div.find('canvas').css('width', '100%');
+    }
     /**
      * init after transaction system
      */
@@ -28,40 +39,40 @@ function Draw(transactionSystem, div, controlPanel) {
             eraser = controlPanel.find('#eraser-box'),
             clear = controlPanel.find('#clear-box'),
             colorPicker = controlPanel.find('#draw-color-picker');
-        canvas = new fabric.Canvas('draw-canvas', {isDrawingMode: true});
-        div.find('.canvas-container').css('position', 'absolute');
-        div.find('.canvas-container').css('height', '100%');
-        div.find('.canvas-container').css('width', '100%');
-        div.find('canvas').css('position', 'absolute');
-        div.find('canvas').css('height', '100%');
-        div.find('canvas').css('width', '100%');
         fabric.Object.prototype.transparentCorners = false;
         canvas.setHeight(div.height());
         canvas.isDrawingMode = false;
         canvas.freeDrawingBrush.color = colorPicker.val();
         canvas.setWidth(div.width());
-        lastHeight  = div.height();
+        lastHeight = div.height();
+        if (transactionSystem.privilege.indexOf("admin") != -1) {
+            newStrokeListener();
+            attachUIHandler();
+            document.addEventListener(events.slidesChange.type, function () {
+                drawList = [];
+                currentIndex = -1;
+                canvas.clear();
+                self.newStroke(JSON.stringify(canvas));
+            });
+        }
+        document.addEventListener(events.viewSizeChange.type, function () {
+            resize(lastHeight,true);
+        });
+    };
+    function newStrokeListener() {
         canvas.on('object:added', function () {            //add handler to event add obj
             self.newStroke(JSON.stringify(canvas));
         });
-        document.addEventListener(events.slidesChange.type, function () {
-            drawList = [];
-            currentIndex = -1;
-            canvas.clear();
-        });
-        document.addEventListener(events.viewSizeChange.type, function () {
-            resize();
+    }
 
-        });
-        attachUIHandler();
-    };
-
-    function resize() {
+    function resize(originHeight, changeCanvas) {
         // TODO limit the max canvas zoom in
-        scaleFactor =  div.height()/lastHeight;
+        scaleFactor = div.height() / originHeight;
 
-        canvas.setHeight(canvas.getHeight() * scaleFactor);
-        canvas.setWidth(canvas.getWidth() * scaleFactor);
+        if (changeCanvas) {
+            canvas.setHeight(div.height());
+            canvas.setWidth(div.width());
+        }
 
         var objects = canvas.getObjects();
         for (var i in objects) {
@@ -93,21 +104,24 @@ function Draw(transactionSystem, div, controlPanel) {
         /**
          * change color when value of color picker change
          */
-        colorPicker.change ( function () {
+        colorPicker.change(function () {
             canvas.freeDrawingBrush.color = colorPicker.val();
         });
         /**
          * clear all content on the canvas
          */
         clear.click(function () {
+            canvas.off();
             canvas.clear();
             self.newStroke(JSON.stringify(canvas));
+            newStrokeListener();
         });
 
         /**
          * click to erase selected object
          */
         eraser.click(function () {
+            canvas.off();
             canvas.isDrawingMode = false;
             canvas.on('object:selected', function () {
                 canvas.getActiveObject().remove();
@@ -119,31 +133,37 @@ function Draw(transactionSystem, div, controlPanel) {
          * change to draw mode
          */
         pen.click(function () {
+            canvas.off();
             canvas.isDrawingMode = true;
+            newStrokeListener();
         });
 
         /**
          * undo to previous draw
          */
         undo.click(function () {
+            canvas.off();
             if (currentIndex > 0) {
                 canvas.clear();
                 canvas.loadFromJSON(drawList[--currentIndex]);
                 canvas.renderAll();
                 self.newStroke(JSON.stringify(canvas));
             }
+            newStrokeListener();
         });
 
         /**
          * redo a draw
          */
         redo.click(function () {
+            canvas.off();
             if (currentIndex < drawList.length - 1) {
                 canvas.clear();
                 canvas.loadFromJSON(drawList[++currentIndex]);
                 canvas.renderAll();
                 self.newStroke(JSON.stringify(canvas));
             }
+            newStrokeListener();
         });
     };
     /**
@@ -156,12 +176,14 @@ function Draw(transactionSystem, div, controlPanel) {
         transactionSystem.newTransaction(self.moduleName, {
             type: 'stroke',
             id: id
-        }, {stroke: stroke}).then(function (result) {
+        }, {stroke: stroke, originHeight: lastHeight}).then(function (result) {
             currentIndex++;
             drawList.push(stroke);
+            canvas.off();
             canvas.clear();
             canvas.loadFromJSON(stroke);
             canvas.renderAll();
+            newStrokeListener();
         }).catch(function (err) {
             console.error('fail to new transaction');
             console.error(err);
@@ -185,7 +207,12 @@ function Draw(transactionSystem, div, controlPanel) {
         drawList.push(payload.stroke);
         canvas.clear();
         canvas.loadFromJSON(payload.stroke);
-        canvas.clear();
+        canvas.renderAll();
+        resize(payload.originHeight,false);
+        canvas.selection = false;
+        canvas.forEachObject(function (o) {
+            o.selectable = false;
+        });
     };
 
     /**

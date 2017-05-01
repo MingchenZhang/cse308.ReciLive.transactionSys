@@ -29,7 +29,7 @@ exports.getRoute = function (s) {
         s.classConn.addRecitation(req.body.name, req.body.startDate, req.body.endDate, req.body.class).then((recitation) => {
             if (recitation) {
                 var privilege = {};
-                privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control"];
+                privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control",'draw'];
                 s.classConn.getStudentsByClass(req.body.class).then((response) => {
                     response.forEach((student) => {
                         privilege[student.user] = []
