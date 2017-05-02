@@ -1,84 +1,83 @@
-/**
- * Created by jieliang on 4/5/17.
- */
-
 var currentClassId = null;
 var currentClassName = null;
 
 $(document).ready(function(){
     listClasses();
-
-    $('#class-date-alert').hide();
-    var startDate = new Date();
-    var endDate = new Date();
-    var today = new Date();
-    var t = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
-    $('#class-date-start').data({date: t}).datepicker('update');
-    $('#class-date-start-display').text($('#class-date-start').data('date'));
-    $('#class-date-end').data({date: t}).datepicker('update');
-    $('#class-date-end-display').text($('#class-date-end').data('date'));
-
-    $('#class-date-start')
-        .datepicker()
-        .on('changeDate', function(ev){
-            if (ev.date.valueOf() > endDate.valueOf()){
-                $('#class-date-alert').show().find('strong').text('The start date must be before the end date.');
-            } else {
-                $('#class-date-alert').hide();
-                startDate = new Date(ev.date);
-                $('#class-date-start-display').text($('#class-date-start').data('date'));
-            }
-            $('#class-date-start').datepicker('hide');
-        });
-    $('#class-date-end')
-        .datepicker()
-        .on('changeDate', function(ev){
-            if (ev.date.valueOf() < startDate.valueOf()){
-                $('#class-date-alert').show().find('strong').text('The end date must be after the start date.');
-            } else {
-                $('#class-date-alert').hide();
-                endDate = new Date(ev.date);
-                $('#class-date-end-display').text($('#class-date-end').data('date'));
-            }
-            $('#class-date-end').datepicker('hide');
-        });
-
-    // Recitation
-    $('#rec-date-alert').hide();
-    var startDate = new Date();
-    var endDate = new Date();
-    var today = new Date();
-    var t = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
-    $('#rec-date-start').data({date: t}).datepicker('update');
-    $('#rec-date-start-display').text($('#rec-date-start').data('date'));
-    $('#rec-date-end').data({date: t}).datepicker('update');
-    $('#rec-date-end-display').text($('#rec-date-end').data('date'));
-
-    $('#rec-date-start')
-        .datepicker()
-        .on('changeDate', function(ev){
-            if (ev.date.valueOf() > endDate.valueOf()){
-                $('#rec-date-alert').show().find('strong').text('The start date must be before the end date.');
-            } else {
-                $('#rec-date-alert').hide();
-                startDate = new Date(ev.date);
-                $('#rec-date-start-display').text($('#rec-date-start').data('date'));
-            }
-            $('#rec-date-start').datepicker('hide');
-        });
-    $('#rec-date-end')
-        .datepicker()
-        .on('changeDate', function(ev){
-            if (ev.date.valueOf() < startDate.valueOf()){
-                $('#rec-date-alert').show().find('strong').text('The end date must be after the start date.');
-            } else {
-                $('#rec-date-alert').hide();
-                endDate = new Date(ev.date);
-                $('#rec-date-end-display').text($('#rec-date-end').data('date'));
-            }
-            $('#rec-date-end').datepicker('hide');
-        });
 });
+function initDateForClass() {
+  $('#class-date-alert').hide();
+  var startDate = new Date();
+  var endDate = new Date();
+  var today = new Date();
+  var currentMonth = today.getMonth()+1;
+  var t = today.getFullYear() + "-" + currentMonth + "-" + today.getDate();
+  $('#class-date-start').data({date: t}).datepicker('update');
+  $('#class-date-start-display').text($('#class-date-start').data('date'));
+  $('#class-date-end').data({date: t}).datepicker('update');
+  $('#class-date-end-display').text($('#class-date-end').data('date'));
+
+  $('#class-date-start')
+      .datepicker()
+      .on('changeDate', function(ev){
+          if (ev.date.valueOf() > endDate.valueOf()){
+              $('#class-date-alert').show().find('strong').text('The start date must be before the end date.');
+          } else {
+              $('#class-date-alert').hide();
+              startDate = new Date(ev.date);
+              $('#class-date-start-display').text($('#class-date-start').data('date'));
+          }
+          $('#class-date-start').datepicker('hide');
+      });
+  $('#class-date-end')
+      .datepicker()
+      .on('changeDate', function(ev){
+          if (ev.date.valueOf() < startDate.valueOf()){
+              $('#class-date-alert').show().find('strong').text('The end date must be after the start date.');
+          } else {
+              $('#class-date-alert').hide();
+              endDate = new Date(ev.date);
+              $('#class-date-end-display').text($('#class-date-end').data('date'));
+          }
+          $('#class-date-end').datepicker('hide');
+      });
+}
+function initDateForRec() {
+  $('#rec-date-alert').hide();
+  var startDate = new Date();
+  var endDate = new Date();
+  var today = new Date();
+  var currentMonth = today.getMonth()+1;
+  var t = today.getFullYear() + "-" + currentMonth + "-" + today.getDate();
+  $('#rec-date-start').data({date: t}).datepicker('update');
+  $('#rec-date-start-display').text($('#rec-date-start').data('date'));
+  $('#rec-date-end').data({date: t}).datepicker('update');
+  $('#rec-date-end-display').text($('#rec-date-end').data('date'));
+
+  $('#rec-date-start')
+      .datepicker()
+      .on('changeDate', function(ev){
+          if (ev.date.valueOf() > endDate.valueOf()){
+              $('#rec-date-alert').show().find('strong').text('The start date must be before the end date.');
+          } else {
+              $('#rec-date-alert').hide();
+              startDate = new Date(ev.date);
+              $('#rec-date-start-display').text($('#rec-date-start').data('date'));
+          }
+          $('#rec-date-start').datepicker('hide');
+      });
+  $('#rec-date-end')
+      .datepicker()
+      .on('changeDate', function(ev){
+          if (ev.date.valueOf() < startDate.valueOf()){
+              $('#rec-date-alert').show().find('strong').text('The end date must be after the start date.');
+          } else {
+              $('#rec-date-alert').hide();
+              endDate = new Date(ev.date);
+              $('#rec-date-end-display').text($('#rec-date-end').data('date'));
+          }
+          $('#rec-date-end').datepicker('hide');
+      });
+}
 
 function getCookie(name) {
     var value = "; " + document.cookie;
@@ -114,12 +113,16 @@ function listClasses() {
 }
 function initClassModal() {
   $(".class-name").val('');
-  var today = new Date();
-  var t = today.getFullYear() + "-" + today.getMonth() + "-" + today.getDate();
-  $('#class-date-start').data({date: t}).datepicker('update');
-  $('#class-date-start-display').text($('#class-date-start').data('date'));
-  $('#class-date-end').data({date: t}).datepicker('update');
-  $('#class-date-end-display').text($('#class-date-end').data('date'));
+  initDateForClass();
+  $(".student-list").empty();
+  add_student();
+  $(".delete-class-btn").hide();
+  $(".save-class").attr("onclick","addClass()");
+}
+//TODO just copied from initClassModal need to change class name
+function initRecModal() {
+  $(".class-name").val('');
+  initDateForRec();
   $(".student-list").empty();
   add_student();
   $(".delete-class-btn").hide();
