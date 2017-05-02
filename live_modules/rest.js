@@ -16,6 +16,7 @@ exports.getRoute = function (s) {
         s.sessionManager.addSession({
             sessionID: req.body.classNumber,
             privilege: req.body.privilege,
+            userList: req.body.userList,
             name: req.body.name,
             startDate: req.body.startDate,
             endDate: req.body.endDate,

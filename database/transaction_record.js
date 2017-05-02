@@ -77,6 +77,7 @@ exports.dropTransactionSession = function (param) {
 exports.addSession = function (param) {
     var sessionID = param.sessionID;
     var privilege = param.privilege;
+    var userList = param.userList;
     var name = param.name;
     var startDate = param.startDate;
     var endDate = param.endDate;
@@ -85,6 +86,7 @@ exports.addSession = function (param) {
     var doc = {
         sessionID: sessionID,
         privilege: privilege,
+        userList: userList,
         name: name,
         startDate: startDate,
         endDate: endDate,

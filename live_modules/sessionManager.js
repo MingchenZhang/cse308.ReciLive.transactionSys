@@ -29,6 +29,7 @@ exports.addSessionDummy = function () {
 exports.addSession = function (param) {
     var sessionID = param.sessionID;
     var privilege = param.privilege;
+    var userList = param.userList;
     var name = param.name;
     var startDate = param.startDate;
     var endDate = param.endDate;
@@ -39,7 +40,7 @@ exports.addSession = function (param) {
         return new When.reject({reason: 3});
     }
     classroomList[sessionID] = new Session.session();
-    return classroomList[sessionID].newSession({sessionID, privilege, name, startDate, endDate, status,slidesNumber});
+    return classroomList[sessionID].newSession({sessionID, privilege, userList, name, startDate, endDate, status,slidesNumber});
 };
 
 //deletesSession return a promise

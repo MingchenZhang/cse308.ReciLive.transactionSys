@@ -53,6 +53,12 @@ exports.getRoute = function (s) {
         else return res.send({status: 'error', reason: 2});
     });
 
+    router.get('/user_list', function(req, res, next){
+        var userList = req.classroomSession.userList;
+        if (userList) return res.send({status: 'ok', userList});
+        else return res.send({status: 'error', reason: 2});
+    });
+
     router.get('/get_resource', function (req, res, next) {
         return res.send({
             "resources": [

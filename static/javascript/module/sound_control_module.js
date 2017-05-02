@@ -4,6 +4,7 @@ function SoundControl(transactionSystem) {
     self.asSpeaker = false;
     self.asListener = false;
     self.inited = false;
+    self.speakerList = {};
 
     /**
      * Init the control.
@@ -34,7 +35,13 @@ function SoundControl(transactionSystem) {
                     if(self.asListener) document.dispatchEvent(events.switchToListener());
                 }
             }
+            if(changeTuple[1]){
+                self.speakerList[changeTuple[0]] = true;
+            }else{
+                delete self.speakerList[changeTuple[0]];
+            }
         });
+        changeUserList();
     };
 
     /**
@@ -43,25 +50,39 @@ function SoundControl(transactionSystem) {
      * @returns {Promise}
      */
     this.giveSpeakerRoleTo = function (userID) {
+        if(userID == transactionSystem.userID) return self.takeSpeakerRole();
         if(transactionSystem.privilege.indexOf(self.moduleName) == 0) return Promise.reject(new Error('not in control')); // if user has no control on sound control
-        return transactionSystem.newTransaction(self.moduleName, {
-            speakerChange: [[userID, true], [transactionSystem.userID, false]]
-        }, {});
+        var speakerChange = [[transactionSystem.userID, false]];
+        for(var userID in self.speakerList){
+            speakerChange.push([userID, false]);
+        }
+        speakerChange.push([userID, true]);
+        return transactionSystem.newTransaction(self.moduleName, {speakerChange}, {});
     };
 
     /**
-     * take speaker role from a user.
+     * take speaker role from all speaker.
      * @param userID (string) user to take
      * @returns {Promise.<*>}
      */
-    this.takeSpeakerRole = function (userID) {
+    this.takeSpeakerRole = function () {
         if(transactionSystem.privilege.indexOf(self.moduleName) == 0) return Promise.reject(new Error('not in control')); // if user has no control on sound control
-        return transactionSystem.newTransaction(self.moduleName, {
-            speakerChange: [[userID, false], [transactionSystem.userID, true]]
-        }, {});
+        var speakerChange = [[transactionSystem.userID, true]];
+        for(var userID in self.speakerList){
+            speakerChange.push([userID, false]);
+        }
+        return transactionSystem.newTransaction(self.moduleName, {speakerChange}, {});
     };
 
     this.reset = function () {
 
     };
+
+    function changeUserList(){
+        var userList = [];
+        for(var userID in transactionSystem.userList){
+            userList.push({id:userID, name: userList.name, role: self.speakerList[userID]?'speaker':'non-speaker'});
+        }
+        updateStudentList(userList);
+    }
 }

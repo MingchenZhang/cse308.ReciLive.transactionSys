@@ -15,6 +15,7 @@ function TransactionSystem(path) {
     //TODO: change current time to relative time soon™
     self.liveFlag = true;
     self.privilege = null; // assign by outside
+    self.userList = null; // assign by outside
     self.userID = null; // assign by outside
 
     /**

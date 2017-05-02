@@ -5,7 +5,7 @@ console.assert(userID, 'userID needed to be provided');
 eventRate = 2048;
 microphone_stream = null;
 audioCtx = new AudioContext();
-soundSystem = new SoundSystem("/room/"+classroomNumber+"/sound", audioCtx.sampleRate, eventRate);
+soundSystem = new SoundSystem("/room/" + classroomNumber + "/sound", audioCtx.sampleRate, eventRate);
 resource = null;
 
 function createEventConstructor(type) {
@@ -36,70 +36,77 @@ $(document).ready(function () {
 });
 
 function viewStudentList() {
-  if($('.student-list').css('display') === 'none'){
-    $('.student-list').show();
-  }else {
-    $('.student-list').hide();
-  }
+    if ($('.student-list').css('display') === 'none') {
+        $('.student-list').show();
+    } else {
+        $('.student-list').hide();
+    }
 }
 
 function viewInfoBoard() {
-  if($('#info-board').css('display') === 'none'){
-    $('#info-board').show();
-  }else {
-    $('#info-board').hide();
-  }
-}
-function updateStudentList(students) {
-  $(".student-list").empty();
-  students.forEach(function(student) {
-    if(student.role ==="speaker") {
-      $(".student-list").append("<h4 onclick=selectUser("+ student.id +")>" + student.name + "<i class='fa fa-microphone student-microphone'></i></h4>");
-    }else {
-      $(".student-list").append("<h4 onclick=selectUser("+ student.id +")>" + student.name + "<i class='fa fa-headphones student-microphone'></i></h4>");
+    if ($('#info-board').css('display') === 'none') {
+        $('#info-board').show();
+    } else {
+        $('#info-board').hide();
     }
-  });
 }
+
+function updateStudentList(students) {
+    $(".student-list").empty();
+    students.forEach(function (student) {
+        if (student.role === "speaker") {
+            $(".student-list").append("<h4 onclick=selectUser(" + student.id + ")>" + student.name + "<i class='fa fa-microphone student-microphone'></i></h4>");
+        } else {
+            $(".student-list").append("<h4 onclick=selectUser(" + student.id + ")>" + student.name + "<i class='fa fa-headphones student-microphone'></i></h4>");
+        }
+    });
+}
+
+function selectUser(student) {
+    soundControlSystem.giveSpeakerRoleTo(student);
+    console.log('speaker switching to '+student.toString());
+}
+
 function newPost() {
-  var post = $("#info-post").val();
-  var color = '#'+ Math.round(0xffffff * Math.random()).toString(16);
-  $newdiv = $('<div onclick="movePost()"><h4>'+ post +'</h4></div>').css({
-      'background-color': color
-  });
+    var post = $("#info-post").val();
+    var color = '#' + Math.round(0xffffff * Math.random()).toString(16);
+    $newdiv = $('<div onclick="movePost()"><h4>' + post + '</h4></div>').css({
+        'background-color': color
+    });
     var divxsize = ($newdiv.width()).toFixed();
     var divysize = ($newdiv.height()).toFixed();
-  var posx = (Math.random() * ($(".col-md-4").width()-$newdiv.width()));
-  // var posx = Math.floor(Math.random() * ($(".col-md-4").position().left+$(".col-md-4").width() - $(".col-md-4").position().left)) + $(".col-md-4").position().left;
-  var posy = (Math.random() * ($(".col-md-4").height() - divysize));
+    var posx = (Math.random() * ($(".col-md-4").width() - $newdiv.width()));
+    // var posx = Math.floor(Math.random() * ($(".col-md-4").position().left+$(".col-md-4").width() - $(".col-md-4").position().left)) + $(".col-md-4").position().left;
+    var posy = (Math.random() * ($(".col-md-4").height() - divysize));
 
-  $newdiv.css({
-      'position':'absolute',
-      'left':posx+'px',
-      'top':posy+'px',
-      'display':'none'
-  }).appendTo( '.col-md-4' ).fadeIn(100, function(){
-     makePost("This is a comment!");
-  });
-  $("#info-post").val('');
+    $newdiv.css({
+        'position': 'absolute',
+        'left': posx + 'px',
+        'top': posy + 'px',
+        'display': 'none'
+    }).appendTo('.col-md-4').fadeIn(100, function () {
+        makePost("This is a comment!");
+    });
+    $("#info-post").val('');
 }
 
 function movePost() {
 
 }
 
-transactionSystem = new TransactionSystem("/room/"+classroomNumber+"/transaction");
+transactionSystem = new TransactionSystem("/room/" + classroomNumber + "/transaction");
 transactionSystem.roomNumber = classroomNumber;
 transactionSystem.userID = userID;
 soundControlSystem = new SoundControl(transactionSystem);
 viewManager = new ViewManager($('.stage-view'));
 chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
 slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'), $('#slides-selector'));
-drawModule = new Draw(transactionSystem,viewManager.getDiv(),$('#draw-control-panel'));
+drawModule = new Draw(transactionSystem, viewManager.getDiv(), $('#draw-control-panel'));
 transactionSystem.registerModule(chatModule.moduleName, chatModule);
 transactionSystem.registerModule(slideModule.moduleName, slideModule);
 transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
-transactionSystem.registerModule(drawModule.moduleName,drawModule);
-sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'),$('#slider-div'));
+transactionSystem.registerModule(drawModule.moduleName, drawModule);
+sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'), $('#slider-div'));
 $('.ending-controller').click(transactionSystem.endRecitation);
 document.addEventListener(events.endRecitation.type, (e) => {
     // if class has ended
@@ -120,7 +127,11 @@ var promiseList = [$.ajax({
     type: 'get',
     dataType: 'json',
 }), $.ajax({
-    url: '/room/'+classroomNumber+'/get_resource',
+    url: window.location.href.split(/\?|#/)[0] + '/get_resource',
+    type: 'get',
+    dataType: 'json'
+}), $.ajax({
+    url: window.location.href.split(/\?|#/)[0] + '/user_list',
     type: 'get',
     dataType: 'json'
 })];
@@ -129,6 +140,9 @@ Promise.all(promiseList).then(function (result) {
     if (result[0].status == 'ok') {
         transactionSystem.privilege = result[0].privilege;
     } else throw result[0];
+    if (result[2].status == 'ok') {
+        transactionSystem.userList = result[2].userList;
+    } else throw result[2];
     //handle the resource
     resource = result[1].resources;
 }).then(function () {
@@ -217,9 +231,9 @@ function activateSound() {
                     audio: true
                 },
                 function (stream) {
-                    if(microphone_stream !== stream) console.warn('microphone_stream !== stream');
-                    if(!microphone_stream) microphone_stream = stream;
-                    if(!microphone_stream_ctx) microphone_stream_ctx = audioCtx.createMediaStreamSource(microphone_stream);
+                    if (microphone_stream !== stream) console.warn('microphone_stream !== stream');
+                    if (!microphone_stream) microphone_stream = stream;
+                    if (!microphone_stream_ctx) microphone_stream_ctx = audioCtx.createMediaStreamSource(microphone_stream);
                     start_microphone(microphone_stream_ctx);
                 },
                 function (e) {

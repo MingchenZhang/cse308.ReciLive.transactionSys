@@ -9,6 +9,7 @@ exports.session = function () {
     var lastTransactionIndex = -1;
     self.sessionID = -1;
     self.privilege = null;
+    self.userList = null;
     self.name = null;
     self.startDate = null;
     self.endDate = null;
@@ -23,6 +24,7 @@ exports.session = function () {
 
         self.sessionID = param.sessionID;
         self.privilege = param.privilege;
+        self.userList = param.userList;
         self.name = param.name;
         self.startDate = param.startDate;
         self.endDate = param.endDate;
@@ -31,6 +33,7 @@ exports.session = function () {
         return s.transactionRecord.addSession({
             sessionID: self.sessionID,
             privilege: self.privilege,
+            userList: self.userList,
             name: self.name,
             startDate: self.startDate,
             endDate: self.endDate,
@@ -46,6 +49,7 @@ exports.session = function () {
 
         self.sessionID = param.sessionID;
         self.privilege = param.privilege;
+        self.userList = param.userList;
         self.name = param.name;
         self.startDate = param.startDate;
         self.endDate = param.endDate;
@@ -323,6 +327,7 @@ exports.session = function () {
         if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
             transaction.description.speakerChange.forEach((tuple)=> {
                 if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) { // speaker need to be removed
+                    //soundSpeaker = []; // there is only one person can be speaker at this point
                     soundSpeaker.push(tuple[0]);
                 } else {
                     soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);

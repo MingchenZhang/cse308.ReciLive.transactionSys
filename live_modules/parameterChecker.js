@@ -27,7 +27,7 @@ const dispatchClassroomRule = (obj)=>{
         obj('startDate').required().isString().isISO8601();
         obj('endDate').required().isString().isISO8601();
         obj('status').required().isString();
-        obj().strict()
+        obj('userList').required().isObject();
     });
 };
 
