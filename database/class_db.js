@@ -143,22 +143,47 @@ exports.addClass = function (name, startDate, endDate, owner) {
 };
 /**
  * delete class by mongoid delete class and enroll info
- * @param classID
- * @param owner
+ * @param classID mongoid
+ * @param owner mongoid
  * @returns {Promise.<TResult>|Promise}
  */
-exports.deleteClassByMongoID = function (classID,owner) {
+exports.deleteClassByMongoID =  (classID,owner)=> {
     return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
         for(clazz in classList){
             if (clazz._id == classID) {
                 var deleteReadyList = [];
                 deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class:clazz._id});
                 deleteReadyList[1] = classDB.classesColl.deleteMany({_id:clazz._id});
+                deleteReadyList[2] = classDB.recitationColl.deleteMany({parentClass:clazz._id});
                 return When.all(deleteReadyList);
             }
         }
     });
 };
+/**
+ * deleteRecitation with privilege check
+ * @param recitationID
+ * @param owner
+ * @returns {*|Promise.<TResult>|Promise}
+ */
+exports.deleteRecitation = (recitationID , owner)=>{
+    return classDB.recitationColl.find({_id:recitationID}).toArray().then((recitation)=>{  //privilege check
+        if(recitation.length!=0)
+        return classDB.classesColl.find({_id:recitation[0].parentClass}).toArray().then((clazz)=>{
+            for(clazzEle in clazz){
+                if(claclazzElezz.owner == owner) return classDB.recitationColl.deleteMany({_id:recitationID});
+            }
+        })
+    });
+};
+/**
+ * addRecitation
+ * @param name
+ * @param startDate
+ * @param endDate
+ * @param parentClass  mongoid
+ * @returns {Promise.<TResult>|Promise}
+ */
 exports.addRecitation = function (name, startDate, endDate, parentClass) {
     var numericID = Math.floor(Math.random() * 10000000);
     var insert = {
@@ -173,17 +198,43 @@ exports.addRecitation = function (name, startDate, endDate, parentClass) {
         return insert
     });
 };
-
+/**
+ * getRecitationsByClass
+ * @param parentClass
+ * @returns {Promise}
+ */
 exports.getRecitationsByClass = function (parentClass) {
     return classDB.recitationColl.find({
         parentClass: s.mongodb.ObjectID(parentClass)
     }).sort({'createdAt': -1}).toArray();
 };
-
-exports.getRecitationByMongoID = (recitationId)=>{
-    return classDB.recitationColl.find({_id:s.mongodb.ObjectID(recitationId)}).toArray();
+/**
+ * getRecitationByMongoID
+ * @param recitationId
+ * @returns {Promise}
+ */
+exports.getRecitationByMongoID = (recitationId,owner)=>{
+    return classDB.recitationColl.find({_id:recitationID}).toArray().then((recitation)=>{  //privilege check
+        if(recitation.length!=0)
+            return classDB.classesColl.find({_id:recitation[0].parentClass}).toArray().then((clazz)=>{
+                for(clazzEle in clazz){
+                    if(claclazzElezz.owner == owner) return  classDB.recitationColl.find({_id:s.mongodb.ObjectID(recitationId)}).toArray();
+                }
+            })
+    });
 };
 
-// exports.editRecitation = (owner, reciationId, recitationInfo)=>{
-//     return;
-// };
+exports.editRecitation = (owner, recitationId, recitationInfo)=>{
+    return classDB.recitationColl.find({_id:recitationID}).toArray().then((recitation)=>{  //privilege check
+        if(recitation.length!=0)
+            return classDB.classesColl.find({_id:recitation[0].parentClass}).toArray().then((clazz)=>{
+                for(clazzEle in clazz){
+                    if(claclazzElezz.owner == owner) return  classDB.recitationColl.updateMany({_id:s.mongodb.ObjectID(recitationId)},{$set:{
+                        name: recitationInfo.name,
+                        startDate: new Date(recitationInfo.startDate),
+                        endDate: new Date(recitationInfo.endDate)
+                    }});
+                }
+            })
+    });
+};

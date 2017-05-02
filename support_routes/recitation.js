@@ -11,15 +11,15 @@ exports.getRoute = function (s) {
         var current_class = req.body.class;
         s.classConn.getRecitationsByClass(current_class).then((response) => {
                 if (response) {
-                  let recitations = [];
-                  response.forEach(function (element) {
-                    recitations.push([element.numericID, element.name]);
-                  });
-                  res.send({result: true, list: recitations});
+                    let recitations = [];
+                    response.forEach(function (element) {
+                        recitations.push([element.numericID, element.name]);
+                    });
+                    res.send({result: true, list: recitations});
                 } else {
                     res.send({result: false, reason: "nothing find in database"});
                 }
-          }
+            }
         ).catch((e) => {
             res.send({result: false, reason: e.message ? e.message : "error in class DB add class"});
         });
@@ -30,38 +30,41 @@ exports.getRoute = function (s) {
             if (recitation) {
                 var privilege = {};
                 var userList = {};
-                privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control",'draw'];
-                userList[req.userLoginInfo.record._id] = {'name':req.userLoginInfo.username,'email':req.userLoginInfo.record.email};
+                privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control", 'draw'];
+                userList[req.userLoginInfo.record._id] = {
+                    'name': req.userLoginInfo.username,
+                    'email': req.userLoginInfo.record.email
+                };
                 s.classConn.getStudentsByClass(req.body.class).then((response) => {
                     response.forEach((student) => {
                         privilege[student.user] = [];
                     });
-                     s.tools.listPromise(response, (student) => {
-                        return s.userConn.getUserByMongoID(student.user).then((userInfo)=>{
-                            userList[userInfo._id] = {'name':userInfo.username,'email':userInfo.email};
+                    s.tools.listPromise(response, (student) => {
+                        return s.userConn.getUserByMongoID(student.user).then((userInfo) => {
+                            userList[userInfo._id] = {'name': userInfo.username, 'email': userInfo.email};
                         });
-                    }).then(()=>{
-                         Request({
-                             method: 'POST',
-                             url: "http://room.recilive.stream/dispatch_classroom",
-                             json: {
-                                 "classNumber": recitation.numericID,
-                                 "privilege": privilege,
-                                 "name": recitation.name,
-                                 "startDate": recitation.startDate,
-                                 "endDate": recitation.endDate,
-                                 "status": "LIVE",
-                                 "userList":userList
-                             }
-                         }, (error, response, body) => {
-                             if (error) return res.status(500).send({
-                                 result: false,
-                                 error,
-                                 statusCode: response.statusCode
-                             });
-                             return res.send({result: true, body});
-                         });
-                     });
+                    }).then(() => {
+                        Request({
+                            method: 'POST',
+                            url: "http://room.recilive.stream/dispatch_classroom",
+                            json: {
+                                "classNumber": recitation.numericID,
+                                "privilege": privilege,
+                                "name": recitation.name,
+                                "startDate": recitation.startDate,
+                                "endDate": recitation.endDate,
+                                "status": "LIVE",
+                                "userList": userList
+                            }
+                        }, (error, response, body) => {
+                            if (error) return res.status(500).send({
+                                result: false,
+                                error,
+                                statusCode: response.statusCode
+                            });
+                            return res.send({result: true, body});
+                        });
+                    });
                 }).catch((e) => {
                     res.send({result: false, reason: e.message || "error in db get students list"});
                 });
@@ -73,17 +76,30 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.post('/ajax/get-recitation-info',jsonParser,(req,res,next)=>{            //give recitation info for edit or view
-        s.classConn.getRecitationsByClass(req.body.class).then((recitation)=>{
-            if(recitation.length==0)
-                res.send({result:false,reason:"no such recitation"});
-            else res.send({result:true,recitation:recitation[0]});
-        }).catch((err)=>{
-            res.send({result:false,reason: e.message||"error in get recitation info db operation"});
+    router.post('/ajax/get-recitation-info', jsonParser, (req, res, next) => {            //give recitation info for edit or view
+        s.classConn.getRecitationsByClass(req.body.class,).then((recitation) => {
+            if (recitation.length == 0)
+                res.send({result: false, reason: "no such recitation"});
+            else res.send({result: true, recitation: recitation[0]});
+        }).catch((err) => {
+            res.send({result: false, reason: e.message || "error in get recitation info db operation"});
         });
     });
 
-   // router.psot('/ajax/edit-recitation',jsonParser,(req,res,next)=>{
-    //});
+    router.post('/ajax/edit-recitation', jsonParser, (req, res, next) => {
+        s.classConn.editRecitation(req.userLoginInfo.record._id,req.body.recitationId,{name:req.body.name,startDate: req.body.startDate,endDate: req.body.endDate}).then(()=>{
+            res.send({result:true});
+        }).catch((err)=>{
+            res.send({result: false, reason: e.message || "error in edit recitation info db operation"});
+        });
+    });
+
+    router.post('/ajax/delete-recitation',jsonParser,(req,res,next)=>{
+        s.classConn.deleteRecitation(req.body.recitationId,req.userLoginInfo.record._id).then(()=>{
+            res.send({result:true});
+        }).catch((err)=>{
+            res.send({result: false, reason: e.message || "error in delete recitation info db operation"});
+        });
+    });
     return router;
 };
