@@ -15,7 +15,7 @@ exports.getRoute = function (s) {
                 });
                 res.send({result: true, list: names});
             }).catch((e) => {
-                    res.send({result: false, reason: e.message ? e.message : 'get classese by instructor error'});
+                    res.send({result: false, reason: e.message ? e.message : 'get classes by instructor error'});
                 }
             )
             ;
@@ -27,7 +27,7 @@ exports.getRoute = function (s) {
                 });
                 res.send({result: true, list: names});
             }).catch((e) => {
-                    res.send({result: false, reason: e.message || 'get classese by student error'});
+                    res.send({result: false, reason: e.message || 'get classes by student error'});
                 }
             );
         } else {
@@ -116,7 +116,7 @@ exports.getRoute = function (s) {
         s.classConn.deleteClassByMongoID(req.body.classId, req.userLoginInfo.record._id).then(() => {
             res.send({result: true});
         }).catch(() => {
-            res.status(400).send({result: false, reason: err.message | 'unknown error'});
+            res.status(400).send({result: false, reason: err.message || 'unknown error'});
         });
     });
     return router;
