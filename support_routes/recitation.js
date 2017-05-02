@@ -77,7 +77,7 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/get-recitation-info', jsonParser, (req, res, next) => {            //give recitation info for edit or view
-        s.classConn.getRecitationsByClass(req.body.class,).then((recitation) => {
+        s.classConn.getRecitationsByClass(req.body.class).then((recitation) => {
             if (recitation.length == 0)
                 res.send({result: false, reason: "no such recitation"});
             else res.send({result: true, recitation: recitation[0]});

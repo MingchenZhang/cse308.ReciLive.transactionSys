@@ -26,6 +26,7 @@ function SoundControl(transactionSystem) {
 
     this.update = function (index, description, createdBy, createdAt, payload) {
         var speakerChange = description.speakerChange;
+        console.log('speaker change received: '+speakerChange);
         speakerChange.forEach(function (changeTuple) {
             if(changeTuple[0] == transactionSystem.userID){
                 self.asSpeaker = changeTuple[1];
@@ -53,7 +54,7 @@ function SoundControl(transactionSystem) {
         if(userID == transactionSystem.userID) return self.takeSpeakerRole();
         if(transactionSystem.privilege.indexOf(self.moduleName) == 0) return Promise.reject(new Error('not in control')); // if user has no control on sound control
         var speakerChange = [[transactionSystem.userID, false]];
-        for(var userID in self.speakerList){
+        for(let userID in self.speakerList){
             speakerChange.push([userID, false]);
         }
         speakerChange.push([userID, true]);
@@ -81,7 +82,11 @@ function SoundControl(transactionSystem) {
     function changeUserList(){
         var userList = [];
         for(var userID in transactionSystem.userList){
-            userList.push({id:userID, name: userList.name, role: self.speakerList[userID]?'speaker':'non-speaker'});
+            userList.push({
+                id:userID,
+                name: transactionSystem.userList[userID].name,
+                role: self.speakerList[userID]?'speaker':'non-speaker'
+            });
         }
         updateStudentList(userList);
     }

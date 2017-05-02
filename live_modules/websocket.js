@@ -11,6 +11,7 @@ exports.WSHandler = function () {
         log.debug('ws route "' + location.path + '" triggered');
         Login.liveGetUserInfo(cookies.login_session).then((userInfo)=>{
             ws.userLoginInfo = userInfo;
+            ws.userLoginInfo.userID = userInfo._id;
             var handler = subhandlerMap[location.path];
             if (handler != undefined) {
                 return handler(ws);
