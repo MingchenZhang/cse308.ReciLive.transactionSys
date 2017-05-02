@@ -141,12 +141,20 @@ exports.addClass = function (name, startDate, endDate, owner) {
     };
     return classDB.classesColl.insertOne(insertObj).then(() => insertObj);
 };
+/**
+ * delete class by mongoid delete class and enroll info
+ * @param classID
+ * @param owner
+ * @returns {Promise.<TResult>|Promise}
+ */
 exports.deleteClassByMongoID = function (classID,owner) {
     return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
         for(clazz in classList){
             if (clazz._id == classID) {
-
-
+                var deleteReadyList = [];
+                deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class:clazz._id});
+                deleteReadyList[1] = classDB.classesColl.deleteMany({_id:clazz._id});
+                return When.all(deleteReadyList);
             }
         }
     });

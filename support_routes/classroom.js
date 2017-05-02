@@ -57,8 +57,8 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/get-edit-class-info', jsonParser, (req, res, next) => {           //edit mode get class information
-        response = {};
-        promiseList = [];
+        var response = {};
+        var promiseList = [];
         promiseList[0] = s.classConn.getClassByMongoID(req.body.classId, req.userLoginInfo.record._id).then((clazz) => {
             response.result4classInfo = true;
             response.classInfo = clazz;
