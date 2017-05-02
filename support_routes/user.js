@@ -25,7 +25,7 @@ exports.getRoute = function (s) {
         }
     });
 
-    router.post('/ajax/login', jsonParser, function (req, res, next) {
+    router.post('/ajax/login', jsonParser, function (req, res, next) {　//login ajax post
         if(!req.body.IDToken){
             return res.status(400).send({result: false, reason: 'format error'});
         }
@@ -80,7 +80,7 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.all('/ajax/logout', (req, res, next)=>{
+    router.all('/ajax/logout', (req, res, next)=>{      //get and post for logout
         s.userConn.removeSession(req.cookies.login_session);
         res.clearCookie('login_session', {domain: '.recilive.stream'});
         res.redirect('/');

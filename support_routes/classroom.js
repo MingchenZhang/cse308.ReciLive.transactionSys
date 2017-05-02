@@ -60,7 +60,7 @@ exports.getRoute = function (s) {
         response = {};
         promiseList = [];
         promiseList[0] = s.classConn.getClassByMongoID(req.body.classId, req.userLoginInfo.record._id).then((clazz) => {
-            response.result4classInfo =true;
+            response.result4classInfo = true;
             response.classInfo = clazz;
         }).catch((err) => {      //catch all the error from db
             response.result4classInfo = false;
@@ -86,7 +86,7 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/edit-class', jsonParser, (req, res, next) => {           //response the edit class button
-        when.all(s.classConn.editClassByMongoID(req.body.classId, {     //primise chain 0:modify class info 1:remove all privilege info
+        When.all(s.classConn.editClassByMongoID(req.body.classId, {     //primise chain 0:modify class info 1:remove all privilege info
             name: req.body.name,
             startDate: req.body.startDate,
             endDate: req.body.endDate
@@ -94,7 +94,9 @@ exports.getRoute = function (s) {
             return s.tools.listPromise(req.body.students, (email) => {              //add privilege info
                 return s.userConn.getUserByEmail(email).then((user) => {
                     if (user) {
-                        return s.classConn.addStudentToClass(user._id, clazz[0]._id);
+                        return clazz[0].then((classID) => {
+                            return s.classConn.addStudentToClass(user._id, classID);
+                        });
                     } else {
                         var userID = s.mongodb.ObjectID();
                         return s.userConn.addUser(null, email, null, null, userID).then(() => {
@@ -110,6 +112,12 @@ exports.getRoute = function (s) {
         });
     });
 
-
+    router.post('/ajax/delete-class', jsonParser, (req, res, next) => {
+        s.classConn.deleteClassByMongoID(req.body.classId, req.userLoginInfo.record._id).then(() => {
+            res.send({result: true});
+        }).catch(() => {
+            res.status(400).send({result: false, reason: err.message | 'unknown error'});
+        });
+    });
     return router;
 };

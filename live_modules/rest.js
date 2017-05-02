@@ -57,11 +57,7 @@ exports.getRoute = function (s) {
         }
         res.send({status: "ok"});
     });
-    router.post('/current_time', jsonParser, (req, res, next) => {
-        res.send({status:"ok",time:(new Date()).toISOString()});
-        //TODO: send end time if there is one
-    });
-    router.get('/current_time', jsonParser, (req, res, next) => {
+    router.all('/current_time', jsonParser, (req, res, next) => {
         res.send({status:"ok",time:(new Date()).toISOString()});
         //TODO: send end time if there is one
     });

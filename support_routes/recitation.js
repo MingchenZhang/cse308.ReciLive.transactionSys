@@ -29,30 +29,38 @@ exports.getRoute = function (s) {
         s.classConn.addRecitation(req.body.name, req.body.startDate, req.body.endDate, req.body.class).then((recitation) => {
             if (recitation) {
                 var privilege = {};
+                var userList = {};
                 privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control",'draw'];
                 s.classConn.getStudentsByClass(req.body.class).then((response) => {
                     response.forEach((student) => {
-                        privilege[student.user] = []
+                        privilege[student.user] = [];
                     });
-                    Request({
-                        method: 'POST',
-                        url: "http://room.recilive.stream/dispatch_classroom",
-                        json: {
-                            "classNumber": recitation.numericID,
-                            "privilege": privilege,
-                            "name": recitation.name,
-                            "startDate": recitation.startDate,
-                            "endDate": recitation.endDate,
-                            "status": "LIVE"
-                        }
-                    }, (error, response, body) => {
-                        if (error) return res.status(500).send({
-                            result: false,
-                            error,
-                            statusCode: response.statusCode
+                     s.tools.listPromise(response, (student) => {
+                        return s.userConn.getUserByMongoID(student.user).then((userInfo)=>{
+                            userList[userInfo._id] = {'name':userInfo.username,'email':userInfo.email};
                         });
-                        return res.send({result: true, body});
-                    });
+                    }).then(()=>{
+                         Request({
+                             method: 'POST',
+                             url: "http://room.recilive.stream/dispatch_classroom",
+                             json: {
+                                 "classNumber": recitation.numericID,
+                                 "privilege": privilege,
+                                 "name": recitation.name,
+                                 "startDate": recitation.startDate,
+                                 "endDate": recitation.endDate,
+                                 "status": "LIVE",
+                                 "userList":userList
+                             }
+                         }, (error, response, body) => {
+                             if (error) return res.status(500).send({
+                                 result: false,
+                                 error,
+                                 statusCode: response.statusCode
+                             });
+                             return res.send({result: true, body});
+                         });
+                     });
                 }).catch((e) => {
                     res.send({result: false, reason: e.message || "error in db get students list"});
                 });

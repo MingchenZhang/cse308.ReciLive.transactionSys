@@ -82,14 +82,14 @@ exports.editClassByMongoID = (classID, classInfo, owner) => {
     primiseList[0] = classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
         var primiseList4classList = [];
         classList.forEach((clazz, index) => {
-            if (clazz._id == classID) primiseList4classList[index] = classDB.classesColl.updateMany({id: classID}, {    //update info
+            if (clazz._id == classID) primiseList4classList[index] = classDB.classesColl.updateMany({_id: clazz._id}, {    //update info
                 $set: {
                     name: classInfo.name,
-                    startDate: new Date(startDate),
-                    endDate: new Date(endDate),
+                    startDate: new Date(classInfo.startDate),
+                    endDate: new Date(classInfo.endDate),
                 }
             })    //all the error send to controller to handle
-        })
+        });
         return primiseList;
     });
     primiseList[1] = classDB.classEnrollColl.removeMany({class: classID}); //remove all the privilege information for rewrite
@@ -128,7 +128,7 @@ exports.getStudentsByClass = function (clazz) {
 };
 
 exports.addStudentToClass = function (student, clazz) {
-    return classDB.classEnrollColl.insertOne({'user': student, 'class': clazz});
+    return classDB.classEnrollColl.updateMany({'user': student, 'class': clazz},{$set:{'user': student, 'class': clazz}},{upsert:true});
 };
 
 exports.addClass = function (name, startDate, endDate, owner) {
@@ -141,7 +141,16 @@ exports.addClass = function (name, startDate, endDate, owner) {
     };
     return classDB.classesColl.insertOne(insertObj).then(() => insertObj);
 };
+exports.deleteClassByMongoID = function (classID,owner) {
+    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
+        for(clazz in classList){
+            if (clazz._id == classID) {
 
+
+            }
+        }
+    });
+};
 exports.addRecitation = function (name, startDate, endDate, parentClass) {
     var numericID = Math.floor(Math.random() * 10000000);
     var insert = {
