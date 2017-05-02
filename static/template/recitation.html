@@ -3,7 +3,7 @@
         <h2>{{recitation_name}}</h2>
         <div class="dropdown-content">
             <a href="https://room.recilive.stream/room/{{id}}">Enter</a>
-            <a href="#">View</a>
+            <a href="#{{recitation_name}}" onclick="viewRecitationInfo('{{id}}')" data-toggle="modal" data-target="#recitation-detail">Edit</a>
         </div>
     </div>
 </script>

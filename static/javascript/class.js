@@ -119,15 +119,6 @@ function initClassModal() {
   $(".delete-class-btn").hide();
   $(".save-class").attr("onclick","addClass()");
 }
-//TODO just copied from initClassModal need to change class name
-function initRecModal() {
-  $(".class-name").val('');
-  initDateForRec();
-  $(".student-list").empty();
-  add_student();
-  $(".delete-class-btn").hide();
-  $(".save-class").attr("onclick","addClass()");
-}
 function addClass() {
   var name = $(".class-name").val();
   var startDate = $("#class-date-start-display").text();
@@ -231,6 +222,13 @@ function deleteClass() {
   });
 }
 
+function initRecModal() {
+  $(".recitation-name").val('');
+  initDateForRec();
+  $(".delete-recitation-btn").hide();
+  $(".save-recitaiton").attr("onclick","addRecitation()");
+}
+
 function listRecitation(current_class_id, current_class_name) {
     $(".add-class").css("display","none");
     $(".add-recitation").css("display","inline-block");
@@ -289,7 +287,70 @@ function addRecitation() {
         contentType : "application/json"
     });
 }
+function viewRecitationInfo(current_recitation_id) {
+  $.ajax({
+      url: '/ajax/get-edit-recitation-info',
+      type: 'post',
+      data: JSON.stringify({recitationId: current_recitation_id}),
+      contentType: "application/json; charset=utf-8",
+      dataType: 'json'
+  }).done(function (data) {
+      if(data.result === true) {
+        $(".recitation-name").val(data.classInfo.name);
+        $("#rec-date-start-display").text(data.classInfo.startDate.split("T")[0]);
+        $('#rec-date-end-display').text(data.classInfo.endDate.split("T")[0]);
+        $(".delete-recitation-btn").show();
+        $(".save-recitaiton").attr("onclick","editRecitation('"+current_recitation_id+"')");
+      }else {
+          console.error(data.reason);
+      }
+      if(data.result4Privilege) {
+          display_students(data.privilegeList);
+      }else {
+          console.error(data.reason);
+      }
+  }).fail(function (err) {
+      console.error(err);
+  });
+}
+function editRecitation(current_recitation_id) {
+  var name = $(".recitation-name").val();
+  var startDate = $("#rec-date-start-display").text();
+  var endDate = $("#rec-date-end-display").text();
 
+  $.ajax({
+      type: "POST",
+      url: "/ajax/edit-recitation",
+      data: JSON.stringify({class: current_recitation_id, name: name, startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt)}),
+      success: function(data){
+          if(data.result === true) {
+              $('#recitation-detail').modal('hide');
+              listRecitation(currentClassId, currentClassName);
+          }else {
+              console.error(data.reason);
+          }
+      },
+      error: function(ts) {
+          console.log(ts.responseText);
+      },
+      dataType: "json",
+      contentType : "application/json"
+  });
+}
+
+function deleteRecitation() {
+  $.ajax({
+      url: '/ajax/delete-recitation',
+      type: 'post',
+      data: JSON.stringify({recId: currentClassId}),
+      contentType: "application/json; charset=utf-8",
+      dataType: 'json'
+  }).done(function (data) {
+
+  }).fail(function (err) {
+      console.error(err);
+  });
+}
 
 function add_student() {
     $(".student-list").append("<input type='text' class='student-email'>");

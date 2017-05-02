@@ -23,6 +23,8 @@ body {
   min-height: calc(100vh - 45px);
 }
 .side-bar {
+  display: flex;
+  flex-direction: column;
   width: 4%;
   min-width: 40px;
   background-color: #e05038;
@@ -34,19 +36,22 @@ body {
   left: 40%;
   width: 50px;
 }
+.side-bar a {
+  text-decoration: none;
+}
 .side-bar span {
   display:inline-block;
-  line-height: 60px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   width: 100%;
-  height: 70px;
   text-align: center;
-  vertical-align: bottom;
   cursor: pointer;
 }
-.draw {
+#draw {
   position: relative;
-  margin: auto;
-  width: 0;
+  display: inline-block;
+  left: 0;
+  padding: 0;
 }
 #draw-control-panel {
   right: auto;
