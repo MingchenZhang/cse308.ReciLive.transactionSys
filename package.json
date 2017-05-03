@@ -18,9 +18,11 @@
     "mongo-escape": "^2.0.6",
     "mongodb": "2.2.24",
     "randomstring": "^1.1.5",
-    "redbird": "^0.6.15",
     "request": "^2.81.0",
     "when": "3.7.8",
     "ws": "2.2.1"
+  },
+  "devDependencies": {
+    "redbird": "^0.6.15",
   }
 }

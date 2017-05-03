@@ -11,8 +11,8 @@ function SoundControl(transactionSystem) {
      * Called after all transaction has been received.
      */
     self.init = function(){
+        self.inited = true;
         if(self.asSpeaker || self.asListener) {
-            self.inited = true;
             if(self.asSpeaker) document.dispatchEvent(events.switchToSpeaker());
             if(self.asListener) document.dispatchEvent(events.switchToListener());
         }else{ // if no transaction about sound control has been made

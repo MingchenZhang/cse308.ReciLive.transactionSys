@@ -68,44 +68,25 @@ exports.getRoute = function (s) {
                         {
                             "name": "first slide",
                             "pages": [
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c3fa0a9785420051ac3"
-                                },
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c3fa0a9785420051ac4"
-                                },
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c3fa0a9785420051ac5"
-                                },
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c3fa0a9785420051ac6"
-                                }
+                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac3"},
+                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac4"},
+                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac5"},
+                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac6"}
                             ]
                         },
                         {
                             "name": "second slide",
                             "pages": [
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c70a0a9785420051acb"
-                                },
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c70a0a9785420051acd"
-                                },
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c70a0a9785420051ad0"
-                                }
+                                {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acb"},
+                                {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acd"},
+                                {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051ad0"}
                             ]
                         }, {
                             "name": "third slide",
                             "pages": [
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c9da0a9785420051ad4"
-                                },
-                                {
-                                    "url": "http://recilive.stream/get_resource?id=59062c9da0a9785420051ad5"
-                                }, {
-                                    "url": "http://recilive.stream/get_resource?id=59062c9da0a9785420051ad6"
-                                }
+                                {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad4"},
+                                {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad5"},
+                                {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad6"}
                             ]
                         },
                     ]

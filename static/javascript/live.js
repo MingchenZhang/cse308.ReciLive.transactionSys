@@ -206,6 +206,11 @@ script_processor_node.onaudioprocess = function (audioProcessingEvent) {
         soundSystem.send(inputData);
     if (soundControlSystem.asListener)
         soundSystem.writeNextSoundBuffer(outputData);
+    else{
+        for(var i=0; i<eventRate; i++){
+            outputData[i] = 0;
+        }
+    }
 };
 microphone_stream = null;
 microphone_stream_ctx = null;
@@ -227,20 +232,16 @@ function activateSound() {
             navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                 navigator.mozGetUserMedia || navigator.msGetUserMedia;
         if (navigator.getUserMedia) {
-            navigator.getUserMedia({
-                    audio: true
-                },
-                function (stream) {
-                    if (microphone_stream !== stream) console.warn('microphone_stream !== stream');
-                    if (!microphone_stream) microphone_stream = stream;
-                    if (!microphone_stream_ctx) microphone_stream_ctx = audioCtx.createMediaStreamSource(microphone_stream);
-                    start_microphone(microphone_stream_ctx);
-                },
-                function (e) {
-                    alert('Error capturing audio.');
-                    reject({reason: 'audio permission rejected'});
-                }
-            );
+            navigator.getUserMedia({audio: true}, function (stream) {
+                if (microphone_stream !== stream && microphone_stream)
+                    console.warn('microphone_stream !== stream');
+                if (!microphone_stream) microphone_stream = stream;
+                if (!microphone_stream_ctx) microphone_stream_ctx = audioCtx.createMediaStreamSource(microphone_stream);
+                start_microphone(microphone_stream_ctx);
+            }, function (e) {
+                alert('Error capturing audio.');
+                reject({reason: 'audio permission rejected'});
+            });
         } else {
             alert('getUserMedia not supported in this browser.');
             reject({reason: 'getUserMedia not supported in this browser.'});

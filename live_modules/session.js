@@ -246,7 +246,7 @@ exports.session = function () {
         var payload = transaction.payload;
         var createdBy = transaction.createdBy;
 
-        if (index != lastTransactionIndex + 1) return When.reject({reason: 1});
+        if (index != lastTransactionIndex + 1) return When.reject({reason: 1, latestIndex: lastTransactionIndex});
 
         if (self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)// if sender has no priviledge
             return When.reject({reason: 2});
