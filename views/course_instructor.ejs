@@ -8,18 +8,25 @@
     <title>ReciLive</title>
     <!-- CSS Library -->
     <!-- <link href="static/css/library/bootstrap.min.css" rel="stylesheet" type="text/css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/library/materialize.min.css">
     <link href="static/css/library/datepicker.css" rel="stylesheet" type="text/css">
     <link href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+    <link href="https://dl2.pushbulletusercontent.com/LC5kwexKQ6dwj3oBuK9g7A2sh9fiXBmP/vex.css" rel="stylesheet" type="text/css" />
+    <link href="https://dl2.pushbulletusercontent.com/OdBbCpZPN4HzEvW6s5ZAKOw5j8JoVPea/vex-theme-plain.css" rel="stylesheet" type="text/css" />
     <!-- JS Library -->
     <script src="static/javascript/library/jquery-3.2.0.min.js"></script>
     <!-- <script src="static/javascript/library/bootstrap.min.js"></script> -->
-    <script src="/static/javascript/library/materialize.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/static/javascript/library/materialize.min.js"></script>
     <script src="static/javascript/library/bootstrap-datepicker.js"></script>
     <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
+    <script src="https://dl2.pushbulletusercontent.com/htm56efiYePFcXUo18L8QYQCA8TX0p92/vex.combined.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.1/Sortable.min.js"></script>
+    <script>vex.defaultOptions.className = 'vex-theme-plain'</script>
     <!-- Our CSS -->
     <link href="static/css/class.css" rel="stylesheet" type="text/css">
     <!-- Our JS-->
@@ -159,6 +166,173 @@
           </div>
       </div>
     </div>
+
+
+    <!--this part is for resources management-->
+    <div class="item-prototype" style="display: none;">
+        <div class="list-group-item" data-id="">
+            <span class="badge removal">✖</span>
+            <span class="glyphicon glyphicon-move" aria-hidden="true"></span>
+            <span class="item-name"></span>
+        </div>
+    </div>
+
+    <div class="modal fade resources-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="listWithHandle" class="list-group">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info upload-button">Upload</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary submit-button">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            Sortable.create(listWithHandle, {
+                handle: '.glyphicon-move',
+                animation: 150
+            });
+
+            var generateItem = (id, name) => {
+                var newItem = $('.item-prototype').find('.list-group-item').clone();
+                newItem.attr('data-id', id);
+                newItem.find('.item-name').html(name);
+                newItem.find('.badge.removal').click(() => {
+                    newItem.remove();
+                });
+                $('#listWithHandle').append(newItem);
+            };
+
+            var getList = (parent) => {
+                var result = [];
+                parent.find('#listWithHandle').find('.list-group-item').each((index, item) => {
+                    result.push({
+                        id: $(item).attr('data-id'),
+                        name: $(item).find('.item-name').html(),
+                    });
+                });
+                return result;
+            };
+
+            var showUploadWindow = () => {
+                var p = new Promise((resolve, reject) => {
+                    vex.dialog.open({
+                        message: 'choose the file you want to upload:',
+                        input: [
+                            '<input name="ffdsf" type="file" value=""/>',
+                        ].join(''),
+                        buttons: [{
+                            text: 'Upload',
+                            type: 'button',
+                            className: 'vex-dialog-button-primary',
+                            click: function(data) {
+                                var request = {
+                                    type: 'POST',
+                                    url: '/add_resources',
+                                    data: new FormData(this.form),
+                                    contentType: false,
+                                    processData: false,
+                                };
+                                $.ajax(request).then((data) => {
+                                    if (typeof data == 'string') data = JSON.stringify(data);
+                                    resolve({
+                                        id: data.files[0].id,
+                                        name: data.files[0].name
+                                    });
+                                }).catch((err) => {
+                                    reject(err);
+                                });
+                            }
+                        }, {
+                            text: 'Cancel',
+                            type: 'button',
+                            className: 'vex-dialog-button-secondary',
+                            click: function(data) {
+                                reject(data);
+                                this.close();
+                            }
+                        }],
+                        callback: function(data) {}
+                    });
+                });
+
+                p.then((fileInfo) => {
+                    generateItem(fileInfo.id, fileInfo.name);
+                    console.log('file upload done');
+                }).catch((err) => {
+                    console.error('file upload failed');
+                    console.error(err);
+                });
+            };
+
+            window.showResourcesEdit = (recitationID) => {
+                var resourcesModal = $('.resources-modal');
+                resourcesModal.modal('show');
+                $.ajax({
+                    type: 'GET',
+                    url: '/get-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
+                    json: true,
+                }).then((resources) => {
+                    resources.resources[0].content[0].pages.forEach((slide) => {
+                        generateItem(slide.id, slide.name);
+                    });
+                    console.log('resources load successful');
+                }).catch((err) => {
+                    console.error('unable to load resources');
+                    console.error(err);
+                });
+                var uploadButton = resourcesModal.find('.upload-button');
+                uploadButton.off('click');
+                uploadButton.click(()=>{
+                    showUploadWindow();
+                });
+                var submitButton = resourcesModal.find('.submit-button');
+                submitButton.off('click');
+                submitButton.click(() => {
+                    var thisSlide = {
+                        name: 'test slide',
+                        pages: []
+                    };
+                    getList(resourcesModal).forEach((slide) => {
+                        thisSlide.pages.push({
+                            name: slide.name,
+                            url: "https://recilive.stream/get_resource?id=" + slide.id,
+                            id: slide.id
+                        });
+                    });
+                    var resourcesContainer = {
+                        resources: [{
+                            type: "slide",
+                            content: [thisSlide]
+                        }]
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        url: '/set-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
+                        data: resourcesContainer,
+                        json: true,
+                    }).then((data) => {
+                        console.log('resources push successful');
+                    }).catch((err) => {
+                        console.warn('resources push failed');
+                        console.warn(err);
+                    });
+                });
+            };
+        })();
+    </script>
 </body>
 
 </html>

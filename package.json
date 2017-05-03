@@ -23,6 +23,6 @@
     "ws": "2.2.1"
   },
   "devDependencies": {
-    "redbird": "^0.6.15",
+    "redbird": "^0.6.15"
   }
 }
