@@ -175,7 +175,7 @@ exports.deleteRecitation = (recitationID, owner) => {
     return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
         if (recitation.length != 0)
             return classDB.classesColl.find({_id: recitation[0].parentClass,owner}).count().then((count) => {
-                    if (ccount>0) return classDB.recitationColl.deleteMany({_id: s.mongodb.ObjectID(recitationID)});
+                    if (count>0) return classDB.recitationColl.deleteMany({_id: s.mongodb.ObjectID(recitationID)});
             })
     });
 };
