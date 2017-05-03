@@ -128,7 +128,12 @@ exports.getStudentsByClass = function (clazz) {
 };
 
 exports.addStudentToClass = function (student, clazz) {
-    return classDB.classEnrollColl.updateMany({'user': student, 'class': clazz},{$set:{'user': student, 'class': clazz}},{upsert:true});
+    return classDB.classEnrollColl.updateMany({'user': student, 'class': clazz}, {
+        $set: {
+            'user': student,
+            'class': clazz
+        }
+    }, {upsert: true});
 };
 
 exports.addClass = function (name, startDate, endDate, owner) {
@@ -147,14 +152,14 @@ exports.addClass = function (name, startDate, endDate, owner) {
  * @param owner mongoid
  * @returns {Promise.<TResult>|Promise}
  */
-exports.deleteClassByMongoID =  (classID,owner)=> {
+exports.deleteClassByMongoID = (classID, owner) => {
     return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        for(clazz in classList){
+        for (clazz in classList) {
             if (clazz._id == classID) {
                 var deleteReadyList = [];
-                deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class:clazz._id});
-                deleteReadyList[1] = classDB.classesColl.deleteMany({_id:clazz._id});
-                deleteReadyList[2] = classDB.recitationColl.deleteMany({parentClass:clazz._id});
+                deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class: clazz._id});
+                deleteReadyList[1] = classDB.classesColl.deleteMany({_id: clazz._id});
+                deleteReadyList[2] = classDB.recitationColl.deleteMany({parentClass: clazz._id});
                 return When.all(deleteReadyList);
             }
         }
@@ -166,14 +171,12 @@ exports.deleteClassByMongoID =  (classID,owner)=> {
  * @param owner
  * @returns {*|Promise.<TResult>|Promise}
  */
-exports.deleteRecitation = (recitationID , owner)=>{
-    return classDB.recitationColl.find({_id:recitationID}).toArray().then((recitation)=>{  //privilege check
-        if(recitation.length!=0)
-        return classDB.classesColl.find({_id:recitation[0].parentClass}).toArray().then((clazz)=>{
-            for(clazzEle in clazz){
-                if(claclazzElezz.owner == owner) return classDB.recitationColl.deleteMany({_id:recitationID});
-            }
-        })
+exports.deleteRecitation = (recitationID, owner) => {
+    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
+        if (recitation.length != 0)
+            return classDB.classesColl.find({_id: recitation[0].parentClass,owner}).count().then((count) => {
+                    if (ccount>0) return classDB.recitationColl.deleteMany({_id: s.mongodb.ObjectID(recitationID)});
+            })
     });
 };
 /**
@@ -213,28 +216,48 @@ exports.getRecitationsByClass = function (parentClass) {
  * @param recitationId
  * @returns {Promise}
  */
-exports.getRecitationByMongoID = (recitationId,owner)=>{
-    return classDB.recitationColl.find({_id:recitationID}).toArray().then((recitation)=>{  //privilege check
-        if(recitation.length!=0)
-            return classDB.classesColl.find({_id:recitation[0].parentClass}).toArray().then((clazz)=>{
-                for(clazzEle in clazz){
-                    if(claclazzElezz.owner == owner) return  classDB.recitationColl.find({_id:s.mongodb.ObjectID(recitationId)}).toArray();
-                }
+exports.getRecitationByMongoID = (recitationId, owner) => {
+    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
+        if (recitation.length != 0)
+            return classDB.classesColl.find({_id: recitation[0].parentClass,owner:owner}).count().then((count) => {
+                    if (count>0) return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationId)}).toArray();
             })
     });
 };
 
-exports.editRecitation = (owner, recitationId, recitationInfo)=>{
-    return classDB.recitationColl.find({_id:recitationID}).toArray().then((recitation)=>{  //privilege check
-        if(recitation.length!=0)
-            return classDB.classesColl.find({_id:recitation[0].parentClass}).toArray().then((clazz)=>{
-                for(clazzEle in clazz){
-                    if(claclazzElezz.owner == owner) return  classDB.recitationColl.updateMany({_id:s.mongodb.ObjectID(recitationId)},{$set:{
-                        name: recitationInfo.name,
-                        startDate: new Date(recitationInfo.startDate),
-                        endDate: new Date(recitationInfo.endDate)
-                    }});
-                }
+exports.editRecitation = (owner, recitationId, recitationInfo) => {
+    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
+        if (recitation.length != 0)
+            return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
+                    if (count>0) return classDB.recitationColl.updateMany({_id: s.mongodb.ObjectID(recitationId)}, {
+                        $set: {
+                            name: recitationInfo.name,
+                            startDate: new Date(recitationInfo.startDate),
+                            endDate: new Date(recitationInfo.endDate)
+                        }
+                    });
+            })
+    });
+};
+
+exports.setRecitationSource = (recitationID, owner, recitationObj) => {
+    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
+        if (recitation.length != 0)
+            return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
+                if (count > 0) return classDB.recitationColl.updateMany({_id: s.mongodb.ObjectID(recitationID)}, {
+                    $set: {
+                         recitationObj
+                    }
+                }, {upsert: true});
+            })
+    });
+};
+
+exports.getRecitationSource = (recitationID, owner) => {
+    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
+        if (recitation.length != 0)
+            return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
+                if (count > 0) return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray();
             })
     });
 };

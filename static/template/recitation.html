@@ -1,9 +1,25 @@
 <script type="text/html">
     <div class="class">
-        <h2>{{recitation_name}}</h2>
-        <div class="dropdown-content">
+        <h4>{{recitation_name}}</h4>
+        <div class="dropdown-course-content">
             <a href="https://room.recilive.stream/room/{{id}}">Enter</a>
-            <a href="#{{recitation_name}}" onclick="viewRecitationInfo('{{id}}')" data-toggle="modal" data-target="#recitation-detail">Edit</a>
+            <a href="#{{id}}">More</a>
         </div>
     </div>
+    <div id="{{id}}" class="modal bottom-sheet">
+        <div class="modal-content class-option">
+            <a onclick="viewRecitationInfo('{{id}}')" href="#recitation-detail">Edit {{recitation_name}}</a>
+            <a href="" onclick="deleteRecitation('{{id}}')">Delete {{recitation_name}}</a>
+        </div>
+    </div>
+    <script>
+        $('#{{id}}').modal({
+            dismissible: true, // Modal can be dismissed by clicking outside of the modal
+            opacity: .5, // Opacity of modal background
+            inDuration: 300, // Transition in duration
+            outDuration: 200, // Transition out duration
+            startingTop: '4%', // Starting top style attribute
+            endingTop: '10%' // Ending top style attribute
+        });
+    </script>
 </script>
