@@ -148,7 +148,7 @@ function addClass() {
         data: JSON.stringify({name: name, startDate: new Date(startDate), endDate: new Date(endDate), students: students}),
         success: function(data){
             if(data.result === true) {
-                $('#class-detail').modal('hide');
+                $('#class-detail').modal('close');
                 listClasses();
             }else {
                 console.error(data.reason);
@@ -207,7 +207,7 @@ function editClass(current_class_id) {
         data: JSON.stringify({classId: current_class_id, name: name, startDate: new Date(startDate), endDate: new Date(endDate), students: students}),
         success: function(data){
             if(data.result === true) {
-                $('#class-detail').modal('hide');
+                $('#class-detail').modal('close');
                 listClasses();
             }else {
                 console.error(data.reason);
@@ -289,7 +289,7 @@ function addRecitation() {
         data: JSON.stringify({class: currentClassId, name: name, startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt)}),
         success: function(data){
             if(data.result === true) {
-                $('#recitation-detail').modal('hide');
+                $('#recitation-detail').modal('close');
                 listRecitation(currentClassId, currentClassName);
             }else {
                 console.error(data.reason);
@@ -339,7 +339,7 @@ function editRecitation(current_recitation_id) {
       data: JSON.stringify({class: current_recitation_id, name: name, startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt)}),
       success: function(data){
           if(data.result === true) {
-              $('#recitation-detail').modal('hide');
+              $('#recitation-detail').modal('close');
               listRecitation(currentClassId, currentClassName);
           }else {
               console.error(data.reason);
