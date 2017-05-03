@@ -275,11 +275,13 @@
                 $.ajax({
                     type: 'GET',
                     url: '/ajax/get-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
-                    json: true,
+                    dataType: "json"
                 }).then((resources) => {
-                    resources.resources[0].content[0].pages.forEach((slide) => {
-                        generateItem(slide.id, slide.name);
-                    });
+                    if(Object.keys(resources).length != 0){
+                        resources.resources[0].content[0].pages.forEach((slide) => {
+                            generateItem(slide.id, slide.name);
+                        });
+                    }
                     console.log('resources load successful');
                 }).catch((err) => {
                     console.error('unable to load resources');
@@ -314,7 +316,7 @@
                         type: 'POST',
                         url: '/set-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
                         data: resourcesContainer,
-                        json: true,
+                        dataType: "json"
                     }).then((data) => {
                         resourcesModal.modal('close');
                         console.log('resources push successful');
