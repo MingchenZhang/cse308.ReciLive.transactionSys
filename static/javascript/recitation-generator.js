@@ -32,7 +32,8 @@ RecitationGenerator = function () {
         RECITATION_VIEW.then(function () {
             var list_info = {
                 recitation_name: info[1],
-                id: info[0]
+                roomid: info[0],
+                mongoid: info[2]
             };
             var div1 = $('<div/>');
             var html = Mustache.to_html(TEMP_RECITATION_VIEW, list_info);

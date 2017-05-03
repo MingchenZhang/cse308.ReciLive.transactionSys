@@ -7,8 +7,6 @@
           content="42088802485-n1mb2q3d8gigkqoth61ca07nfthgk9hr.apps.googleusercontent.com">
     <title>ReciLive</title>
     <!-- CSS Library -->
-    <!-- <link href="static/css/library/bootstrap.min.css" rel="stylesheet" type="text/css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/library/materialize.min.css">
     <link href="static/css/library/datepicker.css" rel="stylesheet" type="text/css">
@@ -17,9 +15,7 @@
     <link href="https://dl2.pushbulletusercontent.com/OdBbCpZPN4HzEvW6s5ZAKOw5j8JoVPea/vex-theme-plain.css" rel="stylesheet" type="text/css" />
     <!-- JS Library -->
     <script src="static/javascript/library/jquery-3.2.0.min.js"></script>
-    <!-- <script src="static/javascript/library/bootstrap.min.js"></script> -->
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="/static/javascript/library/materialize.min.js"></script>
     <script src="static/javascript/library/bootstrap-datepicker.js"></script>
     <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
@@ -177,21 +173,15 @@
         </div>
     </div>
 
-    <div class="modal fade resources-modal" tabindex="-1" role="dialog">
+    <div class="modal resources-modal">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Modal title</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="listWithHandle" class="list-group">
+                <div id="listWithHandle" class="list-group">
 
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info upload-button">Upload</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default modal-action modal-close">Close</button>
                     <button type="button" class="btn btn-primary submit-button">Save changes</button>
                 </div>
             </div>
@@ -279,10 +269,10 @@
 
             window.showResourcesEdit = (recitationID) => {
                 var resourcesModal = $('.resources-modal');
-                resourcesModal.modal('show');
+                resourcesModal.modal('open');
                 $.ajax({
                     type: 'GET',
-                    url: '/get-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
+                    url: '/ajax/get-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
                     json: true,
                 }).then((resources) => {
                     resources.resources[0].content[0].pages.forEach((slide) => {
@@ -324,6 +314,7 @@
                         data: resourcesContainer,
                         json: true,
                     }).then((data) => {
+                        resourcesModal.modal('close');
                         console.log('resources push successful');
                     }).catch((err) => {
                         console.warn('resources push failed');

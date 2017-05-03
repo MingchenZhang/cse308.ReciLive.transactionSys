@@ -13,7 +13,7 @@ exports.getRoute = function (s) {
                 if (response) {
                     let recitations = [];
                     response.forEach(function (element) {
-                        recitations.push([element.numericID, element.name]);
+                        recitations.push([element.numericID, element.name, element._id]);
                     });
                     res.send({result: true, list: recitations});
                 } else {
@@ -129,7 +129,7 @@ exports.getRoute = function (s) {
         }
     });
 
-    router.post('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
+    router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
             s.classConn.getRecitationSource(req.query.recitationID, req.userLoginInfo.record._id).then((recitation) => {
