@@ -217,7 +217,7 @@ exports.getRecitationsByClass = function (parentClass) {
  * @returns {Promise}
  */
 exports.getRecitationByMongoID = (recitationId, owner) => {
-    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
+    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationId)}).toArray().then((recitation) => {  //privilege check
         if (recitation.length != 0)
             return classDB.classesColl.find({_id: recitation[0].parentClass,owner:owner}).count().then((count) => {
                     if (count>0) return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationId)}).toArray();

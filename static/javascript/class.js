@@ -298,7 +298,7 @@ function addRecitation() {
 }
 function viewRecitationInfo(current_recitation_id) {
   $.ajax({
-      url: '/ajax/get-edit-recitation-info',
+      url: '/ajax/get-recitation-info',
       type: 'post',
       data: JSON.stringify({recitationId: current_recitation_id}),
       contentType: "application/json; charset=utf-8",
