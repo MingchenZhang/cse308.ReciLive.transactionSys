@@ -121,10 +121,10 @@ exports.getRoute = function (s) {
     router.post('/ajax/set-recitation-resource', jsonParser, (req, res, next) => {           //save the recitation resource metadata in db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
-            s.classConn.setRecitationSource(req.query.recitationID, req.userLoginInfo.userID, req.body).then((response) => {
+            s.classConn.setRecitationResource(req.query.recitationID, req.userLoginInfo.userID, req.body).then((response) => {
                 res.send({result: true});
             }).catch((err) => {
-                res.send({result: false, reason: e.message || "error in set recitation resource info db operation"});
+                res.send({result: false, reason: err.message || "error in set recitation resource info db operation"});
             });
         }
     });
@@ -132,10 +132,10 @@ exports.getRoute = function (s) {
     router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
-            s.classConn.getRecitationSource(req.query.recitationID, req.userLoginInfo.record._id).then((recitation) => {
-                res.send({result: true, recitationObj: recitation[0].recitationObj});
+            s.classConn.getRecitationResource(req.query.recitationID, req.userLoginInfo.record._id).then((resources) => {
+                res.send(resources);
             }).catch((err) => {
-                res.send({result: false, reason: e.message || "error in get recitation resource info db operation"});
+                res.status(400).send(err);
             });
         }
     });

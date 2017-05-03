@@ -240,24 +240,26 @@ exports.editRecitation = (owner, recitationId, recitationInfo) => {
     });
 };
 
-exports.setRecitationSource = (recitationID, owner, recitationObj) => {
+exports.setRecitationResource = (recitationID, owner, resourcesObj) => {
     return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
         if (recitation.length != 0)
             return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
                 if (count > 0) return classDB.recitationColl.updateMany({_id: s.mongodb.ObjectID(recitationID)}, {
                     $set: {
-                         recitationObj
+                         resources: resourcesObj
                     }
                 }, {upsert: true});
             })
     });
 };
 
-exports.getRecitationSource = (recitationID, owner) => {
+exports.getRecitationResource = (recitationID, owner) => {
     return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
         if (recitation.length != 0)
             return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
-                if (count > 0) return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray();
+                if (count > 0) return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitation)=>{
+                    return recitation.resources;
+                });
             })
     });
 };
