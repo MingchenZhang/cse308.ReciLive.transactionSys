@@ -133,7 +133,7 @@ exports.getRoute = function (s) {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
             s.classConn.getRecitationResource(req.query.recitationID, req.userLoginInfo.record._id).then((resources) => {
-                res.send(resources);
+                res.send(resources || {});
             }).catch((err) => {
                 res.status(400).send(err);
             });

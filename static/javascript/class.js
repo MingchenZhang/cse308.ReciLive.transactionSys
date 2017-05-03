@@ -91,12 +91,6 @@ function initDateForRec() {
       });
 }
 
-function getCookie(name) {
-    var value = "; " + document.cookie;
-    var parts = value.split("; " + name + "=");
-    if (parts.length == 2) return parts.pop().split(";").shift();
-}
-
 function listClasses() {
     $(".add-class").css("display","inline-block");
     $(".add-recitation").css("display","none");
@@ -249,7 +243,7 @@ function listRecitation(current_class_id, current_class_name) {
     $(".halfway-fab").attr("onclick","initRecModal()");
     var listDiv = $('.class-list');
     $(".current-class-name").remove();
-    $('.class-info').prepend("<h1 class='current-class-name'>"+current_class_name+"</h1>");
+    $('.class-info').prepend("<h2 class='current-class-name'>"+current_class_name+"</h2>");
 
     $.ajax({
         url: '/ajax/list-recitation-list',
@@ -368,12 +362,16 @@ function deleteRecitation() {
 }
 
 function add_student() {
-    $(".student-list").append("<input type='text' class='student-email'>");
+  $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate'><label for='email' data-error='wrong' data-success='right'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
 }
 function display_students(student_list) {
-//   student_list.forEach(fucntion(student) {
-//     $(".student-list").append("<input type='text' class='student-email' value= '"+ student + "'>");
-//   });
+  $.each(student_list, function(student) {
+    $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate'"+ student + "><label for='email' data-error='wrong' data-success='right'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
+  });
+}
+
+function deleteStudent(element) {
+  $(element).parent().remove();
 }
 
 function import_student() {

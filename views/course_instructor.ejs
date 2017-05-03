@@ -37,9 +37,9 @@
 <body>
     <nav class="nav-extended">
       <div class="nav-wrapper">
-        <img src="../static/img/logo/android-icon-48x48.png">
+        <img class="brand-logo center" src="../static/img/logo/android-icon-48x48.png">
         <div class="sign-in" data-onsuccess="onSignIn"></div>
-        <a href="#" id="sign-out" onclick="signOut()">Log out</a>
+        <a href="#" id="sign-out" class="waves-effect waves-light btn red" onclick="signOut()">Log out</a>
       </div>
       <div class="nav-content">
         <a class="btn-floating btn-large halfway-fab waves-effect waves-light teal" href="#class-detail" onclick="initClassModal()">
@@ -156,7 +156,7 @@
             </tbody>
         </table>
           <div class="modal-footer">
-              <a href="#!" class="btn save-class" onclick="addClass()">Save</a>
+              <a href="#!" class="btn save-class" id="save-class" onclick="addClass()">Save</a>
               <label class="btn">Bulk Import<input type="file" class="bulk-import-student" style="display: none;" onchange="import_student()"></label>
               <button type="button" class="btn" onclick="add_student()">Add</button>
           </div>
