@@ -316,8 +316,9 @@
                     };
                     $.ajax({
                         type: 'POST',
-                        url: '/set-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
-                        data: resourcesContainer,
+                        url: '/ajax/set-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(resourcesContainer),
                         dataType: "json"
                     }).then((data) => {
                         resourcesModal.modal('close');
