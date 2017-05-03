@@ -263,3 +263,28 @@ exports.getRecitationResource = (recitationID, owner) => {
             })
     });
 };
+
+/**
+ * get a list of participant of the class. the first element is the owner of the class.
+ * @param recitationID (ObjectID)
+ * @returns {Promise|Promise.<TResult>} to a list of participant
+ */
+exports.getRecitationParticipant = (recitationID)=>{
+    var recitationDoc;
+    var parentClass;
+    return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitationD)=>{
+        if(!recitationD) throw new Error('no such recitation');
+        recitationDoc = recitationD;
+        return classDB.classesColl.findOne({_id: recitationDoc.parentClass});
+    }).then((parent)=>{
+        if(!parent) throw new Error('no such class');
+        parentClass = parent;
+        return s.classConn.getStudentsByClass(parentClass);
+    }).then((students)=>{
+        var result = [parentClass.owner];
+        students.forEach((student)=>{
+            result.push(student.user);
+        });
+        return result;
+    });
+};

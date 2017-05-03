@@ -130,14 +130,17 @@ exports.getRoute = function (s) {
     });
 
     router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
-        if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-        else {
-            s.classConn.getRecitationResource(req.query.recitationID, req.userLoginInfo.record._id).then((resources) => {
-                res.send(resources || {});
-            }).catch((err) => {
-                res.status(400).send(err);
-            });
-        }
+        if (!req.userLoginInfo) return res.send({result: false, reason: "please login first"});
+        s.classConn.getRecitationParticipant(req.query.recitationID).then((peopleList)=>{
+            if(peopleList.indexOf(req.userLoginInfo.userID) == -1)
+                throw new Error('not a participant');
+
+        });
+        s.classConn.getRecitationResource(req.query.recitationID, req.userLoginInfo.record._id).then((resources) => {
+            res.send(resources || {});
+        }).catch((err) => {
+            res.status(400).send(err);
+        });
     });
 
     return router;

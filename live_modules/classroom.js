@@ -60,39 +60,39 @@ exports.getRoute = function (s) {
     });
 
     router.get('/get_resource', function (req, res, next) {
-        return res.send({
-            "resources": [
-                {
-                    "type": "slide",
-                    "content": [
-                        {
-                            "name": "first slide",
-                            "pages": [
-                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac3"},
-                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac4"},
-                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac5"},
-                                {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac6"}
-                            ]
-                        },
-                        {
-                            "name": "second slide",
-                            "pages": [
-                                {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acb"},
-                                {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acd"},
-                                {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051ad0"}
-                            ]
-                        }, {
-                            "name": "third slide",
-                            "pages": [
-                                {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad4"},
-                                {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad5"},
-                                {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad6"}
-                            ]
-                        },
-                    ]
-                }
-            ]
-        });
+        // return res.send({
+        //     "resources": [
+        //         {
+        //             "type": "slide",
+        //             "content": [
+        //                 {
+        //                     "name": "first slide",
+        //                     "pages": [
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac3"},
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac4"},
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac5"},
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac6"}
+        //                     ]
+        //                 },
+        //                 {
+        //                     "name": "second slide",
+        //                     "pages": [
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acb"},
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acd"},
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051ad0"}
+        //                     ]
+        //                 }, {
+        //                     "name": "third slide",
+        //                     "pages": [
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad4"},
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad5"},
+        //                         {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad6"}
+        //                     ]
+        //                 },
+        //             ]
+        //         }
+        //     ]
+        // });
         Request({
             method: 'POST',
             url:"https://recilive.stream/get_resource",
