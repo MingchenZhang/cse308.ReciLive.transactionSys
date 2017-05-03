@@ -3,7 +3,19 @@ var currentClassName = null;
 
 $(document).ready(function(){
     listClasses();
+    // $('.modal').modal();
+    $('.modal').modal({
+    dismissible: true, // Modal can be dismissed by clicking outside of the modal
+    opacity: .5, // Opacity of modal background
+    inDuration: 300, // Transition in duration
+    outDuration: 200, // Transition out duration
+    startingTop: '4%', // Starting top style attribute
+    endingTop: '10%' // Ending top style attribute
+  });
 });
+function closeCurrentClassModal(id) {
+  $("#"+id).modal('close');
+}
 function initDateForClass() {
   $('#class-date-alert').hide();
   var startDate = new Date();
@@ -100,7 +112,7 @@ function listClasses() {
             listDiv.empty();
             for(var i in lists) {
                 var listTemplate = new ClassGenerator();
-                var div = $("<div class='col-md-3 col-sm-6'></div>");
+                var div = $("<div class='col s6 m3'></div>");
                 listDiv.append(div);
                 listTemplate.init(div, lists[i]);
             }
@@ -151,6 +163,7 @@ function addClass() {
 }
 
 function viewClassInfo(current_class_id) {
+  closeCurrentClassModal(current_class_id);
   $.ajax({
       url: '/ajax/get-edit-class-info',
       type: 'post',
@@ -208,15 +221,17 @@ function editClass(current_class_id) {
     });
 }
 
-function deleteClass() {
+function deleteClass(current_class_id) {
   $.ajax({
       url: '/ajax/delete-class',
       type: 'post',
-      data: JSON.stringify({classId: currentClassId}),
+      data: JSON.stringify({classId: current_class_id}),
       contentType: "application/json; charset=utf-8",
       dataType: 'json'
   }).done(function (data) {
-
+    if(!data.result) {
+      console.error(data.reason);
+    }
   }).fail(function (err) {
       console.error(err);
   });
@@ -230,8 +245,8 @@ function initRecModal() {
 }
 
 function listRecitation(current_class_id, current_class_name) {
-    $(".add-class").css("display","none");
-    $(".add-recitation").css("display","inline-block");
+    $(".halfway-fab").attr("href","#recitation-detail");
+    $(".halfway-fab").attr("onclick","initRecModal()");
     var listDiv = $('.class-list');
     $(".current-class-name").remove();
     $('.class-info').prepend("<h1 class='current-class-name'>"+current_class_name+"</h1>");
@@ -250,7 +265,7 @@ function listRecitation(current_class_id, current_class_name) {
             listDiv.empty();
             for(var i in lists) {
                 var listTemplate = new RecitationGenerator();
-                var div = $("<div class='col-md-3 col-sm-6'></div>");
+                var div = $("<div class='col s6 m3'></div>");
                 listDiv.append(div);
                 listTemplate.init(div, lists[i]);
             }

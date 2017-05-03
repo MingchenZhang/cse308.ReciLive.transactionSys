@@ -1,9 +1,25 @@
 <script type="text/html">
     <div class="class">
-      <h2>{{class_name}}</h2>
-        <div class="dropdown-content">
+        <h3>{{class_name}}</h3>
+        <div class="dropdown-course-content">
             <a href="#{{class_name}}" onclick="listRecitation('{{class_id}}', '{{class_name}}')">Enter</a>
-            <a href="#{{class_name}}" onclick="viewClassInfo('{{class_id}}')" data-toggle="modal" data-target="#class-detail">Edit</a>
+            <a href="#{{class_id}}">More</a>
         </div>
     </div>
+    <div id="{{class_id}}" class="modal bottom-sheet">
+        <div class="modal-content class-option">
+            <a onclick="viewClassInfo('{{class_id}}')" href="#class-detail">Edit {{class_name}}</a>
+            <a href="" onclick="deleteClass('{{class_id}}')">Delete {{class_name}}</a>
+        </div>
+    </div>
+    <script>
+        $('#{{class_id}}').modal({
+            dismissible: true, // Modal can be dismissed by clicking outside of the modal
+            opacity: .5, // Opacity of modal background
+            inDuration: 300, // Transition in duration
+            outDuration: 200, // Transition out duration
+            startingTop: '4%', // Starting top style attribute
+            endingTop: '10%' // Ending top style attribute
+        });
+    </script>
 </script>
