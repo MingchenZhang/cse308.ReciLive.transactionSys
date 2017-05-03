@@ -347,11 +347,11 @@ function editRecitation(current_recitation_id) {
   });
 }
 
-function deleteRecitation() {
+function deleteRecitation(recID) {
   $.ajax({
       url: '/ajax/delete-recitation',
       type: 'post',
-      data: JSON.stringify({recId: currentClassId}),
+      data: JSON.stringify({recitationId: recID}),
       contentType: "application/json; charset=utf-8",
       dataType: 'json'
   }).done(function (data) {
