@@ -355,7 +355,6 @@ function deleteRecitation(recID) {
       contentType: "application/json; charset=utf-8",
       dataType: 'json'
   }).done(function (data) {
-
   }).fail(function (err) {
       console.error(err);
   });

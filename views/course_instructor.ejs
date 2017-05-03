@@ -31,7 +31,6 @@
     <script src="static/javascript/class-generator.js"></script>
     <script src="static/javascript/recitation-generator.js"></script>
     <script src="static/javascript/papaparse.min.js"></script>
-
 </head>
 
 <body>
@@ -52,8 +51,33 @@
         <div class="modal-dialog">
             <!-- Modal content-->
             <div class="modal-content">
-                <div class="modal-header">
-                </div>
+              <div class="input-field col s12">
+                <input class="recitation-name" type="text" class="validate">
+                <label>Recitation Name</label>
+              </div>
+              <div id="rec-date-alert">
+                  <strong>Oh snap!</strong>
+              </div>
+              <table>
+                  <thead>
+                  <tr>
+                      <th>
+                          Start date
+                          <a href="#!" class="btn" id="rec-date-start" data-date-format="yyyy-mm-dd">Change</a>
+                      </th>
+                      <th>
+                          End date
+                          <a href="#!" class="btn" id="rec-date-end" data-date-format="yyyy-mm-dd">Change</a>
+                      </th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                      <td id="rec-date-start-display"></td>
+                      <td id="rec-date-end-display"></td>
+                  </tr>
+                  </tbody>
+              </table>
                 <div class="modal-footer">
                     <button type="button" class="btn save-recitaiton" onclick="addRecitation()">Save</button>
                 </div>
@@ -124,6 +148,7 @@
           </div>
       </div>
     </div>
+    <!-- End Modal for class -->
 
 
     <!--this part is for resources management-->
