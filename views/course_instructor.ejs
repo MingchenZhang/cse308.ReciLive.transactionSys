@@ -217,8 +217,9 @@
             };
 
             var showUploadWindow = () => {
+                var uploadDialog;
                 var p = new Promise((resolve, reject) => {
-                    vex.dialog.open({
+                    uploadDialog = vex.dialog.open({
                         message: 'choose the file you want to upload:',
                         input: [
                             '<input name="ffdsf" type="file" value=""/>',
@@ -260,6 +261,7 @@
 
                 p.then((fileInfo) => {
                     generateItem(fileInfo.id, fileInfo.name);
+                    vex.close(uploadDialog);
                     console.log('file upload done');
                 }).catch((err) => {
                     console.error('file upload failed');
