@@ -64,61 +64,61 @@
     </div>
 </nav>
 
-    <div class="recitation-info">
-        <div class="side-bar">
-            <span class="fa fa-backward fa-2x"></span>
-            <span class="fa fa-hand-paper-o fa-2x microphone" onclick="viewStudentList()"></span>
-            <span class="fa fa-comments fa-2x chat" onclick="viewInfoBoard()"></span>
-            <span class="fa fa-area-chart fa-2x quiz"></span>
-            <span class="fa fa-download fa-2x download"></span>
-            <!-- Modal Trigger For Slides-->
-            <a href="#modal1"><span class="fa fa-window-restore fa-2x slides"></span></a>
-            <!-- Modal Structure For Slides-->
-            <div id="modal1" class="modal bottom-sheet">
-                <div class="modal-content" id="slides-selector">
+<div class="recitation-info">
+    <div class="side-bar">
+        <span class="fa fa-backward fa-2x"></span>
+        <span class="fa fa-hand-paper-o fa-2x microphone" onclick="viewStudentList()"></span>
+        <span class="fa fa-comments fa-2x chat" onclick="viewInfoBoard()"></span>
+        <span class="fa fa-area-chart fa-2x quiz"></span>
+        <span class="fa fa-download fa-2x download"></span>
+        <!-- Modal Trigger For Slides-->
+        <a href="#modal1"><span class="fa fa-window-restore fa-2x slides"></span></a>
+        <!-- Modal Structure For Slides-->
+        <div id="modal1" class="modal bottom-sheet">
+            <div class="modal-content" id="slides-selector">
 
-                </div>
-                <div class="modal-footer">
-                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
-                </div>
             </div>
-            <div class="fixed-action-btn horizontal" id="draw">
-                <span class="fa fa-pencil-square fa-3x"></span>
-                <ul id="draw-control-panel">
-                    <li id="pencil-box"><a class="btn-floating red"><i class="fa fa-pencil"></i></a></li>
-                    <li ><input id="draw-color-picker" class="btn-floating blue" type="text" value="#333399" /></li>
-                    <li id="undo-box"><a class="btn-floating yellow darken-1"><i class="fa fa-undo"></i></a></li>
-                    <li id="repeat-box"><a class="btn-floating green"><i class="fa fa-repeat"></i></a></li>
-                    <li id="eraser-box"><a class="btn-floating blue"><i class="fa fa-eraser"></i></a></li>
-                    <li id="clear-box"><a class="btn-floating cyan"><i class="fa fa-window-close"></i></a></li>
-                </ul>
-            </div>
-            <!-- <img src="../static/img/shut-down.png" class="ending-controller"> -->
-            <span class="fa fa-power-off fa-3x ending-controller"></span>
-        </div>
-        <div class="student-list">
-          <h4>student<i class="fa fa-microphone student-microphone"></i></h4>
-        </div>
-        <div class="col-md-6" id="slide-stage">
-            <div class="stage-view"></div>
-            <div class="slide-nav">
-                <label id="previous-slide" class="slide-prev">&#x2039;</label>
-                <label id="next-slide" class="slide-next">&#x203a;</label>
-            </div>
-            <div id='slider-div'>
-                <input class="slider__range" type="range" value="100" min="0" step="0.000001" max="100">
+            <div class="modal-footer">
+                <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
             </div>
         </div>
-        <div class="col-md-4" id="info-board">
-            <div class="fixed-action-btn horizontal">
-                <a class="btn-floating btn-large waves-effect waves-light red" id="submit"><i
-                            class="material-icons">add</i></a>
-                <ul>
-                    <li><input type="text" name="text" id="info-post" onchange="newPost()"></input></li>
-                </ul>
-            </div>
+        <div class="fixed-action-btn horizontal" id="draw">
+            <span class="fa fa-pencil-square fa-3x" id="draw-control-panel"></span>
+            <ul>
+                <li id="pencil-box"><a class="btn-floating red"><i class="fa fa-pencil"></i></a></li>
+                <li><input id="draw-color-picker" class="btn-floating blue" type="text" value="#333399"/></li>
+                <li id="undo-box"><a class="btn-floating yellow darken-1"><i class="fa fa-undo"></i></a></li>
+                <li id="repeat-box"><a class="btn-floating green"><i class="fa fa-repeat"></i></a></li>
+                <li id="eraser-box"><a class="btn-floating blue"><i class="fa fa-eraser"></i></a></li>
+                <li id="clear-box"><a class="btn-floating cyan"><i class="fa fa-window-close"></i></a></li>
+            </ul>
+        </div>
+        <!-- <img src="../static/img/shut-down.png" class="ending-controller"> -->
+        <span class="fa fa-power-off fa-3x ending-controller"></span>
+    </div>
+    <div class="student-list">
+        <h4>student<i class="fa fa-microphone student-microphone"></i></h4>
+    </div>
+    <div class="col-md-6" id="slide-stage">
+        <div class="stage-view"></div>
+        <div class="slide-nav">
+            <label id="previous-slide" class="slide-prev">&#x2039;</label>
+            <label id="next-slide" class="slide-next">&#x203a;</label>
+        </div>
+        <div id='slider-div'>
+            <input class="slider__range" type="range" value="100" min="0" step="0.000001" max="100">
         </div>
     </div>
+    <div class="col-md-4" id="info-board">
+        <div class="fixed-action-btn horizontal">
+            <a class="btn-floating btn-large waves-effect waves-light red" id="submit"><i
+                        class="material-icons">add</i></a>
+            <ul>
+                <li><input type="text" name="text" id="info-post" onchange="newPost()"></input></li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <script>
     classroomNumber = parseInt('<%= classroomNumber %>');

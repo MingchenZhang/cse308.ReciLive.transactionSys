@@ -12,7 +12,9 @@ function Draw(transactionSystem, div, controlPanel) {
         redo = null,
         eraser = null,
         clear = null,
-        colorPicker = null;
+        colorPicker = null,
+        drawingLineWidthEl = null,
+        drawingLineWidthDisplay = null;
 
     var scale = 1;      //use when resize
     var lastHeight = 0;
@@ -39,11 +41,15 @@ function Draw(transactionSystem, div, controlPanel) {
             redo = controlPanel.find('#repeat-box'),
             eraser = controlPanel.find('#eraser-box'),
             clear = controlPanel.find('#clear-box'),
-            colorPicker = controlPanel.find('#draw-color-picker');
+            colorPicker = controlPanel.find('#draw-color-picker'),
+            drawingLineWidthEl = controlPanel.find('drawing-line-width'),
+            drawingLineWidthDisplay = controlPanel.find('drawing-line-width-display');
         fabric.Object.prototype.transparentCorners = false;     //fabricjs setting
         canvas.setHeight(div.height());
         canvas.isDrawingMode = false;
         canvas.freeDrawingBrush.color = colorPicker.val();
+        canvas.freeDrawingBrush.width = 20;
+        drawingLineWidthDisplay.val(20);
         canvas.setWidth(div.width());
         lastHeight = div.height();
         if (transactionSystem.privilege.indexOf("admin") != -1) {       //admin will get right for send new draw transaction and attach UI handler
@@ -55,13 +61,14 @@ function Draw(transactionSystem, div, controlPanel) {
                 canvas.clear();
                 self.newStroke(JSON.stringify(canvas));
             });
-        }else{
+        } else {
             controlPanel.hide();            //student hide the control panel
         }
         document.addEventListener(events.viewSizeChange.type, function () {     //when the view size change
-            resize(lastHeight,true);
+            resize(lastHeight, true);
         });
     };
+
     function newStrokeListener() {
         canvas.on('object:added', function () {            //add handler to event add obj
             self.newStroke(JSON.stringify(canvas));
@@ -109,6 +116,13 @@ function Draw(transactionSystem, div, controlPanel) {
      * attach all UI Handler after all the UI init
      */
     var attachUIHandler = function () {
+        /**
+         *change the line width
+         */
+        drawingLineWidthEl.onchange = function () {
+            canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+            drawingLineWidthDisplay.val(this.value);
+        };
         /**
          * change color when value of color picker change
          */
@@ -216,7 +230,7 @@ function Draw(transactionSystem, div, controlPanel) {
         canvas.clear();
         canvas.loadFromJSON(payload.stroke);
         canvas.renderAll();
-        resize(payload.originHeight,false);
+        resize(payload.originHeight, false);
         canvas.selection = false;
         canvas.forEachObject(function (o) {
             o.selectable = false;
