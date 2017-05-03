@@ -168,7 +168,7 @@
     <div class="item-prototype" style="display: none;">
         <div class="list-group-item" data-id="">
             <span class="badge removal">✖</span>
-            <span class="glyphicon glyphicon-move" aria-hidden="true"></span>
+            <span class="material-icons move-file"><i>swap_vert</i></span>
             <span class="item-name"></span>
         </div>
     </div>
@@ -191,7 +191,7 @@
     <script>
         (function () {
             Sortable.create(listWithHandle, {
-                handle: '.glyphicon-move',
+                handle: '.move-file',
                 animation: 150
             });
 
