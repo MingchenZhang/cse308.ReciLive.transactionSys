@@ -53,20 +53,16 @@ exports.getClassesByStudent = function (student) {
         return When.all(proList);
     });
 };
-
 /**
- *
  * @param classID class moongo id(_id)
  * @param owner owner mongo id
  * @returns {Promise.<TResult>|Promise}
  */
-exports.getClassByMongoID = (classID, owner) => {
-    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        for (clazz in classList) {
-            if (classList[clazz]._id == classID) return classDB.classesColl.findOne({_id: classList[clazz]._id}).then((result) => {
-                return result;
-            })
-        }
+exports.getClassByMongoID = (classID) => {
+    return classDB.classesColl.findOne({_id: classID}).sort({'createdAt': -1}).then((clazz) => { //privilege check
+        if (clazz)
+            return clazz;
+        else throw new Error("no such class exist");
     })
 };
 
@@ -77,23 +73,14 @@ exports.getClassByMongoID = (classID, owner) => {
  * @param owner         mongoid
  * @returns {Promise|Promise.<TResult>}
  */
-exports.editClassByMongoID = (classID, classInfo, owner) => {
-    var primiseList = [];
-    primiseList[0] = classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        var primiseList4classList = [];
-        classList.forEach((clazz, index) => {
-            if (clazz._id == classID) primiseList4classList[index] = classDB.classesColl.updateMany({_id: clazz._id}, {    //update info
-                $set: {
-                    name: classInfo.name,
-                    startDate: new Date(classInfo.startDate),
-                    endDate: new Date(classInfo.endDate),
-                }
-            })    //all the error send to controller to handle
-        });
-        return primiseList;
-    });
-    primiseList[1] = classDB.classEnrollColl.removeMany({class: classID}); //remove all the privilege information for rewrite
-    return primiseList;
+exports.editClassByMongoID = (classID, classInfo) => {
+    return classDB.classesColl.updateMany({_id: clazz._id}, {    //update info
+        $set: {
+            name: classInfo.name,
+            startDate: new Date(classInfo.startDate),
+            endDate: new Date(classInfo.endDate),
+        }
+    });   //all the error send to controller to handle
 };
 /**
  * send all the privilege back with email and student id
@@ -101,26 +88,19 @@ exports.editClassByMongoID = (classID, classInfo, owner) => {
  * @param owner         mongoid
  * @returns {Promise|Promise.<TResult>}
  */
-exports.getPrivilegeList = (classID, owner) => {
-    var privilegeList = []
-    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        for (clazz in classList) {
-            if (classList[clazz]._id == classID) {
-                return classDB.classEnrollColl.find({class: classList[clazz]._id}).toArray().then((studentList) => {
-                    var primiseList = [];
-                    for (index in studentList) {
-                        primiseList[index] =
-                            s.userConn.getUserByMongoID(studentList[index].user).then((user) => {
-                                privilegeList[index] = {_id: studentList[index].user, email: user.email};
-                            });
-                    }
-                    return When.all(primiseList).then(() => {
-                        return privilegeList;
-                    });
-                })
-            }
+exports.getPrivilegeList = (classID) => {
+    return classDB.classEnrollColl.find({class: classID}).toArray().then((studentList) => {
+        var primiseList = [];
+        for (index in studentList) {
+            primiseList[index] =
+                s.userConn.getUserByMongoID(studentList[index].user).then((user) => {
+                    privilegeList[index] = {_id: studentList[index].user, email: user.email};
+                });
         }
-    })///
+        return When.all(primiseList).then(() => {
+            return privilegeList;
+        });
+    })
 };
 
 exports.getStudentsByClass = function (clazz) {
@@ -152,18 +132,14 @@ exports.addClass = function (name, startDate, endDate, owner) {
  * @param owner mongoid
  * @returns {Promise.<TResult>|Promise}
  */
-exports.deleteClassByMongoID = (classID, owner) => {
-    return classDB.classesColl.find({owner}).sort({'createdAt': -1}).toArray().then((classList) => { //privilege check
-        for (clazz in classList) {
-            if (clazz._id == classID) {
-                var deleteReadyList = [];
-                deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class: clazz._id});
-                deleteReadyList[1] = classDB.classesColl.deleteMany({_id: clazz._id});
-                deleteReadyList[2] = classDB.recitationColl.deleteMany({parentClass: clazz._id});
-                return When.all(deleteReadyList);
-            }
-        }
-    });
+exports.deleteClassByMongoID = (classID) => {
+    if (clazz._id == classID) {
+        var deleteReadyList = [];
+        deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class: clazz._id});
+        deleteReadyList[1] = classDB.classesColl.deleteMany({_id: clazz._id});
+        deleteReadyList[2] = classDB.recitationColl.deleteMany({parentClass: clazz._id});
+        return When.all(deleteReadyList);
+    }
 };
 /**
  * deleteRecitation with privilege check
@@ -171,13 +147,8 @@ exports.deleteClassByMongoID = (classID, owner) => {
  * @param owner
  * @returns {*|Promise.<TResult>|Promise}
  */
-exports.deleteRecitation = (recitationID, owner) => {
-    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
-        if (recitation.length != 0)
-            return classDB.classesColl.find({_id: recitation[0].parentClass,owner}).count().then((count) => {
-                    if (count>0) return classDB.recitationColl.deleteMany({_id: s.mongodb.ObjectID(recitationID)});
-            })
-    });
+exports.deleteRecitation = (recitationID) => {
+    return classDB.recitationColl.deleteMany({_id: s.mongodb.ObjectID(recitationID)});
 };
 /**
  * addRecitation
@@ -216,51 +187,31 @@ exports.getRecitationsByClass = function (parentClass) {
  * @param recitationId
  * @returns {Promise}
  */
-exports.getRecitationByMongoID = (recitationId, owner) => {
-    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationId)}).toArray().then((recitation) => {  //privilege check
-        if (recitation.length != 0)
-            return classDB.classesColl.find({_id: recitation[0].parentClass,owner:owner}).count().then((count) => {
-                    if (count>0) return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationId)}).toArray();
-            })
+exports.getRecitationByMongoID = (recitationId) => {
+    if (count > 0) return classDB.recitationColl.find({_id: recitationId}).toArray();
+};
+
+exports.editRecitation = (recitationId, recitationInfo) => {
+    return classDB.recitationColl.updateMany({_id: recitationId}, {
+        $set: {
+            name: recitationInfo.name,
+            startDate: new Date(recitationInfo.startDate),
+            endDate: new Date(recitationInfo.endDate)
+        }
     });
 };
 
-exports.editRecitation = (owner, recitationId, recitationInfo) => {
-    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
-        if (recitation.length != 0)
-            return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
-                    if (count>0) return classDB.recitationColl.updateMany({_id: s.mongodb.ObjectID(recitationId)}, {
-                        $set: {
-                            name: recitationInfo.name,
-                            startDate: new Date(recitationInfo.startDate),
-                            endDate: new Date(recitationInfo.endDate)
-                        }
-                    });
-            })
-    });
+exports.setRecitationResource = (recitationID, resourcesObj) => {
+    return classDB.recitationColl.updateMany({_id: s.mongodb.ObjectID(recitationID)}, {
+        $set: {
+            resources: resourcesObj
+        }
+    }, {upsert: true});
 };
 
-exports.setRecitationResource = (recitationID, owner, resourcesObj) => {
-    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
-        if (recitation.length != 0)
-            return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
-                if (count > 0) return classDB.recitationColl.updateMany({_id: s.mongodb.ObjectID(recitationID)}, {
-                    $set: {
-                         resources: resourcesObj
-                    }
-                }, {upsert: true});
-            })
-    });
-};
-
-exports.getRecitationResource = (recitationID, owner) => {
-    return classDB.recitationColl.find({_id: s.mongodb.ObjectID(recitationID)}).toArray().then((recitation) => {  //privilege check
-        if (recitation.length != 0)
-            return classDB.classesColl.find({_id: recitation[0].parentClass, owner: owner}).count().then((count) => {
-                if (count > 0) return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitation)=>{
-                    return recitation.resources;
-                });
-            })
+exports.getRecitationResource = (recitationID) => {
+    return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitation) => {
+        return recitation.resources;
     });
 };
 
@@ -269,20 +220,20 @@ exports.getRecitationResource = (recitationID, owner) => {
  * @param recitationID (ObjectID)
  * @returns {Promise|Promise.<TResult>} to a list of participant
  */
-exports.getRecitationParticipant = (recitationID)=>{
+exports.getRecitationParticipant = (recitationID) => {
     var recitationDoc;
     var parentClass;
-    return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitationD)=>{
-        if(!recitationD) throw new Error('no such recitation');
+    return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitationD) => {
+        if (!recitationD) throw new Error('no such recitation');
         recitationDoc = recitationD;
         return classDB.classesColl.findOne({_id: recitationDoc.parentClass});
-    }).then((parent)=>{
-        if(!parent) throw new Error('no such class');
+    }).then((parent) => {
+        if (!parent) throw new Error('no such class');
         parentClass = parent;
         return s.classConn.getStudentsByClass(parentClass);
-    }).then((students)=>{
+    }).then((students) => {
         var result = [parentClass.owner];
-        students.forEach((student)=>{
+        students.forEach((student) => {
             result.push(student.user);
         });
         return result;

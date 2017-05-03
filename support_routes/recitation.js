@@ -82,11 +82,20 @@ exports.getRoute = function (s) {
     router.post('/ajax/get-recitation-info', jsonParser, (req, res, next) => {            //give recitation info for edit or view
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
-            s.classConn.getRecitationByMongoID(req.body.recitaitonId,req.userLoginInfo.record._id).then((recitation) => {
-                if (recitation.length == 0)
-                    res.send({result: false, reason: "no such recitation"});
-                else res.send({result: true, recitation: recitation[0]});
-            }).catch((err) => {
+            s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
+                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
+                    if (clazz.owner.toString() == req.body.record._id.toString()) {
+                        res.send({result: true, recitation: recitation[0]});
+                    } else {
+                        res.send({result: false, reason: "privilege deny"});
+                    }
+                }).catch((e) => {
+                    res.send({
+                        result: false,
+                        reason: e.message || "error in get classInfo for privilege check info db operation"
+                    });
+                })
+            }).catch((e) => {
                 res.send({result: false, reason: e.message || "error in get recitation info db operation"});
             });
         }
@@ -95,14 +104,29 @@ exports.getRoute = function (s) {
     router.post('/ajax/edit-recitation', jsonParser, (req, res, next) => {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
-            s.classConn.editRecitation(req.userLoginInfo.record._id, req.body.recitationId, {
-                name: req.body.name,
-                startDate: req.body.startDate,
-                endDate: req.body.endDate
-            }).then(() => {
-                res.send({result: true});
-            }).catch((err) => {
-                res.send({result: false, reason: e.message || "error in edit recitation info db operation"});
+            s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
+                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
+                    if (clazz.owner.toString() == req.body.record._id.toString()) { // recitation privilege check
+                        s.classConn.editRecitation(req.body.recitationId, {
+                            name: req.body.name,
+                            startDate: req.body.startDate,
+                            endDate: req.body.endDate
+                        }).then(() => {
+                            res.send({result: true});
+                        }).catch((err) => {
+                            res.send({result: false, reason: err.message || "error in edit recitation"});
+                        });
+                    } else {
+                        res.send({result: false, reason: "privilege deny"});
+                    }
+                }).catch((e) => {
+                    res.send({
+                        result: false,
+                        reason: e.message || "error in get classInfo for privilege check info db operation"
+                    });
+                })
+            }).catch((e) => {
+                res.send({result: false, reason: e.message || "error in get recitation info db operation"});
             });
         }
     });
@@ -110,33 +134,66 @@ exports.getRoute = function (s) {
     router.post('/ajax/delete-recitation', jsonParser, (req, res, next) => {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
-            s.classConn.deleteRecitation(req.body.recitationId, req.userLoginInfo.record._id).then(() => {
-                res.send({result: true});
-            }).catch((err) => {
-                res.send({result: false, reason: e.message || "error in delete recitation info db operation"});
+            s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
+                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
+                    if (clazz.owner.toString() == req.body.record._id.toString()) {
+                        s.classConn.deleteRecitation(req.body.recitationId).then(() => {
+                            res.send({result: true});
+                        }).catch((e) => {
+                            res.send({result: false, reason: e.message || "error in delete recitation"});
+                        });
+                    } else {
+                        res.send({result: false, reason: "privilege deny"});
+                    }
+                }).catch((e) => {
+                    res.send({
+                        result: false,
+                        reason: e.message || "error in get classInfo for privilege check info db operation"
+                    });
+                })
+            }).catch((e) => {
+                res.send({result: false, reason: e.message || "error in get recitation info db operation"});
             });
         }
+
     });
 
     router.post('/ajax/set-recitation-resource', jsonParser, (req, res, next) => {           //save the recitation resource metadata in db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
-            s.classConn.setRecitationResource(req.query.recitationID, req.userLoginInfo.userID, req.body).then((response) => {
-                res.send({result: true});
-            }).catch((err) => {
-                res.send({result: false, reason: err.message || "error in set recitation resource info db operation"});
+            s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.query.recitationID)).then((recitation) => {
+                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
+                    if (clazz.owner.toString() == req.body.record._id.toString()) {
+                        s.classConn.setRecitationResource(s.mongodb.ObjectID(req.query.recitationID), req.body).then(() => {
+                            res.send({result: true});
+                        }).catch((e) => {
+                            res.send({
+                                result: false,
+                                reason: e.message || "error in set recitation resource"
+                            });
+                        });
+                    } else {
+                        res.send({result: false, reason: "privilege deny"});
+                    }
+                }).catch((e) => {
+                    res.send({
+                        result: false,
+                        reason: e.message || "error in get classInfo for privilege check info db operation"
+                    });
+                })
+            }).catch((e) => {
+                res.send({result: false, reason: e.message || "error in get recitation info db operation"});
             });
         }
     });
 
     router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         if (!req.userLoginInfo) return res.send({result: false, reason: "please login first"});
-        s.classConn.getRecitationParticipant(req.query.recitationID).then((peopleList)=>{
-            if(peopleList.indexOf(req.userLoginInfo.userID) == -1)
+        s.classConn.getRecitationParticipant(req.query.recitationID).then((peopleList) => {
+            if (peopleList.indexOf(req.userLoginInfo.userID) == -1)
                 throw new Error('not a participant');
-
         });
-        s.classConn.getRecitationResource(req.query.recitationID, req.userLoginInfo.record._id).then((resources) => {
+        s.classConn.getRecitationResource(req.query.recitationID).then((resources) => {
             res.send(resources || {});
         }).catch((err) => {
             res.status(400).send(err);
