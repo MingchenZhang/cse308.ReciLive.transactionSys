@@ -64,7 +64,7 @@ function updateStudentList(students) {
 
 function selectUser(student) {
     soundControlSystem.giveSpeakerRoleTo(student);
-    console.log('speaker switching to '+student.toString());
+    console.log('speaker switching to ' + student.toString());
 }
 
 function newPost() {
@@ -127,9 +127,10 @@ var promiseList = [$.ajax({
     type: 'get',
     dataType: 'json',
 }), $.ajax({
-    url: window.location.href.split(/\?|#/)[0] + '/get_resource',
+    url: 'https://recilive.stream/ajax/get-recitation-resource?numericID='+encodeURIComponent(classroomNumber),
     type: 'get',
-    dataType: 'json'
+    dataType: 'json',
+    xhrFields: {withCredentials: true},
 }), $.ajax({
     url: window.location.href.split(/\?|#/)[0] + '/user_list',
     type: 'get',
@@ -206,8 +207,8 @@ script_processor_node.onaudioprocess = function (audioProcessingEvent) {
         soundSystem.send(inputData);
     if (soundControlSystem.asListener)
         soundSystem.writeNextSoundBuffer(outputData);
-    else{
-        for(var i=0; i<eventRate; i++){
+    else {
+        for (var i = 0; i < eventRate; i++) {
             outputData[i] = 0;
         }
     }

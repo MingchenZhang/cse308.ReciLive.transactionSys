@@ -3,8 +3,6 @@ var redbird = require('redbird')({
     secure: false,
     ssl: {
         port: 443,
-        key: "../certs/default.key",
-        cert: "../certs/default.crt",
     }
 });
 redbird.register("recilive.stream", "http://localhost:3000", {ssl: {

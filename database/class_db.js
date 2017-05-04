@@ -242,3 +242,7 @@ exports.getRecitationParticipant = (recitationID) => {
         return result;
     });
 };
+
+exports.getRecitationByNumericID=(numericID)=>{
+    return classDB.recitationColl.findOne({numericID:numericID});
+}

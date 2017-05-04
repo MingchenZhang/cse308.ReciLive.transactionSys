@@ -128,7 +128,9 @@ exports.getRoute = function (s) {
         }
     )
     ;
-
+    /**
+     * delete class with all the recitation and resource
+     */
     router.post('/ajax/delete-class', jsonParser, (req, res, next) => {
         s.classConn.getClassByMongoID(s.mongodb.ObjectID(req.body.classId)).then((clazz) => {
             if (clazz.owner.toString() != req.userLoginInfo.record._id.toString()) {
