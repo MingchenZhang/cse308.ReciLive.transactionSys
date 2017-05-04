@@ -78,6 +78,7 @@ function listRecitation(currentClassId) {
 
 function viewRecitationInfo(current_recitation_id, currentClassId) {
   closeCurrentClassModal(current_recitation_id);
+  $("#recitation-detail label").addClass("active");
   $.ajax({
       url: '/ajax/get-recitation-info',
       type: 'post',
