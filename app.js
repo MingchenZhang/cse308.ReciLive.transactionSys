@@ -80,7 +80,7 @@ if(s.role == 'support'){
         if(!req.cookies.login_session) return next();
         s.userConn.getUserInfoBySession(req.cookies.login_session).then((userInfo) => {
             if(!userInfo){
-                res.clearCookie('login_session', {domain: '.recilive.st'});
+                res.clearCookie('login_session', {domain: '.recilive.stream'});
                 return res.redirect('/');
             }
             req.userLoginInfo = userInfo;
