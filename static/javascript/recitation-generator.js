@@ -22,7 +22,7 @@ RecitationGenerator = function () {
         });
     }
 
-    this.refresh = function (divToOperate, info, id) {
+    this.refresh = function (divToOperate, info, classId) {
         div = divToOperate;
         init_info = info;
 
@@ -33,7 +33,8 @@ RecitationGenerator = function () {
             var list_info = {
                 recitation_name: info[1],
                 roomid: info[0],
-                mongoid: info[2]
+                mongoid: info[2],
+                classId: classId
             };
             var div1 = $('<div/>');
             var html = Mustache.to_html(TEMP_RECITATION_VIEW, list_info);
@@ -42,7 +43,7 @@ RecitationGenerator = function () {
         });
     };
 
-    this.init = function (divToOperate, info) {
-        return this.refresh(divToOperate, info);
+    this.init = function (divToOperate, info, classId) {
+        return this.refresh(divToOperate, info, classId);
     };
 };

@@ -1,11 +1,8 @@
-var currentClassId = null;
-var currentClassName = null;
-
-function initRecModal() {
+function initRecModal(classId) {
   $(".recitation-name").val('');
   initDateForRec();
   $(".delete-recitation-btn").hide();
-  $(".save-recitaiton").attr("onclick","addRecitation()");
+  $(".save-recitaiton").attr("onclick","addRecitation('"+classId+"')");
 }
 function initDateForRec() {
   $('#rec-date-alert').hide();
@@ -45,30 +42,28 @@ function initDateForRec() {
       });
 }
 
-function listRecitation(current_class_id, current_class_name) {
+function listRecitation(currentClassId) {
     $(".halfway-fab").attr("href","#recitation-detail");
-    $(".halfway-fab").attr("onclick","initRecModal()");
+    $(".halfway-fab").attr("onclick","initRecModal('"+currentClassId+"')");
     var listDiv = $('.class-list');
     $(".current-class-name").remove();
-    $('.class-info').prepend("<h2 class='current-class-name'>"+current_class_name+"</h2>");
 
     $.ajax({
         url: '/ajax/list-recitation-list',
         type: 'post',
-        data: JSON.stringify({class: current_class_id}),
+        data: JSON.stringify({class: currentClassId}),
         contentType: "application/json; charset=utf-8",
         dataType: 'json'
     }).done(function (data) {
         if(data.result === true) {
-            currentClassId = current_class_id;
-            currentClassName = current_class_name;
+            currentClassId = currentClassId;
             var lists = data.list;
             listDiv.empty();
             for(var i in lists) {
                 var listTemplate = new RecitationGenerator();
                 var div = $("<div class='col s6 m3'></div>");
                 listDiv.append(div);
-                listTemplate.init(div, lists[i]);
+                listTemplate.init(div, lists[i], currentClassId);
             }
         }else {
             console.error(data.reason);
@@ -78,7 +73,7 @@ function listRecitation(current_class_id, current_class_name) {
     });
 }
 
-function viewRecitationInfo(current_recitation_id) {
+function viewRecitationInfo(current_recitation_id, currentClassId) {
   $.ajax({
       url: '/ajax/get-recitation-info',
       type: 'post',
@@ -91,7 +86,7 @@ function viewRecitationInfo(current_recitation_id) {
         $("#rec-date-start-display").text(data.classInfo.startDate.split("T")[0]);
         $('#rec-date-end-display').text(data.classInfo.endDate.split("T")[0]);
         $(".delete-recitation-btn").show();
-        $(".save-recitaiton").attr("onclick","editRecitation('"+current_recitation_id+"')");
+        $(".save-recitaiton").attr("onclick","editRecitation('"+current_recitation_id+"','"+currentClassId+"')");
       }else {
           console.error(data.reason);
       }
@@ -105,7 +100,7 @@ function viewRecitationInfo(current_recitation_id) {
   });
 }
 
-function deleteRecitation(recID) {
+function deleteRecitation(recID, classId) {
   $.ajax({
       url: '/ajax/delete-recitation',
       type: 'post',
@@ -113,12 +108,14 @@ function deleteRecitation(recID) {
       contentType: "application/json; charset=utf-8",
       dataType: 'json'
   }).done(function (data) {
+    closeCurrentClassModal(recID);
+    listRecitation(classId);
   }).fail(function (err) {
       console.error(err);
   });
 }
 
-function addRecitation() {
+function addRecitation(currentClassId) {
     var name = $(".recitation-name").val();
     var startDate = $('#rec-date-start-display').text();;
     var endDate = $('#rec-date-end-display').text();;
@@ -131,7 +128,7 @@ function addRecitation() {
         success: function(data){
             if(data.result === true) {
                 $('#recitation-detail').modal('close');
-                listRecitation(currentClassId, currentClassName);
+                listRecitation(currentClassId);
             }else {
                 console.error(data.reason);
             }
@@ -144,7 +141,7 @@ function addRecitation() {
     });
 }
 
-function editRecitation(current_recitation_id) {
+function editRecitation(current_recitation_id, currentClassId) {
   var name = $(".recitation-name").val();
   var startDate = $("#rec-date-start-display").text();
   var endDate = $("#rec-date-end-display").text();
@@ -156,7 +153,7 @@ function editRecitation(current_recitation_id) {
       success: function(data){
           if(data.result === true) {
               $('#recitation-detail').modal('close');
-              listRecitation(currentClassId, currentClassName);
+              listRecitation(currentClassId);
           }else {
               console.error(data.reason);
           }

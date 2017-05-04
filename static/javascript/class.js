@@ -51,8 +51,6 @@ function initDateForClass() {
 }
 
 function listClasses() {
-    $(".add-class").css("display","inline-block");
-    $(".add-recitation").css("display","none");
     var listDiv = $('.class-list');
     $(".current-class-name").remove();
 
