@@ -83,7 +83,7 @@ exports.getRoute = function (s) {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) == -1)
-                throw new Error('not a participant');
+                res.status(400).send({result: false, reason: "not a participant"});
             s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
                 res.send({result: true, recitation: recitation});
             }).catch((e) => {
@@ -100,7 +100,7 @@ exports.getRoute = function (s) {
 
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
-                throw new Error('not a instructor');
+                res.status(400).send({result: false, reason: "not a participant"});
             s.classConn.editRecitation(s.mongodb.ObjectID(req.body.recitationId), {
                 name: req.body.name,
                 startDate: req.body.startDate,
@@ -117,7 +117,7 @@ exports.getRoute = function (s) {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
-                throw new Error('not a participant');
+                res.status(400).send({result: false, reason: "not a participant"});
             s.classConn.deleteRecitation(req.body.recitationId).then(() => {
                 res.send({result: true});
             }).catch((e) => {
@@ -130,7 +130,7 @@ exports.getRoute = function (s) {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
-                throw new Error('not a owner of this class');
+                res.status(400).send({result: false, reason: "not a owner"});
             s.classConn.setRecitationResource(s.mongodb.ObjectID(req.query.recitationID), req.body).then(() => {
                 res.send({result: true});
             }).catch((e) => {
@@ -146,15 +146,14 @@ exports.getRoute = function (s) {
     router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         if (!req.userLoginInfo) return res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
-            if (peopleList.indexOf(req.userLoginInfo.toString()) == -1)
-                throw new Error('not a participant');
-            s.classConn.getRecitationResource(req.query.recitationID).then((resources) => {
+            if (peopleList.indexOf(req.userLoginInfo.record._id.toString()) == -1)
+                res.status(400).send({result: false, reason: "not a participant"});
+            s.classConn.getRecitationResource(s.mongodb.ObjectID(req.query.recitationID)).then((resources) => {
                 res.send(resources || {});
             }).catch((err) => {
                 res.status(400).send(err);
             });
         });
     });
-
     return router;
 };
