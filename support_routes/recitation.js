@@ -81,110 +81,67 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/get-recitation-info', jsonParser, (req, res, next) => {            //give recitation info for edit or view
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-        else {
+        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.record._id)).then((peopleList) => {
+            if (peopleList.indexOf(req.userLoginInfo.userID) == -1)
+                throw new Error('not a participant');
             s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
-                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
-                    if (clazz.owner.toString() == req.body.record._id.toString()) {
-                        res.send({result: true, recitation: recitation[0]});
-                    } else {
-                        res.send({result: false, reason: "privilege deny"});
-                    }
-                }).catch((e) => {
-                    res.send({
-                        result: false,
-                        reason: e.message || "error in get classInfo for privilege check info db operation"
-                    });
-                })
+                res.send({result: true, recitation: recitation});
             }).catch((e) => {
-                res.send({result: false, reason: e.message || "error in get recitation info db operation"});
-            });
-        }
+                res.send({
+                    result: false,
+                    reason: e.message || "error in get classInfo for privilege check info db operation"
+                });
+            })
+        });
     });
 
     router.post('/ajax/edit-recitation', jsonParser, (req, res, next) => {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-        else {
-            s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
-                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
-                    if (clazz.owner.toString() == req.body.record._id.toString()) { // recitation privilege check
-                        s.classConn.editRecitation(req.body.recitationId, {
-                            name: req.body.name,
-                            startDate: req.body.startDate,
-                            endDate: req.body.endDate
-                        }).then(() => {
-                            res.send({result: true});
-                        }).catch((err) => {
-                            res.send({result: false, reason: err.message || "error in edit recitation"});
-                        });
-                    } else {
-                        res.send({result: false, reason: "privilege deny"});
-                    }
-                }).catch((e) => {
-                    res.send({
-                        result: false,
-                        reason: e.message || "error in get classInfo for privilege check info db operation"
-                    });
-                })
-            }).catch((e) => {
-                res.send({result: false, reason: e.message || "error in get recitation info db operation"});
+
+        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.record._id)).then((peopleList) => {
+            if (peopleList.indexOf(req.userLoginInfo.userID) != 1)
+                throw new Error('not a instructor');
+            s.classConn.editRecitation(req.body.recitationId, {
+                name: req.body.name,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate
+            }).then(() => {
+                res.send({result: true});
+            }).catch((err) => {
+                res.send({result: false, reason: err.message || "error in edit recitation"});
             });
-        }
+        });
     });
 
     router.post('/ajax/delete-recitation', jsonParser, (req, res, next) => {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-        else {
-            s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
-                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
-                    if (clazz.owner.toString() == req.body.record._id.toString()) {
-                        s.classConn.deleteRecitation(req.body.recitationId).then(() => {
-                            res.send({result: true});
-                        }).catch((e) => {
-                            res.send({result: false, reason: e.message || "error in delete recitation"});
-                        });
-                    } else {
-                        res.send({result: false, reason: "privilege deny"});
-                    }
-                }).catch((e) => {
-                    res.send({
-                        result: false,
-                        reason: e.message || "error in get classInfo for privilege check info db operation"
-                    });
-                })
-            }).catch((e) => {
-                res.send({result: false, reason: e.message || "error in get recitation info db operation"});
-            });
-        }
 
+        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.userLoginInfo.record._id)).then((peopleList) => {
+            if (peopleList.indexOf(req.userLoginInfo.userID) != 1)
+                throw new Error('not a participant');
+            s.classConn.deleteRecitation(req.body.recitationId).then(() => {
+                res.send({result: true});
+            }).catch((e) => {
+                res.send({result: false, reason: e.message || "error in delete recitation"});
+            });
+        });
     });
 
     router.post('/ajax/set-recitation-resource', jsonParser, (req, res, next) => {           //save the recitation resource metadata in db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-        else {
-            s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.query.recitationID)).then((recitation) => {
-                s.classConn.getClassByMongoID(s.mongodb.ObjectID(recitation.parentClass)).then((clazz) => {
-                    if (clazz.owner.toString() == req.body.record._id.toString()) {
-                        s.classConn.setRecitationResource(s.mongodb.ObjectID(req.query.recitationID), req.body).then(() => {
-                            res.send({result: true});
-                        }).catch((e) => {
-                            res.send({
-                                result: false,
-                                reason: e.message || "error in set recitation resource"
-                            });
-                        });
-                    } else {
-                        res.send({result: false, reason: "privilege deny"});
-                    }
-                }).catch((e) => {
-                    res.send({
-                        result: false,
-                        reason: e.message || "error in get classInfo for privilege check info db operation"
-                    });
-                })
+        s.classConn.getRecitationParticipant(req.query.recitationID).then((peopleList) => {
+            if (peopleList.indexOf(req.userLoginInfo.userID) != 1)
+                throw new Error('not a owner of this class');
+            s.classConn.setRecitationResource(s.mongodb.ObjectID(req.query.recitationID), req.body).then(() => {
+                res.send({result: true});
             }).catch((e) => {
-                res.send({result: false, reason: e.message || "error in get recitation info db operation"});
+                res.send({
+                    result: false,
+                    reason: e.message || "error in set recitation resource"
+                });
             });
-        }
+        });
+
     });
 
     router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
@@ -192,11 +149,11 @@ exports.getRoute = function (s) {
         s.classConn.getRecitationParticipant(req.query.recitationID).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID) == -1)
                 throw new Error('not a participant');
-        });
-        s.classConn.getRecitationResource(req.query.recitationID).then((resources) => {
-            res.send(resources || {});
-        }).catch((err) => {
-            res.status(400).send(err);
+            s.classConn.getRecitationResource(req.query.recitationID).then((resources) => {
+                res.send(resources || {});
+            }).catch((err) => {
+                res.status(400).send(err);
+            });
         });
     });
 

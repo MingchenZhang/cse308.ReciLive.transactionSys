@@ -59,7 +59,7 @@ exports.getClassesByStudent = function (student) {
  * @returns {Promise.<TResult>|Promise}
  */
 exports.getClassByMongoID = (classID) => {
-    return classDB.classesColl.findOne({_id: classID}).sort({'createdAt': -1}).then((clazz) => { //privilege check
+    return classDB.classesColl.findOne({_id:  classID}).then((clazz) => { //privilege check
         if (clazz)
             return clazz;
         else throw new Error("no such class exist");
@@ -74,7 +74,7 @@ exports.getClassByMongoID = (classID) => {
  * @returns {Promise|Promise.<TResult>}
  */
 exports.editClassByMongoID = (classID, classInfo) => {
-    return classDB.classesColl.updateMany({_id: clazz._id}, {    //update info
+    return classDB.classesColl.updateMany({_id: classID}, {    //update info
         $set: {
             name: classInfo.name,
             startDate: new Date(classInfo.startDate),
@@ -91,6 +91,7 @@ exports.editClassByMongoID = (classID, classInfo) => {
 exports.getPrivilegeList = (classID) => {
     return classDB.classEnrollColl.find({class: classID}).toArray().then((studentList) => {
         var primiseList = [];
+        var privilegeList = [];
         for (index in studentList) {
             primiseList[index] =
                 s.userConn.getUserByMongoID(studentList[index].user).then((user) => {
@@ -133,13 +134,11 @@ exports.addClass = function (name, startDate, endDate, owner) {
  * @returns {Promise.<TResult>|Promise}
  */
 exports.deleteClassByMongoID = (classID) => {
-    if (clazz._id == classID) {
         var deleteReadyList = [];
-        deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class: clazz._id});
-        deleteReadyList[1] = classDB.classesColl.deleteMany({_id: clazz._id});
-        deleteReadyList[2] = classDB.recitationColl.deleteMany({parentClass: clazz._id});
+        deleteReadyList[0] = classDB.classEnrollColl.deleteMany({class: classID});
+        deleteReadyList[1] = classDB.classesColl.deleteMany({_id: classID});
+        deleteReadyList[2] = classDB.recitationColl.deleteMany({parentClass: classID});
         return When.all(deleteReadyList);
-    }
 };
 /**
  * deleteRecitation with privilege check
@@ -202,7 +201,7 @@ exports.editRecitation = (recitationId, recitationInfo) => {
 };
 
 exports.setRecitationResource = (recitationID, resourcesObj) => {
-    return classDB.recitationColl.updateMany({_id: s.mongodb.ObjectID(recitationID)}, {
+    return classDB.recitationColl.updateMany({_id: recitationID}, {
         $set: {
             resources: resourcesObj
         }
@@ -210,7 +209,7 @@ exports.setRecitationResource = (recitationID, resourcesObj) => {
 };
 
 exports.getRecitationResource = (recitationID) => {
-    return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitation) => {
+    return classDB.recitationColl.findOne({_id: recitationID}).then((recitation) => {
         return recitation.resources;
     });
 };
@@ -223,7 +222,7 @@ exports.getRecitationResource = (recitationID) => {
 exports.getRecitationParticipant = (recitationID) => {
     var recitationDoc;
     var parentClass;
-    return classDB.recitationColl.findOne({_id: s.mongodb.ObjectID(recitationID)}).then((recitationD) => {
+    return classDB.recitationColl.findOne({_id:recitationID}).then((recitationD) => {
         if (!recitationD) throw new Error('no such recitation');
         recitationDoc = recitationD;
         return classDB.classesColl.findOne({_id: recitationDoc.parentClass});
