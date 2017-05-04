@@ -81,7 +81,7 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/get-recitation-info', jsonParser, (req, res, next) => {            //give recitation info for edit or view
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.userLoginInfo.record._id)).then((peopleList) => {
+        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) == -1)
                 throw new Error('not a participant');
             s.classConn.getRecitationByMongoID(s.mongodb.ObjectID(req.body.recitationId)).then((recitation) => {
@@ -98,7 +98,7 @@ exports.getRoute = function (s) {
     router.post('/ajax/edit-recitation', jsonParser, (req, res, next) => {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
 
-        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.record._id)).then((peopleList) => {
+        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
                 throw new Error('not a instructor');
             s.classConn.editRecitation(req.body.recitationId, {
@@ -129,7 +129,7 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/set-recitation-resource', jsonParser, (req, res, next) => {           //save the recitation resource metadata in db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-        s.classConn.getRecitationParticipant(req.query.recitationID).then((peopleList) => {
+        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
                 throw new Error('not a owner of this class');
             s.classConn.setRecitationResource(s.mongodb.ObjectID(req.query.recitationID), req.body).then(() => {
@@ -146,7 +146,7 @@ exports.getRoute = function (s) {
 
     router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         if (!req.userLoginInfo) return res.send({result: false, reason: "please login first"});
-        s.classConn.getRecitationParticipant(req.query.recitationID).then((peopleList) => {
+        s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.toString()) == -1)
                 throw new Error('not a participant');
             s.classConn.getRecitationResource(req.query.recitationID).then((resources) => {

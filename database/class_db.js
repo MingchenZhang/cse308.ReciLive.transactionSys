@@ -95,7 +95,7 @@ exports.getPrivilegeList = (classID) => {
         for (index in studentList) {
             primiseList[index] =
                 s.userConn.getUserByMongoID(studentList[index].user).then((user) => {
-                    privilegeList[index] = {_id: studentList[index].user, email: user.email};
+                    privilegeList.push( {_id: studentList[index].user, email: user.email});
                 });
         }
         return When.all(primiseList).then(() => {
@@ -126,6 +126,10 @@ exports.addClass = function (name, startDate, endDate, owner) {
         owner: s.mongodb.ObjectID(owner),
     };
     return classDB.classesColl.insertOne(insertObj).then(() => insertObj);
+};
+
+exports.deletePrivilegeListByClassId = function(classId){
+    return classDB.classEnrollColl.deleteMany({class:classId});
 };
 /**
  * delete class by mongoid delete class and enroll info
@@ -187,7 +191,7 @@ exports.getRecitationsByClass = function (parentClass) {
  * @returns {Promise}
  */
 exports.getRecitationByMongoID = (recitationId) => {
-    if (count > 0) return classDB.recitationColl.find({_id: recitationId}).toArray();
+    return classDB.recitationColl.findOne({_id: recitationId});
 };
 
 exports.editRecitation = (recitationId, recitationInfo) => {
