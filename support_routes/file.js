@@ -1,6 +1,6 @@
 var Express = require('express');
 var Busboy = require('busboy');
-var When = require('When');
+var When = require('when');
 
 exports.getRoute = function (s) {
     var router = Express.Router();
