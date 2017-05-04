@@ -130,7 +130,7 @@ exports.getRoute = function (s) {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
-                res.status(400).send({result: false, reason: "not a owner"});
+                return res.status(400).send({result: false, reason: "not a owner"});
             s.classConn.setRecitationResource(s.mongodb.ObjectID(req.query.recitationID), req.body).then(() => {
                 res.send({result: true});
             }).catch((e) => {
@@ -144,32 +144,27 @@ exports.getRoute = function (s) {
     });
 
     router.all('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
+        var recitationID = req.query.recitationID;
+        var numericID = req.query.numericID;
         res.setHeader('Access-Control-Allow-Origin', '*');
-        if (!req.userLoginInfo) return res.send({result: false, reason: "please login first"});
-        if (!req.query.recitationID) {
-            s.classConn.getRecitationByNumericID(req.query.numericID).then((recitation) => {
-                req.query.recitaitonID = recitation._id;
-                s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
-                    if (peopleList.indexOf(req.userLoginInfo.record._id.toString()) == -1)
-                        res.status(400).send({result: false, reason: "not a participant"});
-                    s.classConn.getRecitationResource(s.mongodb.ObjectID(req.query.recitationID)).then((resources) => {
-                        res.send(resources || {});
-                    }).catch((err) => {
-                        res.status(400).send(err);
-                    });
-                });
+
+        When.resolve().then(()=>{
+            if (recitationID) return When.resolve();
+            return s.classConn.getRecitationByNumericID(numericID).then((recitation)=>{
+                recitationID = recitation._id;
             });
-        } else {
-            s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
+        }).then(()=>{
+            return s.classConn.getRecitationParticipant(s.mongodb.ObjectID(recitationID)).then((peopleList)=>{
                 if (peopleList.indexOf(req.userLoginInfo.record._id.toString()) == -1)
-                    res.status(400).send({result: false, reason: "not a participant"});
-                s.classConn.getRecitationResource(s.mongodb.ObjectID(req.query.recitationID)).then((resources) => {
-                    res.send(resources || {});
-                }).catch((err) => {
-                    res.status(400).send(err);
-                });
+                    throw new Error('user is not in this session');
             });
-        }
+        }).then(()=>{
+            return s.classConn.getRecitationResource(s.mongodb.ObjectID(recitationID)).then((resources)=>{
+                res.send(resources || {});
+            });
+        }).catch((err)=>{
+            res.status(400).send({result: false, reason: err.message || 'unknown error'});
+        });
     });
     return router;
 };
