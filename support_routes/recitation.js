@@ -150,7 +150,9 @@ exports.getRoute = function (s) {
         res.setHeader('Access-Control-Allow-Credentials','true');
         When.resolve().then(()=>{
             if (recitationID) return When.resolve();
+            if (!numericID) return When.reject(new Error('numericID or recitationID must be given'));
             return s.classConn.getRecitationByNumericID(numericID).then((recitation)=>{
+                if(!recitation) throw new Error('numericID does not match');
                 recitationID = recitation._id;
             });
         }).then(()=>{
