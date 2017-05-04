@@ -85,10 +85,10 @@ function viewRecitationInfo(current_recitation_id, currentClassId) {
       dataType: 'json'
   }).done(function (data) {
       if(data.result === true) {
-        $(".recitation-name").val(data.classInfo.name);
+        $(".recitation-name").val(data.recitation.name);
         $('#rec-date-alert').hide();
-        var startDate = new Date(data.classInfo.startDate);
-        var endDate = new Date(data.classInfo.endDate);
+        var startDate = new Date(data.recitation.startDate);
+        var endDate = new Date(data.recitation.endDate);
         var startMonth = startDate.getMonth()+1;
         var endMonth = endDate.getMonth()+1;
         var start = startDate.getFullYear() + "-" + startMonth + "-" + startDate.getDate();
@@ -100,11 +100,6 @@ function viewRecitationInfo(current_recitation_id, currentClassId) {
         checkRecitationDate(startDate, endDate);
 
         $(".save-recitaiton").attr("onclick","editRecitation('"+current_recitation_id+"','"+currentClassId+"')");
-      }else {
-          console.error(data.reason);
-      }
-      if(data.result4Privilege) {
-          display_students(data.privilegeList);
       }else {
           console.error(data.reason);
       }
@@ -132,12 +127,11 @@ function addRecitation(currentClassId) {
     var name = $(".recitation-name").val();
     var startDate = $('#rec-date-start-display').text();;
     var endDate = $('#rec-date-end-display').text();;
-    var createAt = new Date();
 
     $.ajax({
         type: "POST",
         url: "/ajax/add-recitation",
-        data: JSON.stringify({class: currentClassId, name: name, startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt)}),
+        data: JSON.stringify({class: currentClassId, name: name, startDate: new Date(startDate), endDate: new Date(endDate)}),
         success: function(data){
             if(data.result === true) {
                 $('#recitation-detail').modal('close');
@@ -162,7 +156,7 @@ function editRecitation(current_recitation_id, currentClassId) {
   $.ajax({
       type: "POST",
       url: "/ajax/edit-recitation",
-      data: JSON.stringify({class: current_recitation_id, name: name, startDate: new Date(startDate), endDate: new Date(endDate), createAt: new Date(createAt)}),
+      data: JSON.stringify({recitationId: current_recitation_id, name: name, startDate: new Date(startDate), endDate: new Date(endDate)}),
       success: function(data){
           if(data.result === true) {
               $('#recitation-detail').modal('close');
