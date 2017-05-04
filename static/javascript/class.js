@@ -125,16 +125,31 @@ function viewClassInfo(current_class_id) {
       dataType: 'json'
   }).done(function (data) {
       if(data.result === true) {
-        $(".class-name").val(data.classInfo.name);
-        $("#class-date-start-display").text(data.classInfo.startDate.split("T")[0]);
-        $('#class-date-end-display').text(data.classInfo.endDate.split("T")[0]);
-        $(".delete-class-btn").show();
-        $(".save-class").attr("onclick","editClass('"+current_class_id+"')");
-      }else {
+        if(data.result4classInfo) {
+          $(".class-name").val(data.classInfo.name);
+          var startDate = new Date(data.classInfo.startDate);
+          var endDate = new Date(data.classInfo.endDate);
+          var startMonth = startDate.getMonth()+1;
+          var endMonth = endDate.getMonth()+1;
+          var start = startDate.getFullYear() + "-" + startMonth + "-" + startDate.getDate();
+          var end = endDate.getFullYear() + "-" + endMonth + "-" + endDate.getDate();
+          $('#class-date-start').data({date: start}).datepicker('update');
+          $('#class-date-start-display').text($('#class-date-start').data('date'));
+          $('#class-date-end').data({date: end}).datepicker('update');
+          $('#class-date-end-display').text($('#class-date-end').data('date'));
+
+          // $("#class-date-start-display").text(data.classInfo.startDate.split("T")[0]);
+          // $('#class-date-end-display').text(data.classInfo.endDate.split("T")[0]);
+        }else {
           console.error(data.reason);
-      }
-      if(data.result4Privilege) {
+        }
+        if(data.result4Privilege) {
+          $(".student-list").empty();
           display_students(data.privilegeList);
+        }else {
+          console.error(data.reason);
+        }
+        $(".save-class").attr("onclick","editClass('"+current_class_id+"')");
       }else {
           console.error(data.reason);
       }
@@ -194,8 +209,8 @@ function add_student() {
   $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate'><label for='email' data-error='wrong' data-success='right'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
 }
 function display_students(student_list) {
-  $.each(student_list, function(student) {
-    $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate'"+ student + "><label for='email' data-error='wrong' data-success='right'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
+  $.each(student_list, function(key, value) {
+    $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate' value="+ value.email + "><label for='email' data-error='wrong' data-success='right'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
   });
 }
 
