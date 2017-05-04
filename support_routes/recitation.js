@@ -101,7 +101,7 @@ exports.getRoute = function (s) {
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
                 throw new Error('not a instructor');
-            s.classConn.editRecitation(req.body.recitationId, {
+            s.classConn.editRecitation(s.mongodb.ObjectID(req.body.recitationId), {
                 name: req.body.name,
                 startDate: req.body.startDate,
                 endDate: req.body.endDate
@@ -115,7 +115,6 @@ exports.getRoute = function (s) {
 
     router.post('/ajax/delete-recitation', jsonParser, (req, res, next) => {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
-
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
             if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
                 throw new Error('not a participant');
