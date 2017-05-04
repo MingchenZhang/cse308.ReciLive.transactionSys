@@ -99,14 +99,29 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         nextButton.hide();
     }
 
+    function resourceChecker (resource){
+        if(!resource)return true;
+        resource.forEach(function (element) {
+            if(element.type=="slide") return false;
+        })
+        return true;
+    }
 //init call after transaction finish load and get privilege info
     self.init = function () {
+        if(resourceChecker(resource)){
+            nextButton.hide();
+            previousButton.hide();
+            selectorDiv.hide();
+            $('.fa.fa-window-restore.fa-2x.slides').hide();
+            return [];
+        }
         enrollEvent();
         if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;       // admin get control
         if (asController) {
             self.loadAllSlides = function () {              //download all slides
                 //TODO: delete IDToken
                 var promiseList = [];
+
                 resource.forEach(function (element) {
                     if (element.type == "slide") {
                         //get all slides list
@@ -142,6 +157,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                         });
                     }
                 });
+
                 return promiseList;
             };
 

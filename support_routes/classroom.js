@@ -126,12 +126,9 @@ exports.getRoute = function (s) {
                 });
             });
         }
-    )
-    ;
-    /**
-     * delete class with all the recitation and resource
-     */
-    router.post('/ajax/delete-class', jsonParser, (req, res, next) => {
+    );
+
+    router.post('/ajax/delete-class', jsonParser, (req, res, next) => {   //delete class with all the recitation and resource
         s.classConn.getClassByMongoID(s.mongodb.ObjectID(req.body.classId)).then((clazz) => {
             if (clazz.owner.toString() != req.userLoginInfo.record._id.toString()) {
                 res.send({result: false, reason: "privilege deny"});
@@ -145,6 +142,7 @@ exports.getRoute = function (s) {
         });
 
     });
+
     return router;
 }
 ;
