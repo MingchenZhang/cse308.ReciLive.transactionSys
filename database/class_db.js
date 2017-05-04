@@ -229,11 +229,11 @@ exports.getRecitationParticipant = (recitationID) => {
     }).then((parent) => {
         if (!parent) throw new Error('no such class');
         parentClass = parent;
-        return s.classConn.getStudentsByClass(parentClass);
+        return s.classConn.getStudentsByClass(parentClass._id);
     }).then((students) => {
-        var result = [parentClass.owner];
+        var result = [parentClass.owner.toString()];
         students.forEach((student) => {
-            result.push(student.user);
+            result.push(student.user.toString());
         });
         return result;
     });
