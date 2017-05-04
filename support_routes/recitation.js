@@ -117,7 +117,7 @@ exports.getRoute = function (s) {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
 
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
-            if (peopleList.indexOf(req.userLoginInfo.userID.toSting()) != 0)
+            if (peopleList.indexOf(req.userLoginInfo.userID.toString()) != 0)
                 throw new Error('not a participant');
             s.classConn.deleteRecitation(req.body.recitationId).then(() => {
                 res.send({result: true});
