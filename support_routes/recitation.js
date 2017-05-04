@@ -146,8 +146,8 @@ exports.getRoute = function (s) {
     router.all('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         var recitationID = req.query.recitationID;
         var numericID = req.query.numericID;
-        res.setHeader('Access-Control-Allow-Origin', '*');
-
+        res.setHeader('Access-Control-Allow-Origin', 'https://room.recilive.stream');
+        res.setHeader('Access-Control-Allow-Credentials','true');
         When.resolve().then(()=>{
             if (recitationID) return When.resolve();
             return s.classConn.getRecitationByNumericID(numericID).then((recitation)=>{
