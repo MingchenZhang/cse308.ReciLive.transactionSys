@@ -262,12 +262,12 @@
             window.showResourcesEdit = (recitationID) => {
                 var resourcesModal = $('.resources-modal');
                 resourcesModal.modal('open');
+                $('#listWithHandle').empty();
                 $.ajax({
                     type: 'GET',
                     url: '/ajax/get-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
                     dataType: "json"
                 }).then((resources) => {
-                    $('#listWithHandle').empty();
                     if(Object.keys(resources).length != 0){
                         resources.resources[0].content[0].pages.forEach((slide) => {
                             generateItem(slide.id, slide.name);
