@@ -143,7 +143,12 @@ exports.getRoute = function (s) {
 
     });
 
-    router.all('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
+    router.options('/ajax/get-recitation-resource', (req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', 'https://room.recilive.stream');
+        res.setHeader('Access-Control-Allow-Credentials','true');
+        res.send('');
+    });
+    router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         var recitationID = req.query.recitationID;
         var numericID = req.query.numericID;
         res.setHeader('Access-Control-Allow-Origin', 'https://room.recilive.stream');
