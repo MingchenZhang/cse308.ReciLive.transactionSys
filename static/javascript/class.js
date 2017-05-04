@@ -9,10 +9,31 @@ $(document).ready(function(){
     endingTop: '10%' // Ending top style attribute
   });
 });
+
+function isValidEmailAddress() {
+  var result = true;
+    var pattern = /^([a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+(\.[a-z\d!#$%&'*+\-\/=?^_`{|}~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+)*|"((([ \t]*\r\n)?[ \t]+)?([\x01-\x08\x0b\x0c\x0e-\x1f\x7f\x21\x23-\x5b\x5d-\x7e\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|\\[\x01-\x09\x0b\x0c\x0d-\x7f\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))*(([ \t]*\r\n)?[ \t]+)?")@(([a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\d\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.)+([a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]|[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF][a-z\d\-._~\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]*[a-z\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])\.?$/i;
+    $( ".student-email-container input[type=email]" ).each(function(i, email) {
+      if($(email).val() != '' && !pattern.test($(email).val())) {
+        result = false;
+      }
+    });
+    return result;
+};
+
+function validateClassModalInput() {
+  if(($(".class-name").val() != '') && isValidEmailAddress()) {
+    $('#save-class').removeAttr('disabled');
+  }else {
+    $("#save-class").attr("disabled",true);
+  }
+}
+
 function closeCurrentClassModal(id) {
   $("#"+id).modal('close');
 }
 function initDateForClass() {
+  $("#save-class").attr("disabled");
   $('#class-date-alert').hide();
   var startDate = new Date();
   var endDate = new Date();
@@ -209,11 +230,11 @@ function deleteClass(current_class_id) {
 }
 
 function add_student() {
-  $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate'><label for='email' data-error='wrong' data-success='right'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
+  $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate' oninput='validateClassModalInput()'><label for='email'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
 }
 function display_students(student_list) {
   $.each(student_list, function(key, value) {
-    $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate' value="+ value.email + "><label for='email' data-error='wrong' data-success='right'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
+    $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate' value="+ value.email + " oninput='validateClassModalInput()'><label for='email'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
   });
 }
 

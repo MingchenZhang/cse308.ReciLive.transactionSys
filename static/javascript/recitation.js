@@ -4,7 +4,17 @@ function initRecModal(classId) {
   $(".delete-recitation-btn").hide();
   $(".save-recitaiton").attr("onclick","addRecitation('"+classId+"')");
 }
+
+function validateRecitationModalInput() {
+  if($(".recitation-name").val() != '') {
+    $('.save-recitaiton').removeAttr('disabled');
+  }else {
+    $(".save-recitaiton").attr("disabled",true);
+  }
+}
+
 function initDateForRec() {
+  $(".save-recitaiton").attr("disabled",true);
   $('#rec-date-alert').hide();
   var startDate = new Date();
   var endDate = new Date();

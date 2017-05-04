@@ -52,7 +52,7 @@
             <!-- Modal content-->
             <div class="modal-content">
               <div class="input-field col s12">
-                <input class="recitation-name" type="text" class="validate">
+                <input class="recitation-name" type="text" class="validate" oninput="validateRecitationModalInput()">
                 <label>Recitation Name</label>
               </div>
               <div id="rec-date-alert">
@@ -82,7 +82,6 @@
                     <button type="button" class="btn save-recitaiton" onclick="addRecitation()">Save</button>
                 </div>
             </div>
-
         </div>
     </div>
     <!-- End Modal for Recitation -->
@@ -106,7 +105,7 @@
       <!-- Modal content-->
       <div class="modal-content">
         <div class="input-field col s12">
-          <input class="class-name" type="text" class="validate">
+          <input class="class-name" type="text" class="validate" oninput="validateClassModalInput()">
           <label>Class Name</label>
         </div>
         <div id="class-date-alert">
@@ -142,7 +141,7 @@
             </tbody>
         </table>
           <div class="modal-footer">
-              <a href="#!" class="btn save-class" id="save-class" onclick="addClass()">Save</a>
+              <a href="#!" class="btn save-class" id="save-class" onclick="addClass()" disabled>Save</a>
               <label class="btn">Bulk Import<input type="file" class="bulk-import-student" style="display: none;" onchange="import_student()"></label>
               <button type="button" class="btn" onclick="add_student()">Add</button>
           </div>
