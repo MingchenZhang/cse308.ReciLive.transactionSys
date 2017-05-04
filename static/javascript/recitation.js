@@ -15,7 +15,10 @@ function initDateForRec() {
   $('#rec-date-start-display').text($('#rec-date-start').data('date'));
   $('#rec-date-end').data({date: t}).datepicker('update');
   $('#rec-date-end-display').text($('#rec-date-end').data('date'));
+  checkRecitationDate(startDate, endDate);
+}
 
+function checkRecitationDate(startDate, endDate) {
   $('#rec-date-start')
       .datepicker()
       .on('changeDate', function(ev){
@@ -83,9 +86,19 @@ function viewRecitationInfo(current_recitation_id, currentClassId) {
   }).done(function (data) {
       if(data.result === true) {
         $(".recitation-name").val(data.classInfo.name);
-        $("#rec-date-start-display").text(data.classInfo.startDate.split("T")[0]);
-        $('#rec-date-end-display').text(data.classInfo.endDate.split("T")[0]);
-        $(".delete-recitation-btn").show();
+        $('#rec-date-alert').hide();
+        var startDate = new Date(data.classInfo.startDate);
+        var endDate = new Date(data.classInfo.endDate);
+        var startMonth = startDate.getMonth()+1;
+        var endMonth = endDate.getMonth()+1;
+        var start = startDate.getFullYear() + "-" + startMonth + "-" + startDate.getDate();
+        var end = endDate.getFullYear() + "-" + endMonth + "-" + endDate.getDate();
+        $('#rec-date-start').data({date: start}).datepicker('update');
+        $('#rec-date-start-display').text($('#rec-date-start').data('date'));
+        $('#rec-date-end').data({date: end}).datepicker('update');
+        $('#rec-date-end-display').text($('#rec-date-end').data('date'));
+        checkRecitationDate(startDate, endDate);
+
         $(".save-recitaiton").attr("onclick","editRecitation('"+current_recitation_id+"','"+currentClassId+"')");
       }else {
           console.error(data.reason);

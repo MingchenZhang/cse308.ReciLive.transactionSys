@@ -23,10 +23,10 @@ function initDateForClass() {
   $('#class-date-start-display').text($('#class-date-start').data('date'));
   $('#class-date-end').data({date: t}).datepicker('update');
   $('#class-date-end-display').text($('#class-date-end').data('date'));
-  checkDate(startDate, endDate);
+  checkClassDate(startDate, endDate);
 }
 
-function checkDate(startDate, endDate) {
+function checkClassDate(startDate, endDate) {
   $('#class-date-start')
       .datepicker()
       .on('changeDate', function(ev){
@@ -141,10 +141,7 @@ function viewClassInfo(current_class_id) {
           $('#class-date-start-display').text($('#class-date-start').data('date'));
           $('#class-date-end').data({date: end}).datepicker('update');
           $('#class-date-end-display').text($('#class-date-end').data('date'));
-          checkDate(startDate, endDate);
-
-          // $("#class-date-start-display").text(data.classInfo.startDate.split("T")[0]);
-          // $('#class-date-end-display').text(data.classInfo.endDate.split("T")[0]);
+          checkClassDate(startDate, endDate);
         }else {
           console.error(data.reason);
         }
