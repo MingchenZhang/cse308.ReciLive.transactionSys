@@ -1,5 +1,5 @@
 var GoogleAuth = require('google-auth-library');
-var When = require('When');
+var When = require('when');
 
 var auth = new GoogleAuth;
 
