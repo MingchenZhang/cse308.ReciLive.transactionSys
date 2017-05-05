@@ -131,7 +131,7 @@ function TransactionSystem(path) {
                 modules[key].reset();
                 if (modules[key].isNotIncremental) {
                     var keyTrans = findKeyTransaction(modules[key].moduleName, new Date(), true);
-                    if (keyTrans < 0) return;
+                    if (keyTrans < 0) continue;
                     modules[key].update(keyTrans,
                         transactions[keyTrans].description,
                         transactions[keyTrans].createdBy,
@@ -141,7 +141,7 @@ function TransactionSystem(path) {
                 else {
                     //jump to a past time point
                     var keyTrans = findKeyTransaction(modules[key].moduleName, new Date(), false);
-                    if (keyTrans < 0)return;//-1
+                    if (keyTrans < 0) continue;
                     for (var j = keyTrans; j < transactions.length; j++) {
                         if (transactions[j].module == modules[key].moduleName) {
                             modules[key].update(j,
