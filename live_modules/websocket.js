@@ -19,6 +19,7 @@ exports.WSHandler = function () {
             ws.userLoginInfo.userID = userInfo._id;
             var handler = subhandlerMap[location.path];
             if (handler != undefined) {
+                if(ws.readyState > 1) throw new Error('ws connection closed too fast!!');
                 ws.removeListener('message', preMessageHandle);
                 handler(ws);
                 messageCache.forEach((message)=>{
@@ -30,7 +31,7 @@ exports.WSHandler = function () {
                 ws.close();
             }
         }).catch((err)=>{
-            ws.send(JSON.stringify({type: "error", reason: 6}));
+            if(ws.readyState <= 1) ws.send(JSON.stringify({type: "error", reason: 6, detail: err.message}));
             ws.close();
         });
     };
