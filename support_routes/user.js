@@ -65,6 +65,7 @@ exports.getRoute = function (s) {
     });
 
     router.post('/ajax/sign-up', jsonParser, (req, res, next) => {          //new user sign_up
+        if(!req.userLoginInfo) return res.status(403).send('login first');
         s.userConn.setUserInfo(req.userLoginInfo.record._id,{role:req.body.role}).then(() => {
             res.send({result: true, redirect: '/course'});
         }).catch((e) => {

@@ -59,7 +59,8 @@ s.sessionManager = require('./live_modules/sessionManager');
 
 var app = Express();
 
-//app.use(Helmet({hsts:false}));
+app.use(Helmet({hsts:false}));
+app.use
 app.use('/static', Express.static(__dirname + '/static'));
 app.use(CookieParser());
 app.set('view engine', 'ejs');
