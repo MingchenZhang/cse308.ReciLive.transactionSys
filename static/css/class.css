@@ -40,7 +40,7 @@ nav {
   width: 100%;
   height: 70px;
   margin-top: 30px;
-  background-color: #3fb0ac;
+  background-color: #ADEAEA;
   display: flex;
   justify-content: center;
   box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
@@ -104,6 +104,9 @@ nav {
     display: block;
 }
 .class:hover .dropdown-course-content {
+    display: block;
+}
+.recitation:hover .dropdown-course-content {
     display: block;
 }
 .dropdown-course-content a:hover {background-color: #f1f1f1}

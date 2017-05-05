@@ -60,6 +60,9 @@ function checkRecitationDate(startDate, endDate) {
 function listRecitation(currentClassId) {
     $(".halfway-fab").attr("href","#recitation-detail");
     $(".halfway-fab").attr("onclick","initRecModal('"+currentClassId+"')");
+    //temp
+    $(".class-info h2").html("Next Recitation starts in <span>1 hr</span>");
+    //end temp
     var listDiv = $('.class-list');
     $(".current-class-name").remove();
 
