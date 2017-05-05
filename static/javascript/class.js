@@ -33,7 +33,7 @@ function closeCurrentClassModal(id) {
   $("#"+id).modal('close');
 }
 function initDateForClass() {
-  $("#save-class").attr("disabled");
+  $("#save-class").attr("disabled",true);
   $('#class-date-alert').hide();
   var startDate = new Date();
   var endDate = new Date();
@@ -155,7 +155,6 @@ function viewClassInfo(current_class_id) {
         if(data.result4classInfo) {
           $(".class-name").val(data.classInfo.name);
           $('#class-date-alert').hide();
-          $("#save-class").attr("disabled");
           var startDate = new Date(data.classInfo.startDate);
           var endDate = new Date(data.classInfo.endDate);
           var startMonth = startDate.getMonth()+1;
@@ -167,6 +166,7 @@ function viewClassInfo(current_class_id) {
           $('#class-date-end').data({date: end}).datepicker('update');
           $('#class-date-end-display').text($('#class-date-end').data('date'));
           checkClassDate(startDate, endDate);
+          $("#save-class").attr("disabled",true);
         }else {
           console.error(data.reason);
         }
