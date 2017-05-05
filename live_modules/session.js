@@ -193,6 +193,7 @@ exports.session = function () {
                 s.transactionRecord.addSound({sessionID:self.sessionID, createdAt: new Date(), data: message});
                 soundClients.forEach((client) => {
                     if(client.nextSoundFrame) return; // client is in playback mode
+                    if(soundSpeaker.indexOf(ws.userLoginInfo.userID) != -1) return; // this is a speaker
                     try {
                         client.send(message);
                     } catch (e) {
