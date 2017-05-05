@@ -6,7 +6,7 @@ function initRecModal(classId) {
 }
 
 function validateRecitationModalInput() {
-  if($(".recitation-name").val() != '') {
+  if($(".recitation-name").val() != '' && $("#rec-date-alert").css('display') == 'none') {
     $('.save-recitaiton').removeAttr('disabled');
   }else {
     $(".save-recitaiton").attr("disabled",true);

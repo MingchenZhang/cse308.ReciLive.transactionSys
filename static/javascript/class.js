@@ -22,7 +22,7 @@ function isValidEmailAddress() {
 };
 
 function validateClassModalInput() {
-  if(($(".class-name").val() != '') && isValidEmailAddress()) {
+  if(($(".class-name").val() != '') && isValidEmailAddress() && $("#rec-date-alert").css('display') == 'none') {
     $('#save-class').removeAttr('disabled');
   }else {
     $("#save-class").attr("disabled",true);
