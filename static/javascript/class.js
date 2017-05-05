@@ -144,6 +144,7 @@ function addClass() {
 function viewClassInfo(current_class_id) {
   closeCurrentClassModal(current_class_id);
   $("#class-detail label").addClass("active");
+  $(".student-email-container label").addClass("active");
   $.ajax({
       url: '/ajax/get-edit-class-info',
       type: 'post',

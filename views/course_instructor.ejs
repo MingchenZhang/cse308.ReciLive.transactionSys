@@ -101,7 +101,7 @@
         </div>
     </section>
     <!-- Modal for class -->
-    <div id="class-detail" class="modal">
+    <div id="class-detail" class="modal modal-fixed-footer">
       <!-- Modal content-->
       <div class="modal-content">
         <div class="input-field col s12">
@@ -140,11 +140,11 @@
             <tbody class="student-list">
             </tbody>
         </table>
-          <div class="modal-footer">
-              <a href="#!" class="btn save-class" id="save-class" onclick="addClass()" disabled>Save</a>
-              <label class="btn">Bulk Import<input type="file" class="bulk-import-student" style="display: none;" onchange="import_student()"></label>
-              <button type="button" class="btn" onclick="add_student()">Add</button>
-          </div>
+      </div>
+      <div class="modal-footer">
+          <a href="#!" class="btn save-class" id="save-class" onclick="addClass()" disabled>Save</a>
+          <label class="btn">Bulk Import Students<input type="file" class="bulk-import-student" style="display: none;" onchange="import_student()"></label>
+          <button type="button" class="btn" onclick="add_student()">Add</button>
       </div>
     </div>
     <!-- End Modal for class -->
