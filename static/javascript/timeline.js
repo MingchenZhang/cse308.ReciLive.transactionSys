@@ -220,7 +220,8 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                     }, 1000);
                     setTimeout(function () {
                         div.find('.value').html(
-                            playedTime.getMinutes() + ":" + playedTime.getSeconds()
+                            var showTime = playedTime.getTime() -  startTime.getTime();
+                            show.getMinutes() + ":" + show.getSeconds()
                         );
                     },50);
 

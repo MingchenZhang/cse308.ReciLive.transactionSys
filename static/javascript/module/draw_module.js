@@ -31,7 +31,8 @@ function Draw(transactionSystem, div, controlPanel) {
         div.find('canvas').css('position', 'absolute');
         div.find('canvas').css('height', '100%');
         div.find('canvas').css('width', '100%');
-    }
+    };
+
     /**
      * init after transaction system
      */
@@ -188,6 +189,7 @@ function Draw(transactionSystem, div, controlPanel) {
             newStrokeListener();
         });
     };
+
     /**
      * send the transaction to all the students
      * @param stroke a json obj contain all the obj in the canvas
