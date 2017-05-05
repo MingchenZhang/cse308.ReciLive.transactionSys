@@ -101,9 +101,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
 
     function resourceChecker (resource){
         if(!resource)return true;
-        resource.forEach(function (element) {
-            if(element.type=="slide") return false;
-        })
+        for (element in resource){
+            if(element.type=="slide")return false;
+        }
         return true;
     }
 //init call after transaction finish load and get privilege info
