@@ -219,8 +219,8 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                         div.find('.thumb').remove();
                     }, 1000);
                     setTimeout(function () {
+                        var showTime = playedTime.getTime() -  startTime.getTime();
                         div.find('.value').html(
-                            var showTime = playedTime.getTime() -  startTime.getTime();
                             show.getMinutes() + ":" + show.getSeconds()
                         );
                     },50);
