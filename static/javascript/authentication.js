@@ -3,30 +3,9 @@
          gapi.auth2.init();
      });
  }
-// only clear cookies without domain
-function deleteAllCookies() {
-    var cookies = document.cookie.split(";");
-
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
-        var eqPos = cookie.indexOf("=");
-        var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-        if(name === "IDToken") {
-          document.cookie = 'IDToken=; path=/; domain=.recilive.stream; expires=' + new Date(0).toUTCString();
-        }else {
-          document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        }
-    }
-}
-
-$(function() {
-  // $('.sign-in').show();
-  // $('#sign-out').hide();
-});
 
 function signOut() {
     var auth2 = gapi.auth2.getAuthInstance();
-    //auth2.disconnect();
     auth2.signOut().then(function () {
       $.ajax({
           url: '/ajax/logout',
