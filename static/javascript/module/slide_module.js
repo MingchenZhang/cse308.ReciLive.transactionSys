@@ -102,7 +102,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     function resourceChecker (resource){
         if(!resource)return true;
         for (element in resource){
-            if(element.type=="slide")return false;
+            if(resource[element].type=="slide")return false;
         }
         return true;
     }
