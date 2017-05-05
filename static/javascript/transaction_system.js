@@ -315,6 +315,7 @@ function TransactionSystem(path) {
             // console.error('connect called');
             ws = createWebSocket(destination);
             ws.addEventListener("open", function (e) {
+                //setTimeout(()=>onConnectCallback(e), 1000);
                 onConnectCallback(e);
             });
             ws.addEventListener("message", function (e) {

@@ -61,13 +61,13 @@ var app = Express();
 
 app.use(Helmet({hsts: false}));
 app.use('/static', Express.static(__dirname + '/static'));
-app.use((req, res, next)=> { // http redirection
-    if (req.protocol == 'http') {
-        res.redirect('https://recilive.stream')
-    } else {
-        next();
-    }
-});
+// app.use((req, res, next)=> { // http redirection
+//     if (req.protocol == 'http') {
+//         res.redirect('https://recilive.stream')
+//     } else {
+//         next();
+//     }
+// });
 app.use(CookieParser());
 app.set('view engine', 'ejs');
 if(!s.inProduction){
@@ -145,7 +145,7 @@ if (process.env.HTTPS_PORT) {
     }
 }
 
-wsServer = new WSWebSocket({server: httpServer});
+wsServer = new WSWebSocket({server: httpServer, perMessageDeflate: false});
 wsServer.on('connection', s.wsHandler.handle);
 if (process.env.HTTPS_PORT) {
     wsServer = new WSWebSocket({server: httpsServer});
