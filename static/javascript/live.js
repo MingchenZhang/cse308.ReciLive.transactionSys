@@ -70,9 +70,10 @@ function selectUser(student) {
 function newPost() {
     var post = $("#info-post").val();
     var color = '#' + Math.round(0xffffff * Math.random()).toString(16);
-    $newdiv = $('<div onclick="movePost()"><h4>' + post + '</h4></div>').css({
+    $newdiv = $("<div><h4>" + post + "</h4></div>").css({
         'background-color': color
     });
+
     var divxsize = ($newdiv.width()).toFixed();
     var divysize = ($newdiv.height()).toFixed();
     var posx = (Math.random() * ($(".col-md-4").width() - $newdiv.width()));
@@ -85,13 +86,10 @@ function newPost() {
         'top': posy + 'px',
         'display': 'none'
     }).appendTo('.col-md-4').fadeIn(100, function () {
-        makePost("This is a comment!");
+        // newPost("This is a comment!");
     });
+    $newdiv.draggable();
     $("#info-post").val('');
-}
-
-function movePost() {
-
 }
 
 transactionSystem = new TransactionSystem("/room/" + classroomNumber + "/transaction");
