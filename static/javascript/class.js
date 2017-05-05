@@ -155,6 +155,7 @@ function viewClassInfo(current_class_id) {
         if(data.result4classInfo) {
           $(".class-name").val(data.classInfo.name);
           $('#class-date-alert').hide();
+          $("#save-class").attr("disabled");
           var startDate = new Date(data.classInfo.startDate);
           var endDate = new Date(data.classInfo.endDate);
           var startMonth = startDate.getMonth()+1;
@@ -242,6 +243,7 @@ function display_students(student_list) {
 
 function deleteStudent(element) {
   $(element).parent().remove();
+  validateClassModalInput();
 }
 
 function import_student() {

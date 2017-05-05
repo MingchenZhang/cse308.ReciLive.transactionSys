@@ -101,6 +101,7 @@ function viewRecitationInfo(current_recitation_id, currentClassId) {
       if(data.result === true) {
         $(".recitation-name").val(data.recitation.name);
         $('#rec-date-alert').hide();
+        $(".save-recitaiton").attr("disabled",true);
         var startDate = new Date(data.recitation.startDate);
         var endDate = new Date(data.recitation.endDate);
         var startMonth = startDate.getMonth()+1;
