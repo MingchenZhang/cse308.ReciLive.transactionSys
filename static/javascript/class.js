@@ -22,7 +22,7 @@ function isValidEmailAddress() {
 };
 
 function validateClassModalInput() {
-  if(($(".class-name").val() != '') && isValidEmailAddress() && $("#rec-date-alert").css('display') == 'none') {
+  if(($(".class-name").val() != '') && isValidEmailAddress() && $("#class-date-alert").is(":hidden")) {
     $('#save-class').removeAttr('disabled');
   }else {
     $("#save-class").attr("disabled",true);
@@ -59,6 +59,7 @@ function checkClassDate(startDate, endDate) {
               $('#class-date-start-display').text($('#class-date-start').data('date'));
           }
           $('#class-date-start').datepicker('hide');
+          validateClassModalInput();
       });
   $('#class-date-end')
       .datepicker()
@@ -71,6 +72,7 @@ function checkClassDate(startDate, endDate) {
               $('#class-date-end-display').text($('#class-date-end').data('date'));
           }
           $('#class-date-end').datepicker('hide');
+          validateClassModalInput();
       });
 }
 

@@ -6,7 +6,7 @@ function initRecModal(classId) {
 }
 
 function validateRecitationModalInput() {
-  if($(".recitation-name").val() != '' && $("#rec-date-alert").css('display') == 'none') {
+  if($(".recitation-name").val() != '' && $("#rec-date-alert").is(":hidden")) {
     $('.save-recitaiton').removeAttr('disabled');
   }else {
     $(".save-recitaiton").attr("disabled",true);
@@ -40,6 +40,7 @@ function checkRecitationDate(startDate, endDate) {
               $('#rec-date-start-display').text($('#rec-date-start').data('date'));
           }
           $('#rec-date-start').datepicker('hide');
+          validateRecitationModalInput();
       });
   $('#rec-date-end')
       .datepicker()
@@ -52,6 +53,7 @@ function checkRecitationDate(startDate, endDate) {
               $('#rec-date-end-display').text($('#rec-date-end').data('date'));
           }
           $('#rec-date-end').datepicker('hide');
+          validateRecitationModalInput();
       });
 }
 
