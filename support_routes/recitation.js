@@ -5,7 +5,7 @@ var Request = require("request");
 exports.getRoute = function (s) {
     var router = Express.Router();
 
-    var jsonParser = BodyParser.json({limit: '10kb'});
+    var jsonParser = BodyParser.json({limit: '100kb'});
 
     router.post('/ajax/list-recitation-list', jsonParser, function (req, res, next) {
         var current_class = req.body.class;

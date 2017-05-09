@@ -119,7 +119,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;       // admin get control
         if (asController) {
             self.loadAllSlides = function () {              //download all slides
-                //TODO: delete IDToken
                 var promiseList = [];
 
                 resource.forEach(function (element) {

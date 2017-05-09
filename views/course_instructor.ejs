@@ -226,8 +226,7 @@
                                 $.ajax(request).then((data) => {
                                     if (typeof data == 'string') data = JSON.stringify(data);
                                     resolve({
-                                        id: data.files[0].id,
-                                        name: data.files[0].name
+                                        files: data.files,
                                     });
                                 }).catch((err) => {
                                     reject(err);
@@ -246,8 +245,13 @@
                     });
                 });
 
-                p.then((fileInfo) => {
-                    generateItem(fileInfo.id, fileInfo.name);
+                p.then((filesInfo) => {
+
+                    if(filesInfo.files.length != 0){
+                        filesInfo.files.forEach((file) => {
+                            generateItem(file.id, file.name);
+                        });
+                    }
                     vex.close(uploadDialog);
                     console.log('file upload done');
                 }).catch((err) => {
