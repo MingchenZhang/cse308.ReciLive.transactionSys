@@ -7,24 +7,6 @@ exports.getRoute = function (s) {
 
     var jsonParser = BodyParser.json({limit: '100kb'});
 
-    router.post('/ajax/list-recitation-list', jsonParser, function (req, res, next) {
-        var current_class = req.body.class;
-        s.classConn.getRecitationsByClass(current_class).then((response) => {
-                if (response) {
-                    let recitations = [];
-                    response.forEach(function (element) {
-                        recitations.push([element.numericID, element.name, element._id]);
-                    });
-                    res.send({result: true, list: recitations});
-                } else {
-                    res.send({result: false, reason: "nothing find in database"});
-                }
-            }
-        ).catch((e) => {
-            res.send({result: false, reason: e.message ? e.message : "error in class DB add class"});
-        });
-    });
-
     router.post('/ajax/add-recitation', jsonParser, (req, res, next) => {       //add recitation to class db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {

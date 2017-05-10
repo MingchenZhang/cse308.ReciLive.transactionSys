@@ -6,6 +6,35 @@ exports.getRoute = function (s) {
     var router = Express.Router();              //return all the parsere
     var jsonParser = BodyParser.json({limit: '10kb'});
 
+    router.get('/course/:classId', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
+      s.classConn.getRecitationsByClass(req.params.classId).then((response) => {
+            let recitations = [];
+            response.forEach(function (element) {
+              recitations.push({roomid: element.numericID, name:element.name, mongoid:element._id});
+            });
+            if (req.userLoginInfo.record.role == "Instructor") {
+                res.render("recitation.ejs",{
+                  recitations: recitations,
+                  classId: req.params.classId,
+                  username: req.userLoginInfo.name,
+                  instructor: true
+                });
+            } else if (req.userLoginInfo.record.role == "Student") {
+                res.render("recitation.ejs",{
+                  recitations: recitations,
+                  classId: req.params.classId,
+                  username: req.userLoginInfo.record.name,
+                  instructor: false
+                });
+            } else {
+                res.status(400).send('please choose role from home page first');
+            }
+          }
+      ).catch((e) => {
+          res.status(400).send({result: false, reason: e.message ? e.message : "error in class DB add class"});
+      });
+    });
+
     router.post('/ajax/list-class-list', jsonParser, function (req, res, next) {    //return all the class list according to user's role
         if (req.userLoginInfo.record.role == "Instructor") {
             s.classConn.getClassesByOwner(req.userLoginInfo.record._id).then((r) => {

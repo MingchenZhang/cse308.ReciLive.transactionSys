@@ -1,0 +1,319 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id"
+          content="42088802485-n1mb2q3d8gigkqoth61ca07nfthgk9hr.apps.googleusercontent.com">
+    <title>ReciLive</title>
+    <!-- CSS Library -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/library/materialize.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.css" rel="stylesheet" type="text/css" />
+    <link href="https://dl2.pushbulletusercontent.com/LC5kwexKQ6dwj3oBuK9g7A2sh9fiXBmP/vex.css" rel="stylesheet" type="text/css" />
+    <link href="https://dl2.pushbulletusercontent.com/OdBbCpZPN4HzEvW6s5ZAKOw5j8JoVPea/vex-theme-plain.css" rel="stylesheet" type="text/css" />
+    <!-- JS Library -->
+    <script src="/static/javascript/library/jquery-3.2.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="/static/javascript/library/materialize.min.js"></script>
+    <script src="/static/javascript/library/bootstrap-datepicker.js"></script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
+    <script src="https://dl2.pushbulletusercontent.com/htm56efiYePFcXUo18L8QYQCA8TX0p92/vex.combined.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.5.1/Sortable.min.js"></script>
+    <script>vex.defaultOptions.className = 'vex-theme-plain'</script>
+    <!-- Our CSS -->
+    <link href="/static/css/class.css" rel="stylesheet" type="text/css">
+    <!-- Our JS-->
+    <script src="/static/javascript/authentication.js"></script>
+    <script src="/static/javascript/recitation.js"></script>
+</head>
+
+<body>
+    <nav class="nav-extended">
+      <div class="nav-wrapper">
+        <img class="brand-logo center" src="../static/img/logo/android-icon-48x48.png">
+        <div class="sign-in" data-onsuccess="onSignIn"></div>
+        <h4><%= username %></h4>
+        <a href="#" id="sign-out" class="waves-effect waves-light btn red" onclick="signOut()">Log out</a>
+      </div>
+      <% if(instructor) { %>
+      <div class="nav-content">
+        <a class="btn-floating btn-large halfway-fab waves-effect waves-light teal" href="#recitation-detail" onclick="initRecModal('<%= classId %>')">
+          <i class="material-icons">add</i>
+        </a>
+      </div>
+      <% } %>
+    </nav>
+    <!-- Modal for Recitation -->
+    <div id="recitation-detail" class="modal">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="input-field col s12">
+                <input class="recitation-name" type="text" class="validate" oninput="validateRecitationModalInput()">
+                <label>Recitation Name</label>
+              </div>
+              <div id="rec-date-alert">
+                  <strong>Oh snap!</strong>
+              </div>
+              <table>
+                  <thead>
+                  <tr>
+                      <th>
+                          Start date
+                          <a href="#!" class="btn" id="rec-date-start" data-date-format="yyyy-mm-dd">Change</a>
+                      </th>
+                      <th>
+                          End date
+                          <a href="#!" class="btn" id="rec-date-end" data-date-format="yyyy-mm-dd">Change</a>
+                      </th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                      <td id="rec-date-start-display"></td>
+                      <td id="rec-date-end-display"></td>
+                  </tr>
+                  </tbody>
+              </table>
+              <% if(instructor) { %>
+                <div class="modal-footer">
+                    <button type="button" class="btn save-recitaiton" onclick="addRecitation()">Save</button>
+                </div>
+              <% } %>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal for Recitation -->
+    <section class="class-info">
+        <h2>Next Recitation starts in <span>1 hr</span></h2>
+        <br>
+        <div class="input-field col s6">
+          <i class="material-icons prefix">search</i>
+          <input type="text" class="validate">
+          <label for="icon_prefix">Search</label>
+        </div>
+    </section>
+    <section>
+        <div class="container-fluid">
+            <div class="row class-list">
+              <% recitations.forEach(function(recitation) { %>
+                <div class="col s6 m3">
+                  <div class="recitation">
+                    <h4><%= recitation.name %></h4>
+                    <div class="dropdown-course-content">
+                        <a target="_blank" href="https://room.recilive.stream/room/<%= recitation.roomid %>">Enter</a>
+                        <a href="#<%= recitation.mongoid %>">More</a>
+                    </div>
+                  </div>
+              </div>
+                <div id="<%= recitation.mongoid %>" class="modal bottom-sheet">
+                    <div class="modal-content class-option">
+                        <a onclick="viewRecitationInfo('<%= recitation.mongoid %>','<%= classId %>')" href="#recitation-detail">Edit <%= recitation.name %></a>
+                        <% if(instructor) { %>
+                          <a href="#" onclick="deleteRecitation('<%= recitation.mongoid %>','<%= classId %>')">Delete <%= recitation.name %></a>
+                          <a onclick="showResourcesEdit('<%= recitation.mongoid %>')" >Resources</a>
+                        <% } %>
+                    </div>
+                </div>
+                <script>
+                    $('#<%= recitation.mongoid %>').modal({
+                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                        opacity: .5, // Opacity of modal background
+                        inDuration: 300, // Transition in duration
+                        outDuration: 200, // Transition out duration
+                        startingTop: '4%', // Starting top style attribute
+                        endingTop: '10%' // Ending top style attribute
+                    });
+                </script>
+              <% }); %>
+            </div>
+        </div>
+    </section>
+
+    <!-- resources management prototype -->
+    <div class="item-prototype" style="display: none;">
+        <div class="list-group-item" data-id="">
+            <span class="badge removal">✖</span>
+            <span class="material-icons move-file"><i>swap_vert</i></span>
+            <span class="item-name"></span>
+        </div>
+    </div>
+
+    <!-- resources management modal -->
+<div class="modal resources-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <h4>Slides</h4>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="tabs">
+                        <li class="tab col s3"><a href="#listWithHandle">tab 1</a></li>
+                        <li class="tab col s3"><a href="#tab2">tab 2</a></li>
+                    </ul>
+                </div>
+                <div id="listWithHandle" class="list-group"></div>
+                <div id="tab2" class="col s12">Test 2</div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info upload-button">Upload</button>
+                <button type="button" class="btn btn-default modal-action modal-close">Close</button>
+                <button type="button" class="btn btn-primary submit-button">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        (function () {
+            Sortable.create(listWithHandle, {
+                handle: '.move-file',
+                animation: 150
+            });
+
+            var generateItem = (id, name) => {
+                var newItem = $('.item-prototype').find('.list-group-item').clone();
+                newItem.attr('data-id', id);
+                newItem.find('.item-name').html(name);
+                newItem.find('.badge.removal').click(() => {
+                    newItem.remove();
+                });
+                $('#listWithHandle').append(newItem);
+            };
+
+            var getList = (parent) => {
+                var result = [];
+                parent.find('#listWithHandle').find('.list-group-item').each((index, item) => {
+                    result.push({
+                        id: $(item).attr('data-id'),
+                        name: $(item).find('.item-name').html(),
+                    });
+                });
+                return result;
+            };
+
+            var showUploadWindow = () => {
+                var uploadDialog;
+                var p = new Promise((resolve, reject) => {
+                    uploadDialog = vex.dialog.open({
+                        message: 'choose the file you want to upload:',
+                        input: [
+                            '<input name="ffdsf" type="file" value=""/>',
+                        ].join(''),
+                        buttons: [{
+                            text: 'Upload',
+                            type: 'button',
+                            className: 'vex-dialog-button-primary',
+                            click: function(data) {
+                                var request = {
+                                    type: 'POST',
+                                    url: '/add_resources',
+                                    data: new FormData(this.form),
+                                    contentType: false,
+                                    processData: false,
+                                };
+                                $.ajax(request).then((data) => {
+                                    if (typeof data == 'string') data = JSON.stringify(data);
+                                    resolve({
+                                        files: data.files,
+                                    });
+                                }).catch((err) => {
+                                    reject(err);
+                                });
+                            }
+                        }, {
+                            text: 'Cancel',
+                            type: 'button',
+                            className: 'vex-dialog-button-secondary',
+                            click: function(data) {
+                                reject(data);
+                                this.close();
+                            }
+                        }],
+                        callback: function(data) {}
+                    });
+                });
+
+                p.then((filesInfo) => {
+
+                    if(filesInfo.files.length != 0){
+                        filesInfo.files.forEach((file) => {
+                            generateItem(file.id, file.name);
+                        });
+                    }
+                    vex.close(uploadDialog);
+                    console.log('file upload done');
+                }).catch((err) => {
+                    console.error('file upload failed');
+                    console.error(err);
+                });
+
+                return p;
+            };
+
+            window.showResourcesEdit = (recitationID) => {
+                var resourcesModal = $('.resources-modal');
+                resourcesModal.modal('open');
+                $('#listWithHandle').empty();
+                $.ajax({
+                    type: 'GET',
+                    url: '/ajax/get-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
+                    dataType: "json"
+                }).then((resources) => {
+                    if(Object.keys(resources).length != 0){
+                        resources.resources[0].content[0].pages.forEach((slide) => {
+                            generateItem(slide.id, slide.name);
+                        });
+                    }
+                    console.log('resources load successful');
+                }).catch((err) => {
+                    console.error('unable to load resources');
+                    console.error(err);
+                });
+                var uploadButton = resourcesModal.find('.upload-button');
+                uploadButton.off('click');
+                uploadButton.click(()=>{
+                    showUploadWindow();
+                });
+                var submitButton = resourcesModal.find('.submit-button');
+                submitButton.off('click');
+                submitButton.click(() => {
+                    var thisSlide = {
+                        name: 'test slide',
+                        pages: []
+                    };
+                    getList(resourcesModal).forEach((slide) => {
+                        thisSlide.pages.push({
+                            name: slide.name,
+                            url: "https://recilive.stream/get_resource?id=" + slide.id,
+                            id: slide.id
+                        });
+                    });
+                    var resourcesContainer = {
+                        resources: [{
+                            type: "slide",
+                            content: [thisSlide]
+                        }]
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        url: '/ajax/set-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(resourcesContainer),
+                        dataType: "json"
+                    }).then((data) => {
+                        resourcesModal.modal('close');
+                        console.log('resources push successful');
+                    }).catch((err) => {
+                        console.warn('resources push failed');
+                        console.warn(err);
+                    });
+                });
+            };
+        })();
+    </script>
+</body>
+
+</html>

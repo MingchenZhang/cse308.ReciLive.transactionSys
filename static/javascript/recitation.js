@@ -1,3 +1,15 @@
+$(document).ready(function(){
+    $('.modal').modal({
+    dismissible: true, // Modal can be dismissed by clicking outside of the modal
+    opacity: .5, // Opacity of modal background
+    inDuration: 300, // Transition in duration
+    outDuration: 200, // Transition out duration
+    startingTop: '4%', // Starting top style attribute
+    endingTop: '10%' // Ending top style attribute
+  });
+  $('ul.tabs').tabs();
+});
+
 function initRecModal(classId) {
   $(".recitation-name").val('');
   initDateForRec();
@@ -57,42 +69,8 @@ function checkRecitationDate(startDate, endDate) {
       });
 }
 
-function listRecitation(currentClassId) {
-    $(".halfway-fab").attr("href","#recitation-detail");
-    $(".halfway-fab").attr("onclick","initRecModal('"+currentClassId+"')");
-    //temp
-    $(".class-info h2").html("Next Recitation starts in <span>1 hr</span>");
-    //end temp
-    var listDiv = $('.class-list');
-    $(".current-class-name").remove();
-
-    $.ajax({
-        url: '/ajax/list-recitation-list',
-        type: 'post',
-        data: JSON.stringify({class: currentClassId}),
-        contentType: "application/json; charset=utf-8",
-        dataType: 'json'
-    }).done(function (data) {
-        if(data.result === true) {
-            currentClassId = currentClassId;
-            var lists = data.list;
-            listDiv.empty();
-            for(var i in lists) {
-                var listTemplate = new RecitationGenerator();
-                var div = $("<div class='col s6 m3'></div>");
-                listDiv.append(div);
-                listTemplate.init(div, lists[i], currentClassId);
-            }
-        }else {
-            console.error(data.reason);
-        }
-    }).fail(function (err) {
-        console.error(err);
-    });
-}
-
 function viewRecitationInfo(current_recitation_id, currentClassId) {
-  closeCurrentClassModal(current_recitation_id);
+  $("#"+current_recitation_id).modal('close');
   $("#recitation-detail label").addClass("active");
   $.ajax({
       url: '/ajax/get-recitation-info',
@@ -134,8 +112,8 @@ function deleteRecitation(recID, classId) {
       contentType: "application/json; charset=utf-8",
       dataType: 'json'
   }).done(function (data) {
-    closeCurrentClassModal(recID);
-    listRecitation(classId);
+    $("#"+recID).modal('close');
+    location.reload();
   }).fail(function (err) {
       console.error(err);
   });
@@ -153,7 +131,7 @@ function addRecitation(currentClassId) {
         success: function(data){
             if(data.result === true) {
                 $('#recitation-detail').modal('close');
-                listRecitation(currentClassId);
+                location.reload();
             }else {
                 console.error(data.reason);
             }
@@ -178,7 +156,7 @@ function editRecitation(current_recitation_id, currentClassId) {
       success: function(data){
           if(data.result === true) {
               $('#recitation-detail').modal('close');
-              listRecitation(currentClassId);
+              location.reload();
           }else {
               console.error(data.reason);
           }
