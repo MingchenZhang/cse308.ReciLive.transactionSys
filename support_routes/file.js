@@ -31,70 +31,28 @@ exports.getRoute = function (s) {
                 return file.pipe(BlackHole());
             }
             if (filename.match(/(.*)\.pdf$/)) {     //if the filename end with pdf
-                var fileHeader = filename.replace(/^(.*)\.pdf$/, '$1');
-                var saveTo = path.join(os.tmpDir(), path.basename(fieldname));
-                if (!fs.existsSync(saveTo)) {       //make dir if dir not exist
-                    fs.mkdirSync(saveTo);
-                }
-                var filePath = path.join(saveTo, fileHeader);
-                if (!fs.existsSync(filePath)) {       //make dir if dir not exist
-                    fs.mkdirSync(filePath);
-                }
+                var fileHeader = s.mongodb.ObjectID().toString();
+                var filePath = path.join(os.tmpDir(), fileHeader);
                 var uploadP = When.promise((resolve, reject) => {       //promise upload all the png
-                    file.pipe(fs.createWriteStream(path.join(filePath, filename))).once('finish', () => {
+                    file.pipe(fs.createWriteStream(filePath + '.pdf')).once('finish', () => {
                         //get page number from gs with path and filename
-                        gs().getPageNumber(path.join(filePath, filename),
+                        gs().getPageNumber(filePath + '.pdf',
                             (pageNumber) => {
                                 if (!pageNumber.success) {        // couldn't get page number
                                     return reject();
                                 }
                                 var pages = parseInt(pageNumber.data);      //get page number for gs
-
-                                gs()            //convert pdf to pngs
-                                    .batch()
+                                gs().batch()
                                     .nopause()
                                     .device('png16m')
-                                    .output(path.join(filePath, fileHeader + '-%d.png'))
-                                    .input(path.join(filePath, filename))
+                                    .output(filePath + '-%d.png')
+                                    .input(filePath + '.pdf')
                                     .exec((err, stdout, stderr) => {
-                                        if (err) {            //err in convert
-                                            return reject();
-                                        }
-                                        var pngsPromiseList = [];//promise list for all pngs save to mongodb
-                                        for (var index = 1; index < pages + 1; index++) {
-                                            //add png file one by one
-                                            let fileID = s.mongodb.ObjectID();
-                                            let fileName = fileHeader + '-' + index + '.png';
-                                            let file = fs.createReadStream(path.join(filePath, fileName));
-                                            fields.attachmentList[index - 1] = ({name: fileName, id: fileID});
-                                            var uploadStream = s.resourceConn.getResourceFileBucket()
-                                                .openUploadStreamWithId(fileID, fileName, {
-                                                    metadata: {},
-                                                    contentType: 'image/png'
-                                                });
-                                            pngsPromiseList.push(When.promise((resolve, reject) => {
-                                                file.pipe(uploadStream).once('finish', function () {
-                                                    //upload stream to mongodb
-                                                    return resolve();
-                                                });
-                                            }).catch((err) => {
-                                                console.err(err.message || "err in pngs promise list id: " + fileID + ' number:' + index);
-                                            }));
-                                        }
-                                        return When.all(pngsPromiseList).then(() => {
-                                            return resolve();
-                                        })
+                                      return sendAllPng2Mongodb(filename,filePath,pages,err,resolve);
                                     });
                             });
                     });
-                }).then(() => {
-                    //remove the folder
-                        rimraf(filePath,
-                            function () {
-                                console.log('delete path:' + path.join(os.tmpDir(), path.basename(fieldname)));
-                            });
-                    }
-                );
+                });
             } else {
                 var fileID = s.mongodb.ObjectID();
                 var uploadStream = s.resourceConn.getResourceFileBucket()
@@ -135,6 +93,39 @@ exports.getRoute = function (s) {
         });
 
         req.pipe(boy);
+
+        function sendAllPng2Mongodb(filename,filePath,pages,err,resolve){
+            fs.unlink(filePath+'.pdf');
+            if (err) {            //err in convert
+                return reject();
+            }
+            var pngsPromiseList = [];//promise list for all pngs save to mongodb
+            for (var index = 1; index < pages + 1; index++) {
+                //add png file one by one
+                let fileID = s.mongodb.ObjectID();
+                let pngName = filename + '-' + index + '.png';
+                let pngPath = filePath + '-' + index + '.png';
+                let file = fs.createReadStream(pngPath);
+                fs.unlink(pngPath);
+                fields.attachmentList[index - 1] = ({name: pngName, id: fileID});
+                var uploadStream = s.resourceConn.getResourceFileBucket()
+                    .openUploadStreamWithId(fileID, pngName, {
+                        metadata: {},
+                        contentType: 'image/png'
+                    });
+                pngsPromiseList.push(When.promise((resolve, reject) => {
+                    file.pipe(uploadStream).once('finish', function () {
+                        //upload stream to mongodb
+                        return resolve();
+                    });
+                }).catch((err) => {
+                    console.err(err.message || "err in pngs promise list id: " + fileID + ' number:' + index);
+                }));
+            }
+            return When.all(pngsPromiseList).then(() => {
+                return resolve();
+            })
+        }
     });
 
     router.get('/get_resource', function (req, res, next) {

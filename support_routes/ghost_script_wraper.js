@@ -34,9 +34,7 @@ gs.prototype.device = function (device) {
 
 gs.prototype.exec = function (callback) {
     var self = this;
-
     if (!this._input) return callback("Please specify input");
-
     var args = this.options.concat([this._input]).join(' ');
     exec((os.platform() == 'win32' ? 'gswin64c ' : 'gs ')  + args, function (err, stdout, stderr) {
         callback(err, stdout, stderr);
