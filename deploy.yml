@@ -62,7 +62,14 @@
     register: has_nodejs
   - include: install_nodejs.yml
     when: has_nodejs|failed
-    
+
+  - name: check ghost script
+    shell: dpkg-query -W 'gs'
+    ignore-errors: True
+    register: has_gs
+    include: install_gs.yml
+    when: has_gs|failed
+
   - name: check mongodb server
     shell: dpkg-query -W 'mongodb-org-server'
     ignore_errors: True
