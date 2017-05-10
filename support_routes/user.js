@@ -6,17 +6,6 @@ exports.getRoute = function (s) {
     var router = Express.Router();                          //create a new router later on will add in the app.js
     var jsonParser = BodyParser.json({limit: '10kb'});      //json parser parse the request before router run it's content
 
-    router.get('/course', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
-        if(!req.userLoginInfo) return res.status(400).send('please login first');
-        if (req.userLoginInfo.record.role == "Instructor") {
-            res.render("course_instructor.ejs");
-        } else if (req.userLoginInfo.record.role == "Student") {
-            res.render("course_student.ejs");
-        } else {
-            res.status(400).send('please choose role from home page first');
-        }
-    });
-
     router.post('/ajax/check-user', jsonParser, function (req, res, next) {     //check user has role for front end sign_up needed
         if (req.userLoginInfo.record.role) {//TODO: double check record
             res.send({result: true, sign_up: false, redirect: '/course'});

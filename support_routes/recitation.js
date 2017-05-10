@@ -7,6 +7,35 @@ exports.getRoute = function (s) {
 
     var jsonParser = BodyParser.json({limit: '100kb'});
 
+    router.get('/course/:classId', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
+      s.classConn.getRecitationsByClass(req.params.classId).then((response) => {
+            let recitations = [];
+            response.forEach(function (element) {
+              recitations.push({roomid: element.numericID, name:element.name, mongoid:element._id});
+            });
+            if (req.userLoginInfo.record.role == "Instructor") {
+                res.render("recitation.ejs",{
+                  recitations: recitations,
+                  classId: req.params.classId,
+                  username: req.userLoginInfo.username,
+                  instructor: true
+                });
+            } else if (req.userLoginInfo.record.role == "Student") {
+                res.render("recitation.ejs",{
+                  recitations: recitations,
+                  classId: req.params.classId,
+                  username: req.userLoginInfo.username,
+                  instructor: false
+                });
+            } else {
+                res.status(400).send('please choose role from home page first');
+            }
+          }
+      ).catch((e) => {
+          res.status(400).send({result: false, reason: e.message ? e.message : "error in class DB add class"});
+      });
+    });
+
     router.post('/ajax/add-recitation', jsonParser, (req, res, next) => {       //add recitation to class db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
