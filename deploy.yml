@@ -67,7 +67,7 @@
     shell: dpkg-query -W 'gs'
     ignore-errors: True
     register: has_gs
-    include: install_gs.yml
+  - include: install_gs.yml
     when: has_gs|failed
 
   - name: check mongodb server
