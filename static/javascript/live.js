@@ -25,6 +25,7 @@ events = {
     workAreaRatioChange: createEventConstructor('workAreaRatioChange'),
     switchToSpeaker: createEventConstructor('switchToSpeaker'),
     switchToListener: createEventConstructor('switchToListener'),
+    newSpeakers: createEventConstructor('newSpeakers'),
     slidesChange: createEventConstructor('slidesChange'),
     viewSizeChange: createEventConstructor('viewSizeChange'),
 };
@@ -261,4 +262,27 @@ function activateSound() {
 
 // attach handler to change speaker role
 document.addEventListener(events.switchToSpeaker.type, activateSound, false);
+document.addEventListener(events.switchToSpeaker.type, (e)=>{
+    if(e.changed){
+        toastr.success('You are in speaking now','',{timeOut: 2000, progressBar:true});
+    }
+}, false);
 document.addEventListener(events.switchToListener.type, activateSound, false);
+document.addEventListener(events.switchToListener.type, (e)=>{
+    if(e.changed){
+        toastr.info('You speaking is ended','',{timeOut: 2000, progressBar:true});
+    }
+}, false);
+
+document.addEventListener(events.newSpeakers.type, (e)=>{
+    var userNameList = [];
+    e.newSpeakers.forEach((userID)=>{
+        var userInfo = transactionSystem.userList[userID];
+        userNameList.push(userInfo.name || userInfo.email);
+    });
+    toastr.info(userNameList.join(', ')+' is now speaking','',{timeOut: 2000, progressBar:true});
+}, false);
+
+document.addEventListener(events.endRecitation.type, (e) => {
+    toastr.success('Class is ended','',{timeOut: 10000, progressBar:true});
+}, false);
