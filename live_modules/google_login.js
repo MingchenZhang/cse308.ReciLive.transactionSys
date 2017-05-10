@@ -24,7 +24,8 @@ exports.getUserInfo = function (tokenID) {
                 resolve({
                     userID: payload['sub'],
                     name: payload['name'],
-                    email: payload['email']
+                    email: payload['email'],
+                    photo: payload['picture']
                 });
             });
     });

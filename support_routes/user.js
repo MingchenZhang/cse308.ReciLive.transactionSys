@@ -25,7 +25,7 @@ exports.getRoute = function (s) {
             return s.userConn.getUserByEmail(userInfo.email);
         }).then((userInfo)=>{
             if(!userInfo){ // user is not in db
-                return s.userConn.addUser(googleUserInfo.userID, googleUserInfo.email, null, googleUserInfo.name).then((result)=>{
+                return s.userConn.addUser(googleUserInfo.userID, googleUserInfo.email, null, googleUserInfo.name,googleUserInfo.photo).then((result)=>{
                     return result.insertedId;
                 });
             }else if(s.userConn.matchBasicUserInfoRule(userInfo)){ // user has complete info
@@ -33,7 +33,7 @@ exports.getRoute = function (s) {
                 return userInfo._id;
             }else{ // user info is incomplete
                 hasRole = !!userInfo.role;
-                let record = {googleID: googleUserInfo.userID, username: googleUserInfo.name};
+                let record = {googleID: googleUserInfo.userID, username: googleUserInfo.name,googlePhoto:googleUserInfo.photo};
                 return s.userConn.setUserInfo(userInfo._id, record).then((result)=>{
                     return userInfo._id;
                 });
