@@ -7,48 +7,49 @@ exports.getRoute = function (s) {
     var jsonParser = BodyParser.json({limit: '10kb'});
 
     router.get('/course', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
-        if(!req.userLoginInfo) return res.status(400).send('please login first');
-        if (req.userLoginInfo.record.role == "Instructor") {
-            res.render("course.ejs",{
-              username: req.userLoginInfo.record.googlePhoto,
-              instructor: true
-            });
-        } else if (req.userLoginInfo.record.role == "Student") {
-          res.render("course.ejs",{
-            username: req.userLoginInfo.record.googlePhoto,
-            instructor: false
+        if(!req.userLoginInfo) {
+          return res.render("error.ejs", {
+            message: 'please login first'
           });
-        } else {
-            res.status(400).send('please choose role from home page first');
         }
-    });
-
-    router.post('/ajax/list-class-list', jsonParser, function (req, res, next) {    //return all the class list according to user's role
         if (req.userLoginInfo.record.role == "Instructor") {
             s.classConn.getClassesByOwner(req.userLoginInfo.record._id).then((r) => {
-                let names = [];
+                let classes = [];
                 r.forEach(function (element) {
-                    names.push([element._id, element.name]);
+                    classes.push({id: element._id, name: element.name});
                 });
-                res.send({result: true, list: names});
+                res.render("course.ejs",{
+                  username: req.userLoginInfo.username,
+                  instructor: true,
+                  classes: classes
+                });
             }).catch((e) => {
-                    res.send({result: false, reason: e.message ? e.message : 'get classes by instructor error'});
+                  res.render("error.ejs", {
+                    message: e.message ? e.message : 'get classes by instructor error'
+                  });
                 }
-            )
-            ;
+            );
         } else if (req.userLoginInfo.record.role == "Student") {
             s.classConn.getClassesByStudent(req.userLoginInfo.record._id).then((r) => {
-                let names = [];
+                let classes = [];
                 r.forEach(function (element) {
-                    names.push([element._id, element.name]);
+                    classes.push({id: element._id, name: element.name});
                 });
-                res.send({result: true, list: names});
+                res.render("course.ejs",{
+                  username: req.userLoginInfo.username,
+                  instructor: false,
+                  classes: classes
+                });
             }).catch((e) => {
-                    res.send({result: false, reason: e.message || 'get classes by student error'});
+                  res.render("error.ejs", {
+                    message: e.message || 'get classes by student error'
+                  });
                 }
             );
         } else {
-            res.send({result: false, reason: "no such role"});
+          res.render("error.ejs", {
+            message: 'no such role'
+          });
         }
     });
 

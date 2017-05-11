@@ -29,7 +29,6 @@
     <!-- Our JS-->
     <script src="static/javascript/authentication.js"></script>
     <script src="static/javascript/class.js"></script>
-    <script src="static/javascript/class-generator.js"></script>
     <script src="static/javascript/papaparse.min.js"></script>
 </head>
 
@@ -61,6 +60,35 @@
     <section>
         <div class="container-fluid">
             <div class="row class-list">
+              <% classes.forEach(function(element) { %>
+                <div class="col s6 m3">
+                  <div class="class">
+                    <h4><%= element.name %></h4>
+                    <div class="dropdown-course-content">
+                        <a href="course/<%= element.id %>">Enter</a>
+                        <a href="#<%= element.id %>">More</a>
+                    </div>
+                  </div>
+                </div>
+                <div id="<%= element.id %>" class="modal bottom-sheet">
+                    <div class="modal-content class-option">
+                        <a onclick="viewClassInfo('<%= element.id %>')" href="#class-detail">Edit <%= element.name %></a>
+                        <% if(instructor) { %>
+                          <a href="" onclick="deleteClass('<%= element.id %>')">Delete <%= element.name %></a>
+                        <% } %>
+                    </div>
+                </div>
+                <script>
+                    $('#<%= element.id %>').modal({
+                        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+                        opacity: .5, // Opacity of modal background
+                        inDuration: 300, // Transition in duration
+                        outDuration: 200, // Transition out duration
+                        startingTop: '4%', // Starting top style attribute
+                        endingTop: '10%' // Ending top style attribute
+                    });
+                </script>
+              <% }); %>
             </div>
         </div>
     </section>

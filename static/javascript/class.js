@@ -1,5 +1,4 @@
 $(document).ready(function(){
-    listClasses();
     $('.modal').modal({
     dismissible: true, // Modal can be dismissed by clicking outside of the modal
     opacity: .5, // Opacity of modal background
@@ -76,31 +75,6 @@ function checkClassDate(startDate, endDate) {
       });
 }
 
-function listClasses() {
-    var listDiv = $('.class-list');
-    $(".current-class-name").remove();
-
-    $.ajax({
-        url: '/ajax/list-class-list',
-        type: 'post'
-    }).done(function (data) {
-        if(data.result === true) {
-            var lists = data.list;
-            listDiv.empty();
-            for(var i in lists) {
-                var listTemplate = new ClassGenerator();
-                var div = $("<div class='col s6 m3'></div>");
-                listDiv.append(div);
-                listTemplate.init(div, lists[i]);
-            }
-        }else {
-            console.error(data.reason);
-        }
-    }).fail(function (err) {
-        console.error(err);
-    });
-}
-
 function initClassModal() {
   $(".class-name").val('');
   initDateForClass();
@@ -128,7 +102,7 @@ function addClass() {
         success: function(data){
             if(data.result === true) {
                 $('#class-detail').modal('close');
-                listClasses();
+                location.reload();
             }else {
                 console.error(data.reason);
             }
@@ -204,7 +178,7 @@ function editClass(current_class_id) {
         success: function(data){
             if(data.result === true) {
                 $('#class-detail').modal('close');
-                listClasses();
+                location.reload();
             }else {
                 console.error(data.reason);
             }
