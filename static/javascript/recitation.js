@@ -7,7 +7,9 @@ $(document).ready(function(){
     startingTop: '4%', // Starting top style attribute
     endingTop: '10%' // Ending top style attribute
   });
-  $('ul.tabs').tabs();
+  $('ul.tabs').tabs({
+    swipeable: true
+  });
 });
 
 function initRecModal(classId) {
@@ -167,4 +169,10 @@ function editRecitation(current_recitation_id, currentClassId) {
       dataType: "json",
       contentType : "application/json"
   });
+}
+
+function addSlide() {
+  var count = $(".tabs li").length;
+  $(".tabs").append("<li class='tab col s3'><a href='#slide"+count+"'>Slide"+count+"</a></li>");
+  $(".slide-container").append("<div id=slide"+count+" class='list-group></div>");
 }

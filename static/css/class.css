@@ -41,8 +41,7 @@ nav {
   margin: 10px;
   color: white;
   width: 60px;
-  /*background-color: #e05038;*/
-  background-color: black;
+  background-color: #e05038;
   transition: width .35s;
   -webkit-transition: width .35s;
   overflow: hidden;
