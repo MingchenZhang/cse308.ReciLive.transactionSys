@@ -122,12 +122,16 @@ else console.error('WARNING: no role assigned');
 // ---------------error handling section ---------------
 // 404 error
 app.all('*', function (req, res, next) {
-    res.status(404).send("404 NOT FOUND");
+    // res.status(404).send("404 NOT FOUND");
+    res.render("404.ejs");
 });
 // default error handling
 app.use(function (err, req, res, next) {
     console.error(err.stack || err);
-    res.status(500).send("500 SERVER ERROR");
+    // res.status(500).send("500 SERVER ERROR");
+    res.render("error.ejs",{
+      message: err
+    });
 });
 
 // create server

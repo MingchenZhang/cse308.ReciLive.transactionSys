@@ -10,12 +10,12 @@ exports.getRoute = function (s) {
         if(!req.userLoginInfo) return res.status(400).send('please login first');
         if (req.userLoginInfo.record.role == "Instructor") {
             res.render("course.ejs",{
-              username: req.userLoginInfo.username,
+              username: req.userLoginInfo.record.googlePhoto,
               instructor: true
             });
         } else if (req.userLoginInfo.record.role == "Student") {
           res.render("course.ejs",{
-            username: req.userLoginInfo.username,
+            username: req.userLoginInfo.record.googlePhoto,
             instructor: false
           });
         } else {
