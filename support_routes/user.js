@@ -33,7 +33,7 @@ exports.getRoute = function (s) {
                 return userInfo._id;
             }else{ // user info is incomplete
                 hasRole = !!userInfo.role;
-                let record = {googleID: googleUserInfo.userID, username: googleUserInfo.name,googlePhoto:googleUserInfo.photo};
+                let record = {googleID: googleUserInfo.userID, username: googleUserInfo.name,photo:googleUserInfo.photo};
                 return s.userConn.setUserInfo(userInfo._id, record).then((result)=>{
                     return userInfo._id;
                 });
