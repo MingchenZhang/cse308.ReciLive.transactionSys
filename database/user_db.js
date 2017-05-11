@@ -45,7 +45,7 @@ exports.getUserByEmail = function (email) {
     return userDB.usersColl.findOne({email});
 };
 
-exports.addUser = function (googleID, email, role, username, _id,photo) {
+exports.addUser = function (googleID, email, role, username,photo,_id) {
     _id = s.mongodb.ObjectID(_id);
     return userDB.usersColl.insertOne({
         googleID,

@@ -156,10 +156,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                         });
                     }
                 });
-
                 return promiseList;
             };
-
             /**
              * send new slides to transaction system
              * @param slideDataObj
