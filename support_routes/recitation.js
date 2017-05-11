@@ -17,14 +17,14 @@ exports.getRoute = function (s) {
                 res.render("recitation.ejs",{
                   recitations: recitations,
                   classId: req.params.classId,
-                  username: req.userLoginInfo.username,
+                  username: req.userLoginInfo.record.photo,
                   instructor: true
                 });
             } else if (req.userLoginInfo.record.role == "Student") {
                 res.render("recitation.ejs",{
                   recitations: recitations,
                   classId: req.params.classId,
-                  username: req.userLoginInfo.username,
+                  username: req.userLoginInfo.record.photo,
                   instructor: false
                 });
             } else {

@@ -34,8 +34,10 @@
       <div class="nav-wrapper">
         <img class="brand-logo center" src="../static/img/logo/android-icon-48x48.png">
         <div class="sign-in" data-onsuccess="onSignIn"></div>
-        <h4><%= username %></h4>
-        <a href="#" id="sign-out" class="waves-effect waves-light btn red" onclick="signOut()">Log out</a>
+        <a id="sign-out" onclick="signOut()">
+          <img src="<%= username %>">
+          <div class="logout">LOGOUT</div>
+        </a>
       </div>
       <% if(instructor) { %>
       <div class="nav-content">

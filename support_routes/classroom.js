@@ -19,7 +19,7 @@ exports.getRoute = function (s) {
                     classes.push({id: element._id, name: element.name});
                 });
                 res.render("course.ejs",{
-                  username: req.userLoginInfo.username,
+                  username: req.userLoginInfo.record.photo,
                   instructor: true,
                   classes: classes
                 });
@@ -36,7 +36,7 @@ exports.getRoute = function (s) {
                     classes.push({id: element._id, name: element.name});
                 });
                 res.render("course.ejs",{
-                  username: req.userLoginInfo.username,
+                  username: req.userLoginInfo.record.photo,
                   instructor: false,
                   classes: classes
                 });

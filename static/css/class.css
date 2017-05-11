@@ -11,14 +11,52 @@ nav {
 .brand-logo {
   top: 14%;
 }
-#sign-out {
-  top: 13;
-  left: 10;
-}
 .nav-wrapper {
   display: flex;
   flex-direction: row;
 }
+/* Log out button */
+#sign-out img {
+  width: 50px;
+  border-radius: 50px;
+  float: left;
+}
+
+.logout {
+  font-size: .8em;
+	position: relative;
+  right: -18px;
+  overflow: hidden;
+  letter-spacing: 3px;
+  opacity: 0;
+  transition: opacity .45s;
+  -webkit-transition: opacity .35s;
+  height: 40px;
+}
+
+#sign-out {
+	text-decoration: none;
+	float: right;
+  padding: 5px;
+  margin: 10px;
+  color: white;
+  width: 60px;
+  /*background-color: #e05038;*/
+  background-color: black;
+  transition: width .35s;
+  -webkit-transition: width .35s;
+  overflow: hidden;
+}
+
+#sign-out:hover {
+  width: 150px;
+}
+
+#sign-out:hover .logout{
+  opacity: .9;
+}
+/* end log out button */
+
 .class-info {
   text-align: center;
 }
