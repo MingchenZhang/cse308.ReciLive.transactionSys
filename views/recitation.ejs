@@ -156,10 +156,10 @@
             <div class="row slide-container">
                 <div class="col s12">
                     <ul class="tabs">
-                        <li class="tab col s3"><a href="#listWithHandle">Slide 1</a></li>
+                        <!--<li class="tab col s3"><a href="#listWithHandle">Slide 1</a></li>-->
                     </ul>
                 </div>
-                <div id="listWithHandle" class="list-group"></div>
+                <!--<div id="listWithHandle" class="list-group"></div>-->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-info upload-button">Upload</button>
@@ -190,7 +190,7 @@
                     return;
                 }
                 var slideDiv = $("<div id=slide" + i + " class='list-group></div>");
-                var tab = $('<li class="tab col s3"><a href="#slide' + i + '">'+slide+'</a></li>');
+                var tab = $('<li class="tab col s3"><a href="#slide' + i + '">'+slide.name+'</a></li>');
                 slide.pages.forEach((item)=> {
                     generateItem(item.id, item.name, slideDiv);
                 });
@@ -291,15 +291,15 @@
         window.showResourcesEdit = (recitationID) => {
             var resourcesModal = $('.resources-modal');
             resourcesModal.modal('open');
-            $('#listWithHandle').empty();
             $.ajax({
                 type: 'GET',
                 url: '/ajax/get-recitation-resource?recitationID=' + encodeURIComponent(recitationID),
                 dataType: "json"
             }).then((resources) => {
-                if (Object.keys(resources).length != 0) {
-                    reGenerateView(resources.resources[0].content);
+                if (!(Object.keys(resources).length != 0)) {
+                    resources = {resources:[{content:[]}]};
                 }
+                reGenerateView(resources.resources[0].content);
                 console.log('resources load successful');
             }).catch((err) => {
                 console.error('unable to load resources');
