@@ -224,7 +224,7 @@
                         url: "https://recilive.stream/get_resource?id=" + ($(item).attr('data-id'))
                     });
                 });
-                result.push(slide);
+                result.push(slideObj);
             });
             return result;
         };
@@ -310,7 +310,7 @@
             uploadButton.click(()=> {
                 var focusedIndex = 0;
                 resourcesModal.find('.tabs').find('a').each((i, elem)=>{
-                    if($(elem).hassClass('active')){
+                    if($(elem).hasClass('active')){
                         focusedIndex = i;
                     }
                 });
