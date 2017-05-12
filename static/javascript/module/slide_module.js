@@ -10,12 +10,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     self.currentSlidesNumber = -1;
     //reset ignore slidelist and clean up canvas
     self.slidesName = null;
+    self.preload = 5; // how many slides will be preload
     self.reset = function () {
-        self.slidesIndex = null;
         self.ignoreTransaction = {};
         self.slideData = [];
         self.slidesName = null;
-        self.slidesIndex = null;
         //check here for reset problem
         if (showDiv.find('#slide-img')) showDiv.find('#slide-img').remove();
         self.currentSlidesNumber = -1;
@@ -37,12 +36,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         selectorDiv.children('*').remove();
         let i = 0;
         self.slideData.forEach(function (element) {
-            var slidesOption = $('<div class="slides element" index="' + (i++) + '" value="' + element.name + '">' + element.name + '</div>');
+            var slidesOption = $('<div class="slides element" value="' + element.name + '">' + element.name + '</div>');
             slidesOption.on('click', function () {
-                self.slidesIndex = parseInt($(this).attr('index'));
                 self.slidesName = $(this).attr('value');
                 self.currentSlidesNumber = 0;
-                self.newSlide(self.slideData[self.slidesIndex].imgDataList[0]);
+                self.newSlide(self.slideData[slidesName].imgDataList[0]);
             });
             selectorDiv.append(slidesOption);
         });
@@ -75,7 +73,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         showImage(payload.slideImage, showDiv);
         self.currentSlidesNumber = payload.slideIndex;
         self.slidesName = payload.slidesName;
-        self.slidesIndex = payload.slidesIndex;
     };
     function enrollEvent() {            //enroll　enable handler and disable handler
         document.addEventListener(events.switchToPlayBack.type, disableHandler);
@@ -99,16 +96,49 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         nextButton.hide();
     }
 
-    function resourceChecker (resource){
-        if(!resource)return true;
-        for (element in resource){
-            if(resource[element].type=="slide")return false;
+    function resourceChecker(resource) {
+        if (!resource)return true;
+        for (element in resource) {
+            if (resource[element].type == "slide")return false;
         }
         return true;
     }
+
+    function getImage(slidesName, slidesNumber) {
+        var obj = self.slideData[slidesName].imgDataList[slidesNumber];
+        if (obj.then) {
+            return obj;
+        } else if (slidesNumber >= 0 && slidesNumber < self.slideData[slidesName].imgDataList.length) {
+            return self.slideData[slidesName].imgDataList[slidesNumber] = new Promise(function (resolve, reject) {
+                var img = document.createElement('img');
+                img.crossOrigin = 'anonymous';
+                img.src = obj.url;
+                img.onload = function () {
+                    let canvas = document.createElement("canvas");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    resolve({slide64: canvas.toDataURL("image/png"), id: slidesNumber});
+                };
+            })
+        } else {
+            console.log("out of index for slidenumber");
+        }
+    }
+
+    function getImagePromiseList(slidesName, slidesStart, slidesEnd) {
+        if (slidesStart <= slidesEnd) {
+            var PromiseList = [];
+            for (var index = slidesStart; index <= slidesEnd; index++) {
+                PromiseList.push(getImage(slidesName, index));
+            }
+            return PromiseList;
+        }
+    }
+
 //init call after transaction finish load and get privilege info
     self.init = function () {
-        if(resourceChecker(resource)){
+        if (resourceChecker(resource)) {
             nextButton.hide();
             previousButton.hide();
             selectorDiv.hide();
@@ -118,9 +148,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         enrollEvent();
         if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;       // admin get control
         if (asController) {
-            self.loadAllSlides = function () {              //download all slides
+            self.loadAllSlides = function () {              //download all slides url
                 var promiseList = [];
-
                 resource.forEach(function (element) {
                     if (element.type == "slide") {
                         //get all slides list
@@ -129,30 +158,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                         let listItemCounter = -1;
                         payload.forEach(function (slides) {
                             //counter for promiseList
-                            let index = -1;
-                            self.slideData[slidesCounter++] = {name: slides.name, imgDataList: []};
-                            slides.pages.forEach(function (url) {
-                                index++;
-                                listItemCounter++;
-                                let i = index;
-                                promiseList[listItemCounter] = new Promise(function (resolve, reject) {
-                                    var img = document.createElement('img');
-                                    img.crossOrigin = 'anonymous';
-                                    img.src = url.url;
-                                    let j = slidesCounter - 1;
-                                    img.onload = function () {
-                                        let canvas = document.createElement("canvas");
-                                        canvas.width = img.width;
-                                        canvas.height = img.height;
-                                        canvas.getContext('2d').drawImage(img, 0, 0);
-                                        self.slideData[j].imgDataList[i] = {
-                                            slide64: canvas.toDataURL("image/png"),
-                                            id: i
-                                        };
-                                        resolve();
-                                    };
-                                });
-                            });
+                            if (!self.slidesName || self.slidesName == null) self.slidesName = slides.name;
+                            self.slideData[slides.name] = {name: slides.name, imgDataList: slides.pages};
+                            promiseList.concat(getImagePromiseList(slides.name, 0, self.preload));
                         });
                     }
                 });
@@ -173,7 +181,6 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                     slideImage: slideDataObj.slide64,
                     slideIndex: slideDataObj.id,
                     slidesName: self.slidesName,
-                    slidesIndex: self.slidesIndex
                 })
                     .then(function (result) {
                         document.dispatchEvent(events.slidesChange());    //dispatch event for the slides changing
@@ -184,46 +191,57 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                     delete self.ignoreTransaction[id];
                 });
             };
+            addHandler();
 
-            previousButton.on('click', function () { //to precious slide
-                if (self.currentSlidesNumber - 1 > -1) {
-                    self.newSlide(self.slideData[self.slidesIndex].imgDataList[--self.currentSlidesNumber]);
-                    console.log("previous slide\n current slide number :", self.currentSlidesNumber);
-                }
-                else {
-                    console.log("no previous slide\n");
-                }
-            });
-
-            nextButton.on('click', function () {        //to next slide
-                if (self.currentSlidesNumber + 1 < self.slideData[self.slidesIndex].imgDataList.length) {
-                    self.newSlide(self.slideData[self.slidesIndex].imgDataList[++self.currentSlidesNumber]);
-                    console.log("next slide\n current slide number :", self.currentSlidesNumber);
-                }
-                else {
-                    console.log("no next slide\n");
-                }
-            });
             Promise.all(self.loadAllSlides()).then(function (response) {
                 updateSelector();
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
                     self.slidesIndex = 0;
-                    self.slidesName = self.slideData[self.slidesIndex].name;
-                    self.newSlide(self.slideData[self.slidesIndex].imgDataList[++self.currentSlidesNumber]);
+                    self.slidesName = self.slideData[self.slidesName].name;
+                    getImage(self.slidesName, ++self.currentSlidesNumber).then(function (response) {
+                        self.newSlide(response);
+                    });
                 } else {
                     console.log("reconnect to classroom and instructor and get previous slides");
                 }
             });
-
-
         } else {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {     //don't have control for slides
                 nextButton.remove();
                 previousButton.remove();
                 resolve();
             })
         }
-    }
+    };
+    function addHandler() {
+        previousButton.on('click', function () { //to precious slide
+            if (self.currentSlidesNumber - 1 > -1) {
+                getImage(self.slidesName, --self.currentSlidesNumber).then(function (response) {
+                    self.newSlide(response);
+                });
+                getImagePromiseList(self.slidesName, self.currentSlidesNumber--, self.currentSlidesNumber++);
+                console.log("previous slide\n current slide number :", self.currentSlidesNumber);
+            }
+            else {
+                console.log("no previous slide\n");
+                toastr.success('no previous slide', '', {timeOut: 10000, progressBar: true});
 
+            }
+        });
+
+        nextButton.on('click', function () {        //to next slide
+            if (self.currentSlidesNumber + 1 < self.slideData[self.slidesName].imgDataList.length) {
+                getImage(self.slidesName, ++self.currentSlidesNumber).then(function (response) {
+                    self.newSlide(response);
+                });
+                getImagePromiseList(self.slidesName, self.currentSlidesNumber--, self.currentSlidesNumber++);
+                console.log("next slide\n current slide number :", self.currentSlidesNumber);
+            }
+            else {
+                console.log("no next slide\n");
+                toastr.success('no next slide', '', {timeOut: 10000, progressBar: true});
+            }
+        });
+    }
 }
