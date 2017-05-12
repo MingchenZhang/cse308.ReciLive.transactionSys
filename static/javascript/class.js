@@ -226,8 +226,10 @@ function import_student() {
     Papa.parse(file, {
         complete: function(results) {
             for(count = 0; count < results.data.length; count++){
-                $(".student-list").append("<input type='text' class='student-email' value= '"+ results.data[count][1] + "'>");
+              if(results.data[count][0] !== '')
+                $(".student-list").append("<div class='col s12 student-email-main-container'><div class='input-field student-email-container'><input type='email' class='student-email validate' value="+ results.data[count][0] + " oninput='validateClassModalInput()'><label for='email'>Email</label></div><a class='btn-floating btn-large red delete-student' onclick='deleteStudent(this)'><i class='material-icons left'>delete</i></a></div>");
             }
+            validateClassModalInput();
         }
     });
 }
