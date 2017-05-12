@@ -1,178 +1,195 @@
-$(document).ready(function(){
+$(document).ready(function () {
     $('.modal').modal({
-    dismissible: true, // Modal can be dismissed by clicking outside of the modal
-    opacity: .5, // Opacity of modal background
-    inDuration: 300, // Transition in duration
-    outDuration: 200, // Transition out duration
-    startingTop: '4%', // Starting top style attribute
-    endingTop: '10%' // Ending top style attribute
-  });
-  $('ul.tabs').tabs({
-    swipeable: true
-  });
+        dismissible: true, // Modal can be dismissed by clicking outside of the modal
+        opacity: .5, // Opacity of modal background
+        inDuration: 300, // Transition in duration
+        outDuration: 200, // Transition out duration
+        startingTop: '4%', // Starting top style attribute
+        endingTop: '10%' // Ending top style attribute
+    });
+    $('ul.tabs').tabs({
+        swipeable: true
+    });
 });
 
 function initRecModal(classId) {
-  $(".recitation-name").val('');
-  initDateForRec();
-  $(".delete-recitation-btn").hide();
-  $(".save-recitaiton").attr("onclick","addRecitation('"+classId+"')");
+    $(".recitation-name").val('');
+    initDateForRec();
+    $(".delete-recitation-btn").hide();
+    $(".save-recitaiton").attr("onclick", "addRecitation('" + classId + "')");
 }
 
 function validateRecitationModalInput() {
-  if($(".recitation-name").val() != '' && $("#rec-date-alert").is(":hidden")) {
-    $('.save-recitaiton').removeAttr('disabled');
-  }else {
-    $(".save-recitaiton").attr("disabled",true);
-  }
+    if ($(".recitation-name").val() != '' && $("#rec-date-alert").is(":hidden")) {
+        $('.save-recitaiton').removeAttr('disabled');
+    } else {
+        $(".save-recitaiton").attr("disabled", true);
+    }
 }
 
 function initDateForRec() {
-  $(".save-recitaiton").attr("disabled",true);
-  $('#rec-date-alert').hide();
-  var startDate = new Date();
-  var endDate = new Date();
-  var today = new Date();
-  var currentMonth = today.getMonth()+1;
-  var t = today.getFullYear() + "-" + currentMonth + "-" + today.getDate();
-  $('#rec-date-start').data({date: t}).datepicker('update');
-  $('#rec-date-start-display').text($('#rec-date-start').data('date'));
-  $('#rec-date-end').data({date: t}).datepicker('update');
-  $('#rec-date-end-display').text($('#rec-date-end').data('date'));
-  checkRecitationDate(startDate, endDate);
+    $(".save-recitaiton").attr("disabled", true);
+    $('#rec-date-alert').hide();
+    var startDate = new Date();
+    var endDate = new Date();
+    var today = new Date();
+    var currentMonth = today.getMonth() + 1;
+    var t = today.getFullYear() + "-" + currentMonth + "-" + today.getDate();
+    $('#rec-date-start').data({date: t}).datepicker('update');
+    $('#rec-date-start-display').text($('#rec-date-start').data('date'));
+    $('#rec-date-end').data({date: t}).datepicker('update');
+    $('#rec-date-end-display').text($('#rec-date-end').data('date'));
+    checkRecitationDate(startDate, endDate);
 }
 
 function checkRecitationDate(startDate, endDate) {
-  $('#rec-date-start')
-      .datepicker()
-      .on('changeDate', function(ev){
-          if (ev.date.valueOf() > endDate.valueOf()){
-              $('#rec-date-alert').show().find('strong').text('The start date must be before the end date.');
-          } else {
-              $('#rec-date-alert').hide();
-              startDate = new Date(ev.date);
-              $('#rec-date-start-display').text($('#rec-date-start').data('date'));
-          }
-          $('#rec-date-start').datepicker('hide');
-          validateRecitationModalInput();
-      });
-  $('#rec-date-end')
-      .datepicker()
-      .on('changeDate', function(ev){
-          if (ev.date.valueOf() < startDate.valueOf()){
-              $('#rec-date-alert').show().find('strong').text('The end date must be after the start date.');
-          } else {
-              $('#rec-date-alert').hide();
-              endDate = new Date(ev.date);
-              $('#rec-date-end-display').text($('#rec-date-end').data('date'));
-          }
-          $('#rec-date-end').datepicker('hide');
-          validateRecitationModalInput();
-      });
+    $('#rec-date-start')
+        .datepicker()
+        .on('changeDate', function (ev) {
+            if (ev.date.valueOf() > endDate.valueOf()) {
+                $('#rec-date-alert').show().find('strong').text('The start date must be before the end date.');
+            } else {
+                $('#rec-date-alert').hide();
+                startDate = new Date(ev.date);
+                $('#rec-date-start-display').text($('#rec-date-start').data('date'));
+            }
+            $('#rec-date-start').datepicker('hide');
+            validateRecitationModalInput();
+        });
+    $('#rec-date-end')
+        .datepicker()
+        .on('changeDate', function (ev) {
+            if (ev.date.valueOf() < startDate.valueOf()) {
+                $('#rec-date-alert').show().find('strong').text('The end date must be after the start date.');
+            } else {
+                $('#rec-date-alert').hide();
+                endDate = new Date(ev.date);
+                $('#rec-date-end-display').text($('#rec-date-end').data('date'));
+            }
+            $('#rec-date-end').datepicker('hide');
+            validateRecitationModalInput();
+        });
 }
 
 function viewRecitationInfo(current_recitation_id, currentClassId) {
-  $("#"+current_recitation_id).modal('close');
-  $("#recitation-detail label").addClass("active");
-  $.ajax({
-      url: '/ajax/get-recitation-info',
-      type: 'post',
-      data: JSON.stringify({recitationId: current_recitation_id}),
-      contentType: "application/json; charset=utf-8",
-      dataType: 'json'
-  }).done(function (data) {
-      if(data.result === true) {
-        $(".recitation-name").val(data.recitation.name);
-        $('#rec-date-alert').hide();
-        $(".save-recitaiton").attr("disabled",true);
-        var startDate = new Date(data.recitation.startDate);
-        var endDate = new Date(data.recitation.endDate);
-        var startMonth = startDate.getMonth()+1;
-        var endMonth = endDate.getMonth()+1;
-        var start = startDate.getFullYear() + "-" + startMonth + "-" + startDate.getDate();
-        var end = endDate.getFullYear() + "-" + endMonth + "-" + endDate.getDate();
-        $('#rec-date-start').data({date: start}).datepicker('update');
-        $('#rec-date-start-display').text($('#rec-date-start').data('date'));
-        $('#rec-date-end').data({date: end}).datepicker('update');
-        $('#rec-date-end-display').text($('#rec-date-end').data('date'));
-        checkRecitationDate(startDate, endDate);
+    $("#" + current_recitation_id).modal('close');
+    $("#recitation-detail label").addClass("active");
+    $.ajax({
+        url: '/ajax/get-recitation-info',
+        type: 'post',
+        data: JSON.stringify({recitationId: current_recitation_id}),
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json'
+    }).done(function (data) {
+        if (data.result === true) {
+            $(".recitation-name").val(data.recitation.name);
+            $('#rec-date-alert').hide();
+            $(".save-recitaiton").attr("disabled", true);
+            var startDate = new Date(data.recitation.startDate);
+            var endDate = new Date(data.recitation.endDate);
+            var startMonth = startDate.getMonth() + 1;
+            var endMonth = endDate.getMonth() + 1;
+            var start = startDate.getFullYear() + "-" + startMonth + "-" + startDate.getDate();
+            var end = endDate.getFullYear() + "-" + endMonth + "-" + endDate.getDate();
+            $('#rec-date-start').data({date: start}).datepicker('update');
+            $('#rec-date-start-display').text($('#rec-date-start').data('date'));
+            $('#rec-date-end').data({date: end}).datepicker('update');
+            $('#rec-date-end-display').text($('#rec-date-end').data('date'));
+            checkRecitationDate(startDate, endDate);
 
-        $(".save-recitaiton").attr("onclick","editRecitation('"+current_recitation_id+"','"+currentClassId+"')");
-      }else {
-          console.error(data.reason);
-      }
-  }).fail(function (err) {
-      console.error(err);
-  });
+            $(".save-recitaiton").attr("onclick", "editRecitation('" + current_recitation_id + "','" + currentClassId + "')");
+        } else {
+            console.error(data.reason);
+        }
+    }).fail(function (err) {
+        console.error(err);
+    });
 }
 
 function deleteRecitation(recID, classId) {
-  $.ajax({
-      url: '/ajax/delete-recitation',
-      type: 'post',
-      data: JSON.stringify({recitationId: recID}),
-      contentType: "application/json; charset=utf-8",
-      dataType: 'json'
-  }).done(function (data) {
-    $("#"+recID).modal('close');
-    location.reload();
-  }).fail(function (err) {
-      console.error(err);
-  });
+    $.ajax({
+        url: '/ajax/delete-recitation',
+        type: 'post',
+        data: JSON.stringify({recitationId: recID}),
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json'
+    }).done(function (data) {
+        $("#" + recID).modal('close');
+        location.reload();
+    }).fail(function (err) {
+        console.error(err);
+    });
 }
 
 function addRecitation(currentClassId) {
     var name = $(".recitation-name").val();
-    var startDate = $('#rec-date-start-display').text();;
-    var endDate = $('#rec-date-end-display').text();;
+    var startDate = $('#rec-date-start-display').text();
+    ;
+    var endDate = $('#rec-date-end-display').text();
+    ;
 
     $.ajax({
         type: "POST",
         url: "/ajax/add-recitation",
-        data: JSON.stringify({class: currentClassId, name: name, startDate: new Date(startDate), endDate: new Date(endDate)}),
-        success: function(data){
-            if(data.result === true) {
+        data: JSON.stringify({
+            class: currentClassId,
+            name: name,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate)
+        }),
+        success: function (data) {
+            if (data.result === true) {
                 $('#recitation-detail').modal('close');
                 location.reload();
-            }else {
+            } else {
                 console.error(data.reason);
             }
         },
-        error: function(ts) {
+        error: function (ts) {
             console.log(ts.responseText);
         },
         dataType: "json",
-        contentType : "application/json"
+        contentType: "application/json"
     });
 }
 
 function editRecitation(current_recitation_id, currentClassId) {
-  var name = $(".recitation-name").val();
-  var startDate = $("#rec-date-start-display").text();
-  var endDate = $("#rec-date-end-display").text();
+    var name = $(".recitation-name").val();
+    var startDate = $("#rec-date-start-display").text();
+    var endDate = $("#rec-date-end-display").text();
 
-  $.ajax({
-      type: "POST",
-      url: "/ajax/edit-recitation",
-      data: JSON.stringify({recitationId: current_recitation_id, name: name, startDate: new Date(startDate), endDate: new Date(endDate)}),
-      success: function(data){
-          if(data.result === true) {
-              $('#recitation-detail').modal('close');
-              location.reload();
-          }else {
-              console.error(data.reason);
-          }
-      },
-      error: function(ts) {
-          console.log(ts.responseText);
-      },
-      dataType: "json",
-      contentType : "application/json"
-  });
+    $.ajax({
+        type: "POST",
+        url: "/ajax/edit-recitation",
+        data: JSON.stringify({
+            recitationId: current_recitation_id,
+            name: name,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate)
+        }),
+        success: function (data) {
+            if (data.result === true) {
+                $('#recitation-detail').modal('close');
+                location.reload();
+            } else {
+                console.error(data.reason);
+            }
+        },
+        error: function (ts) {
+            console.log(ts.responseText);
+        },
+        dataType: "json",
+        contentType: "application/json"
+    });
 }
 
 function addSlide() {
-  var count = $(".tabs li").length;
-  $(".tabs").append("<li class='tab col s3'><a href='#slide"+count+"'>Slide"+count+"</a></li>");
-  $(".slide-container").append("<div id=slide"+count+" class='list-group></div>");
+    var count = $(".tabs li").length;
+    $(".tabs").append("<li class='tab col s3'><a href='#slide" + count + "'>Slide" + count + "</a></li>");
+    var newSlideTab = $("<div id=slide" + count + " class='list-group></div>");
+    $(".slide-container").append(newSlideTab);
+    Sortable.create(newSlideTab[0], {
+        handle: '.move-file',
+        animation: 150
+    });
 }
