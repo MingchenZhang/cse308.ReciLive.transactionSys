@@ -67,6 +67,16 @@ exports.getClassByMongoID = (classID) => {
 };
 
 /**
+ * @param class name
+ * @returns {Promise.<TResult>|Promise}
+ */
+exports.searchClass = (name) => {
+  return classDB.classesColl.find({ name: {$regex:name}}).then((clazz) => {
+    return clazz;
+  })
+};
+
+/**
  * change the class information by instuctor
  * @param classID   mongoid
  * @param classInfo     obj have all the modified info

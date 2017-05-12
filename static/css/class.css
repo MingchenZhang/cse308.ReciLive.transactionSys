@@ -152,10 +152,31 @@ nav {
     list-style-type: none;
     display: flex;
     flex-direction: row;
+    justify-content: space-around;
     align-items: stretch;
 }
 .class-option a {
+  width: 48%;
+  text-decoration: none;
+  padding: 10px;
+  background-color: #3fb0ac;
+  color: black;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.recitation-option {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: stretch;
+}
+.recitation-option a {
   width: 33%;
   text-decoration: none;
+  padding: 10px;
+  background-color: #3fb0ac;
+  color: black;
+  border-radius: 5px;
   cursor: pointer;
 }

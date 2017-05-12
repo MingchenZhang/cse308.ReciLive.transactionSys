@@ -115,12 +115,11 @@
                 </div>
             </div>
             <div id="<%= recitation.mongoid %>" class="modal bottom-sheet">
-                <div class="modal-content class-option">
+                <div class="modal-content recitation-option">
                     <a onclick="viewRecitationInfo('<%= recitation.mongoid %>','<%= classId %>')"
-                       href="#recitation-detail">Edit <%= recitation.name %></a>
+                       href="#recitation-detail">View <%= recitation.name %></a>
                     <% if(instructor) { %>
-                    <a href="#"
-                       onclick="deleteRecitation('<%= recitation.mongoid %>','<%= classId %>')">Delete <%= recitation.name %></a>
+                    <a href="#" onclick="deleteRecitation('<%= recitation.mongoid %>','<%= classId %>')">Delete <%= recitation.name %></a>
                     <a onclick="showResourcesEdit('<%= recitation.mongoid %>')">Resources</a>
                     <% } %>
                 </div>
