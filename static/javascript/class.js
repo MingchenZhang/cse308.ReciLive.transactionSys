@@ -117,8 +117,7 @@ function addClass() {
 
 function viewClassInfo(current_class_id) {
   closeCurrentClassModal(current_class_id);
-  $("#class-detail label").addClass("active");
-  $(".student-email-container label").addClass("active");
+  $(".student-list label").addClass("active");
   $.ajax({
       url: '/ajax/get-edit-class-info',
       type: 'post',
@@ -148,6 +147,7 @@ function viewClassInfo(current_class_id) {
         if(data.result4Privilege) {
           $(".student-list").empty();
           display_students(data.privilegeList);
+          $("#class-detail label").addClass("active");
         }else {
           console.error(data.reason);
         }
