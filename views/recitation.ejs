@@ -165,7 +165,7 @@
                 <button type="button" class="btn btn-info upload-button">Upload</button>
                 <button type="button" class="btn btn-default modal-action modal-close">Close</button>
                 <button type="button" class="btn add-slide" onclick="addSlide()">Add Slide</button>
-                <button type="button" class="btn btn-primary submit-button save-slides">Save changes</button>
+                <button type="button" class="btn btn-primary submit-button" id="save-slides">Save changes</button>
             </div>
         </div>
     </div>
@@ -193,7 +193,7 @@
                 var slideDiv = $('<div class="list-group"></div>');
                 if(i==0) tabBody.addClass('active');
                 else tabBody.css('display', 'none');
-                var tab = $('<li class="tab col s3"><a href="#tab-' + i + '">'+slide.name+'</a></li>');
+                var tab = $('<li class="tab"><a href="#tab-' + i + '">'+slide.name+'<i class="material-icons" onclick="deleteSlide(this)">clear</i></a></li>');
                 slide.pages.forEach((item)=> {
                     generateItem(item.id, item.name, slideDiv);
                 });

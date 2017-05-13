@@ -128,7 +128,7 @@ nav {
 .slides-workarea .row {
   margin-bottom: 0;
 }
-.save-slides {
+#save-slides {
   float: left;
 }
 /* end modal */
