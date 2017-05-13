@@ -80,12 +80,8 @@ function selectPostColor() {
 }
 
 function addReplies(id) {
-  $(id).parent().append("<a>"+id.value+"<i class='material-icons' onclick='removeReplies(this)'>clear</i></a>");
+  $(id).parent().append("<a>"+id.value+"</a>");
   id.value = '';
-}
-
-function removeReplies(reply) {
-  $(reply).parent().remove();
 }
 
 function newPost() {
