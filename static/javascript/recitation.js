@@ -186,12 +186,13 @@ function addSlide() {
     $(".tabs").append("<li class='tab'><a href='#tab-" + count + "'>Slide " + count + "</a></li>");
     var newSlideTab = $('<div class="list-group"></div>');
     var tabBody = $('<div id="tab-'+count+'" class="tab-body"></div>');
-    $(".slide-container").append(tabBody);
+    $(".slides-workarea").append(tabBody);
     tabBody.append(newSlideTab);
     Sortable.create(newSlideTab[0], {
         handle: '.move-file',
         animation: 150
     });
+    $(".tabs").tabs('select_tab', "tab-"+count);
 }
 
 function deleteSlide(element) {
