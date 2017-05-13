@@ -91,10 +91,33 @@ body {
   width: 31%;
   background-color: #173e43;
 }
+#info-board {
+  min-width: 300px;
+}
 #info-post {
   font-size: 20px;
   color: #ffffff;
 }
+
+.replies-drop-down-container {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+.replies-drop-down-container a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+}
+.post:hover .replies-drop-down-container {
+    display: block;
+}
+.recitation:hover .replies-drop-down-container {
+    display: block;
+}
+.replies-drop-down-container a:hover {background-color: #f1f1f1}
 
 .navbar-toggle span {
     background-color: #e05038;

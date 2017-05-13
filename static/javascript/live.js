@@ -34,6 +34,11 @@ $(document).ready(function () {
     $('.modal').modal();
     $('#draw-color-picker').colorPicker({pickerDefault: "ffffff"});
     $('.student-list').hide();
+    $('.dropdown-button').dropdown({
+        inDuration: 300,
+        outDuration: 225
+      }
+    );
 });
 
 function viewStudentList() {
@@ -68,17 +73,33 @@ function selectUser(student) {
     console.log('speaker switching to ' + student.toString());
 }
 
+function selectPostColor() {
+  var choices = ['#f2b632', '#428bca', '#c5e9b8', '#cd5c5c'];
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
+
+function addReplies(id) {
+  $(id).parent().append("<a>"+id.value+"<i class='material-icons' onclick='removeReplies(this)'>clear</i></a>");
+  id.value = '';
+}
+
+function removeReplies(reply) {
+  $(reply).parent().remove();
+}
+
 function newPost() {
     var post = $("#info-post").val();
-    var color = '#' + Math.round(0xffffff * Math.random()).toString(16);
-    $newdiv = $("<div><h4>" + post + "</h4></div>").css({
+    var color = selectPostColor();
+    var id = Math.floor(Math.random() * 30);
+
+    $newdiv = $("<div onclick='viewReplies()' class='post' id='"+id+"'><h4>" + post + "</h4><div class='replies-drop-down-container'><input onchange='addReplies(this)'/></div></div>").css({
         'background-color': color
     });
 
     var divxsize = ($newdiv.width()).toFixed();
     var divysize = ($newdiv.height()).toFixed();
     var posx = (Math.random() * ($(".col-md-4").width() - $newdiv.width()));
-    // var posx = Math.floor(Math.random() * ($(".col-md-4").position().left+$(".col-md-4").width() - $(".col-md-4").position().left)) + $(".col-md-4").position().left;
     var posy = (Math.random() * ($(".col-md-4").height() - divysize));
 
     $newdiv.css({
@@ -87,7 +108,6 @@ function newPost() {
         'top': posy + 'px',
         'display': 'none'
     }).appendTo('.col-md-4').fadeIn(100, function () {
-        // newPost("This is a comment!");
     });
     $newdiv.draggable();
     $("#info-post").val('');
