@@ -199,6 +199,8 @@
                 slidesContainer.append(slideDiv);
                 tabsContainer.append(tab);
             });
+            var firstTabID = slidesContainer.find('.list-group')[0].id;
+            tabsContainer.tabs('select_tab', firstTabID);
         };
 
         var generateItem = (id, name, append) => {
