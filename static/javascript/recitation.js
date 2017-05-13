@@ -196,5 +196,8 @@ function addSlide() {
 }
 
 function deleteSlide(element) {
+  var x = $(element).parent();
+  var id = $(element).parent().attr('href');
+  $(id).remove();
   $(element).parent().parent().remove();
 }

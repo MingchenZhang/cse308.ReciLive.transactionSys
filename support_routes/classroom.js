@@ -161,8 +161,8 @@ exports.getRoute = function (s) {
     });
 
     // TODO
-    router.post('/ajax/search-class', jsonParser, (req, res, next) => {   //delete class with all the recitation and resource
-        s.classConn.searchClass(req.body.classId).then((clazz) => {
+    router.get('/search-class', jsonParser, (req, res, next) => {   //delete class with all the recitation and resource
+        s.classConn.searchClass(req.classId).then((clazz) => {
         });
     });
 
