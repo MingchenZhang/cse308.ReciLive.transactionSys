@@ -42,7 +42,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
             slidesOption.on('click', function () {
                 self.slidesName = $(this).attr('value');
                 self.currentSlidesNumber = 0;
-                self.newSlide(self.slideData[self.slidesIndex].imgDataList[0]);
+                self.slideData[self.slidesIndex].imgDataList[0].then(function(slideObj){
+                    self.newSlide(slideObj);
+                });
             });
             selectorDiv.append(slidesOption);
         });
