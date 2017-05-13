@@ -182,8 +182,8 @@ function editRecitation(current_recitation_id, currentClassId) {
 }
 
 function addSlide() {
-    var count = $(".tabs li").length+1;
-    $(".tabs").append("<li class='tab'><a href='#tab-" + count + "'>Slide " + count + "<i class='material-icons' onclick='deleteSlide(this)'>clear</i></a></li>");
+    var count = Math.random();
+    $(".tabs").append('<li class="tab"><a href="#tab-' + count + '" tab-id=tab-"'+count+'">New Slide<i class="material-icons" onclick="deleteSlide(this)">clear</i></a></li>');
     var newSlideTab = $('<div class="list-group"></div>');
     var tabBody = $('<div id="tab-'+count+'" class="tab-body"></div>');
     $(".slides-workarea").append(tabBody);
