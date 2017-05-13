@@ -226,7 +226,7 @@
             var links = parent.find('.tabs').find('a');
             parent.find('.list-group').each((i, list)=> {
                 var slideObj = {};
-                slideObj.name = $(links[i]).html();
+                slideObj.name = links[i].firstChild.nodeValue;
                 slideObj.pages = [];
                 var slide = slideObj.pages;
                 $(list).find('.list-group-item').each((j, item)=> {
