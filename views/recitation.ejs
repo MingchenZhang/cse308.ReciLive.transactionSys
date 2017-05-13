@@ -189,10 +189,14 @@
                     console.error(slide);
                     return;
                 }
-                var slideDiv = $("<div id=slide" + i + " class='list-group></div>");
+                var slideDiv = $('<div id="slide'+ i + '" class="list-group"></div>');
                 var tab = $('<li class="tab col s3"><a href="#slide' + i + '">'+slide.name+'</a></li>');
                 slide.pages.forEach((item)=> {
                     generateItem(item.id, item.name, slideDiv);
+                });
+                Sortable.create(slideDiv[0], {
+                    handle: '.move-file',
+                    animation: 150
                 });
                 slidesContainer.append(slideDiv);
                 tabsContainer.append(tab);
@@ -217,7 +221,7 @@
                 slideObj.name = $(links[i]).html();
                 slideObj.pages = [];
                 var slide = slideObj.pages;
-                $(list).each((j, item)=> {
+                $(list).find('.list-group-item').each((j, item)=> {
                     slide.push({
                         id: $(item).attr('data-id'),
                         name: $(item).find('.item-name').html(),
