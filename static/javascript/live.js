@@ -84,12 +84,12 @@ function addReplies(id) {
   id.value = '';
 }
 
-function newPost() {
-    var post = $("#info-post").val();
+function newPost(message) {
+    var post = message;
     var color = selectPostColor();
     var id = Math.floor(Math.random() * 30);
 
-    $newdiv = $("<div onclick='viewReplies()' class='post' id='"+id+"'><h4>" + post + "</h4><div class='replies-drop-down-container'><input onchange='addReplies(this)'/></div></div>").css({
+    var $newdiv = $("<div onclick='viewReplies()' class='post' id='"+id+"'><h4>" + post + "</h4><div class='replies-drop-down-container'><input onchange='addReplies(this)'/></div></div>").css({
         'background-color': color
     });
 
@@ -117,6 +117,7 @@ viewManager = new ViewManager($('.stage-view'));
 chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
 slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'), $('#slides-selector'));
 drawModule = new Draw(transactionSystem, viewManager.getDiv(), $('#draw'));
+discussionBoardModule = new DiscussionBoard();
 transactionSystem.registerModule(chatModule.moduleName, chatModule);
 transactionSystem.registerModule(slideModule.moduleName, slideModule);
 transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);

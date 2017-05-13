@@ -73,7 +73,7 @@ exports.getRoute = function (s) {
                                 if (error) return res.status(500).send({
                                     result: false,
                                     error,
-                                    statusCode: response.statusCode
+                                    statusCode: (response)?response.statusCode:0
                                 });
                                 return res.send({result: true, body});
                             });
