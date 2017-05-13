@@ -182,7 +182,7 @@ function editRecitation(current_recitation_id, currentClassId) {
 }
 
 function addSlide() {
-    var count = $(".tabs li").length+1;
+    var count = Math.random();
     $(".tabs").append("<li class='tab'><a href='#tab-" + count + "'>Slide " + count + "</a></li>");
     var newSlideTab = $('<div class="list-group"></div>');
     var tabBody = $('<div id="tab-'+count+'" class="tab-body"></div>');

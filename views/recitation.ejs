@@ -189,11 +189,12 @@
                     console.error(slide);
                     return;
                 }
-                var tabBody = $('<div id="tab-'+i+'" class="tab-body"></div>');
+                var tabID = Math.random();
+                var tabBody = $('<div id="tab-'+tabID+'" class="tab-body"></div>');
                 var slideDiv = $('<div class="list-group"></div>');
                 if(i==0) tabBody.addClass('active');
                 else tabBody.css('display', 'none');
-                var tab = $('<li class="tab col s3"><a href="#tab-' + i + '">'+slide.name+'</a></li>');
+                var tab = $('<li class="tab col s3"><a href="#tab-' + tabID + '">'+slide.name+'</a></li>');
                 slide.pages.forEach((item)=> {
                     generateItem(item.id, item.name, slideDiv);
                 });
