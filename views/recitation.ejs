@@ -178,7 +178,7 @@
 
         var reGenerateView = (slides)=>{
             var slidesContainer = $('.slide-container');
-            slidesContainer.find('.list-group').remove();
+            slidesContainer.find('.tab-body').remove();
             var tabsContainer = slidesContainer.find('.tabs');
             tabsContainer.find('.tab').remove();
             slides.forEach((slide, i)=> {
@@ -187,8 +187,11 @@
                     console.error(slide);
                     return;
                 }
-                var slideDiv = $('<div id="slide'+ i + '" class="list-group"></div>');
-                var tab = $('<li class="tab col s3"><a href="#slide' + i + '">'+slide.name+'</a></li>');
+                var tabBody = $('<div id="tab-'+i+'" class="tab-body"></div>');
+                var slideDiv = $('<div class="list-group"></div>');
+                if(i==0) tabBody.addClass('active');
+                else tabBody.css('display', 'none');
+                var tab = $('<li class="tab col s3"><a href="#tab-' + i + '">'+slide.name+'</a></li>');
                 slide.pages.forEach((item)=> {
                     generateItem(item.id, item.name, slideDiv);
                 });
@@ -196,10 +199,11 @@
                     handle: '.move-file',
                     animation: 150
                 });
-                slidesContainer.append(slideDiv);
+                tabBody.append(slideDiv);
+                slidesContainer.append(tabBody);
                 tabsContainer.append(tab);
             });
-            var firstTabID = slidesContainer.find('.list-group')[0].id;
+            var firstTabID = slidesContainer.find('.tab-body')[0].id;
             tabsContainer.tabs('select_tab', firstTabID);
         };
 
@@ -318,7 +322,7 @@
                         focusedIndex = i;
                     }
                 });
-                var focusedElem = $(resourcesModal.find('.list-group')[focusedIndex]);
+                var focusedElem = $(resourcesModal.find('.list-group')[focusedIndex]).find('div');
                 showUploadWindow(focusedElem);
             });
             var submitButton = resourcesModal.find('.submit-button');

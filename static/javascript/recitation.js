@@ -183,9 +183,11 @@ function editRecitation(current_recitation_id, currentClassId) {
 
 function addSlide() {
     var count = $(".tabs li").length+1;
-    $(".tabs").append("<li class='tab'><a href='#slide" + count + "'>Slide " + count + "</a></li>");
-    var newSlideTab = $("<div id=slide" + count + " class=\"list-group\"></div>");
-    $(".slide-container").append(newSlideTab);
+    $(".tabs").append("<li class='tab'><a href='#tab-" + count + "'>Slide " + count + "</a></li>");
+    var newSlideTab = $('<div class="list-group"></div>');
+    var tabBody = $('<div id="tab-'+i+'" class="tab-body"></div>');
+    $(".slide-container").append(tabBody);
+    tabBody.append(newSlideTab);
     Sortable.create(newSlideTab[0], {
         handle: '.move-file',
         animation: 150
