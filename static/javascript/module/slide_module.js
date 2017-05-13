@@ -10,9 +10,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     self.currentSlidesNumber = -1;
     //reset ignore slidelist and clean up canvas
     self.slidesName = null;
+    self.slidesIndex = null;
     self.preload = 5; // how many slides will be preload
     self.reset = function () {
         self.ignoreTransaction = {};
+        self.slidesIndex = null;
         self.slideData = [];
         self.slidesName = null;
         //check here for reset problem
@@ -36,11 +38,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         selectorDiv.children('*').remove();
         let i = 0;
         self.slideData.forEach(function (element) {
-            var slidesOption = $('<div class="slides element" value="' + element.name + '">' + element.name + '</div>');
+            var slidesOption = $('<div class="slides element" index="' + (i++) + '" value="' + element.name + '">' + element.name + '</div>');
             slidesOption.on('click', function () {
                 self.slidesName = $(this).attr('value');
                 self.currentSlidesNumber = 0;
-                self.newSlide(self.slideData[slidesName].imgDataList[0]);
+                self.newSlide(self.slideData[self.slidesIndex].imgDataList[0]);
             });
             selectorDiv.append(slidesOption);
         });
@@ -73,6 +75,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         showImage(payload.slideImage, showDiv);
         self.currentSlidesNumber = payload.slideIndex;
         self.slidesName = payload.slidesName;
+        self.slidesIndex = payload.slidesIndex;
     };
     function enrollEvent() {            //enroll　enable handler and disable handler
         document.addEventListener(events.switchToPlayBack.type, disableHandler);
@@ -104,33 +107,45 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         return true;
     }
 
-    function getImage(slidesName, slidesNumber) {
-        var obj = self.slideData[slidesName].imgDataList[slidesNumber];
+    function getImage(slideIndex, slidesNumber) {
+        if (slidesNumber < 0 || slidesNumber >= self.slideData[slideIndex].imgDataList.length) {
+            console.log("out of index for slidenumber");
+            return new Promise(function (resolve, reject) {
+                resolve();
+            });
+        }
+        var obj = self.slideData[slideIndex].imgDataList[slidesNumber];
         if (obj.then) {
             return obj;
-        } else if (slidesNumber >= 0 && slidesNumber < self.slideData[slidesName].imgDataList.length) {
-            return self.slideData[slidesName].imgDataList[slidesNumber] = new Promise(function (resolve, reject) {
-                var img = document.createElement('img');
-                img.crossOrigin = 'anonymous';
-                img.src = obj.url;
-                img.onload = function () {
-                    let canvas = document.createElement("canvas");
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    canvas.getContext('2d').drawImage(img, 0, 0);
-                    resolve({slide64: canvas.toDataURL("image/png"), id: slidesNumber});
-                };
-            })
         } else {
-            console.log("out of index for slidenumber");
+            return self.slideData[slideIndex].imgDataList[slidesNumber] = new Promise(function (resolve, reject) {
+                $("<img>", {src: obj.url, crossOrigin: 'anonymous', name: obj.name}).on('load', function () {
+                    let canvas = document.createElement("canvas");
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    canvas.getContext('2d').drawImage(this, 0, 0);
+                    resolve({slide64: canvas.toDataURL("image/png"), id: slidesNumber});
+                    console.log('Load');
+                }).on('error', function (msg) {
+                    $("<img>", {src: '/static/img/img_load_error.jpg'}).on('load', function () {
+                        let canvas = document.createElement("canvas");
+                        canvas.width = this.width;
+                        canvas.height = this.height;
+                        canvas.getContext('2d').drawImage(this, 0, 0);
+                        resolve({slide64: canvas.toDataURL("image/jpg"), id: slidesNumber});
+                        console.log('Load');
+                    });
+                    console.error('img load error' + msg);
+                });
+            })
         }
     }
 
-    function getImagePromiseList(slidesName, slidesStart, slidesEnd) {
+    function getImagePromiseList(slideIndex, slidesStart, slidesEnd) {
         if (slidesStart <= slidesEnd) {
             var PromiseList = [];
             for (var index = slidesStart; index <= slidesEnd; index++) {
-                PromiseList.push(getImage(slidesName, index));
+                PromiseList.push(getImage(slideIndex, index));
             }
             return PromiseList;
         }
@@ -155,12 +170,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                         //get all slides list
                         let payload = element.content;
                         let slidesCounter = 0;
-                        let listItemCounter = -1;
                         payload.forEach(function (slides) {
                             //counter for promiseList
                             if (!self.slidesName || self.slidesName == null) self.slidesName = slides.name;
-                            self.slideData[slides.name] = {name: slides.name, imgDataList: slides.pages};
-                            promiseList.concat(getImagePromiseList(slides.name, 0, self.preload));
+                            self.slideData[slidesCounter++] = {name: slides.name, imgDataList: slides.pages};
+                            promiseList = promiseList.concat(getImagePromiseList(slidesCounter - 1, 0, self.preload));
                         });
                     }
                 });
@@ -181,6 +195,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                     slideImage: slideDataObj.slide64,
                     slideIndex: slideDataObj.id,
                     slidesName: self.slidesName,
+                    slidesIndex: self.slidesIndex
                 })
                     .then(function (result) {
                         document.dispatchEvent(events.slidesChange());    //dispatch event for the slides changing
@@ -198,8 +213,8 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
                     self.slidesIndex = 0;
-                    self.slidesName = self.slideData[self.slidesName].name;
-                    getImage(self.slidesName, ++self.currentSlidesNumber).then(function (response) {
+                    self.slidesName = self.slideData[self.slidesIndex].name;
+                    getImage(self.slidesIndex, ++self.currentSlidesNumber).then(function (response) {
                         self.newSlide(response);
                     });
                 } else {
@@ -217,25 +232,24 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     function addHandler() {
         previousButton.on('click', function () { //to precious slide
             if (self.currentSlidesNumber - 1 > -1) {
-                getImage(self.slidesName, --self.currentSlidesNumber).then(function (response) {
+                getImage(self.slidesIndex, --self.currentSlidesNumber).then(function (response) {
                     self.newSlide(response);
                 });
-                getImagePromiseList(self.slidesName, self.currentSlidesNumber--, self.currentSlidesNumber++);
+                getImagePromiseList(self.slidesIndex, self.currentSlidesNumber--, self.currentSlidesNumber++);
                 console.log("previous slide\n current slide number :", self.currentSlidesNumber);
             }
             else {
                 console.log("no previous slide\n");
                 toastr.success('no previous slide', '', {timeOut: 10000, progressBar: true});
-
             }
         });
 
         nextButton.on('click', function () {        //to next slide
-            if (self.currentSlidesNumber + 1 < self.slideData[self.slidesName].imgDataList.length) {
-                getImage(self.slidesName, ++self.currentSlidesNumber).then(function (response) {
+            if (self.currentSlidesNumber + 1 < self.slideData[self.slidesIndex].imgDataList.length) {
+                getImage(self.slidesIndex, ++self.currentSlidesNumber).then(function (response) {
                     self.newSlide(response);
                 });
-                getImagePromiseList(self.slidesName, self.currentSlidesNumber--, self.currentSlidesNumber++);
+                getImagePromiseList(self.slidesIndex, self.currentSlidesNumber--, self.currentSlidesNumber++);
                 console.log("next slide\n current slide number :", self.currentSlidesNumber);
             }
             else {
