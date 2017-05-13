@@ -189,7 +189,7 @@
                     console.error(slide);
                     return;
                 }
-                var tabID = Math.random();
+                var tabID = Math.floor(Math.random() * 30);
                 var tabBody = $('<div id="tab-'+tabID+'" class="tab-body"></div>');
                 var slideDiv = $('<div class="list-group"></div>');
                 if(i==0) tabBody.addClass('active');
