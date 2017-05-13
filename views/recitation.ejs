@@ -203,6 +203,7 @@
                 slidesContainer.append(tabBody);
                 tabsContainer.append(tab);
             });
+            if(!slidesContainer.find('.tab-body')[0]) return;
             var firstTabID = slidesContainer.find('.tab-body')[0].id;
             tabsContainer.tabs('select_tab', firstTabID);
         };
@@ -322,7 +323,7 @@
                         focusedIndex = i;
                     }
                 });
-                var focusedElem = $(resourcesModal.find('.list-group')[focusedIndex]).find('div');
+                var focusedElem = $(resourcesModal.find('.tab-body')[focusedIndex]).find('div');
                 showUploadWindow(focusedElem);
             });
             var submitButton = resourcesModal.find('.submit-button');

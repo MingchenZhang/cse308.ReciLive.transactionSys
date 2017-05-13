@@ -185,7 +185,7 @@ function addSlide() {
     var count = $(".tabs li").length+1;
     $(".tabs").append("<li class='tab'><a href='#tab-" + count + "'>Slide " + count + "</a></li>");
     var newSlideTab = $('<div class="list-group"></div>');
-    var tabBody = $('<div id="tab-'+i+'" class="tab-body"></div>');
+    var tabBody = $('<div id="tab-'+count+'" class="tab-body"></div>');
     $(".slide-container").append(tabBody);
     tabBody.append(newSlideTab);
     Sortable.create(newSlideTab[0], {
