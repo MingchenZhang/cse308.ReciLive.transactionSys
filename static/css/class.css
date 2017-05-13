@@ -163,6 +163,7 @@ nav {
   color: black;
   border-radius: 5px;
   cursor: pointer;
+  text-align: center;
 }
 .recitation-option {
   list-style-type: none;
@@ -179,4 +180,5 @@ nav {
   color: black;
   border-radius: 5px;
   cursor: pointer;
+  text-align: center;
 }
