@@ -7,10 +7,10 @@ exports.getRoute = function (s) {
     var jsonParser = BodyParser.json({limit: '10kb'});
 
     router.get('/course', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
-        if(!req.userLoginInfo) {
-          return res.render("error.ejs", {
-            message: 'please login first'
-          });
+        if (!req.userLoginInfo) {
+            return res.render("error.ejs", {
+                message: 'please login first'
+            });
         }
         if (req.userLoginInfo.record.role == "Instructor") {
             s.classConn.getClassesByOwner(req.userLoginInfo.record._id).then((r) => {
@@ -18,15 +18,15 @@ exports.getRoute = function (s) {
                 r.forEach(function (element) {
                     classes.push({id: element._id, name: element.name});
                 });
-                res.render("course.ejs",{
-                  username: req.userLoginInfo.record.photo,
-                  instructor: true,
-                  classes: classes
+                res.render("course.ejs", {
+                    username: req.userLoginInfo.record.photo,
+                    instructor: true,
+                    classes: classes
                 });
             }).catch((e) => {
-                  res.render("error.ejs", {
-                    message: e.message ? e.message : 'get classes by instructor error'
-                  });
+                    res.render("error.ejs", {
+                        message: e.message ? e.message : 'get classes by instructor error'
+                    });
                 }
             );
         } else if (req.userLoginInfo.record.role == "Student") {
@@ -35,21 +35,21 @@ exports.getRoute = function (s) {
                 r.forEach(function (element) {
                     classes.push({id: element._id, name: element.name});
                 });
-                res.render("course.ejs",{
-                  username: req.userLoginInfo.record.photo,
-                  instructor: false,
-                  classes: classes
+                res.render("course.ejs", {
+                    username: req.userLoginInfo.record.photo,
+                    instructor: false,
+                    classes: classes
                 });
             }).catch((e) => {
-                  res.render("error.ejs", {
-                    message: e.message || 'get classes by student error'
-                  });
+                    res.render("error.ejs", {
+                        message: e.message || 'get classes by student error'
+                    });
                 }
             );
         } else {
-          res.render("error.ejs", {
-            message: 'no such role'
-          });
+            res.render("error.ejs", {
+                message: 'no such role'
+            });
         }
     });
 
@@ -61,7 +61,7 @@ exports.getRoute = function (s) {
                         return s.classConn.addStudentToClass(user._id, clazz._id);
                     } else {
                         var userID = s.mongodb.ObjectID();
-                        return s.userConn.addUser(null, email, null, null, userID).then(() => {
+                        return s.userConn.addUser(null, email, null, null, null, userID).then(() => {
                             return s.classConn.addStudentToClass(userID, clazz._id);
                         });
                     }
@@ -126,7 +126,7 @@ exports.getRoute = function (s) {
                                 return s.classConn.addStudentToClass(user._id, s.mongodb.ObjectID(req.body.classId));
                             } else {
                                 var userID = s.mongodb.ObjectID();
-                                return s.userConn.addUser(null, email, null, null, userID).then(() => {
+                                return s.userConn.addUser(null, email, null, null, null, userID).then(() => {
                                     return s.classConn.addStudentToClass(userID, s.mongodb.ObjectID(req.body.classId));
                                 });
                             }
