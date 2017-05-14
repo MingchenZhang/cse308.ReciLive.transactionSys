@@ -3,6 +3,7 @@ var Cookie = require('cookie');
 var assert = require('assert');
 var EventEmitter = require('events');
 var s = global.s;
+var Request = require("request");
 
 exports.session = function () {
     var self = this;
@@ -163,59 +164,66 @@ exports.session = function () {
         ws.roomSession = self;
         soundClients.push(ws);
 
-        function sendSoundFrame(){
+        function sendSoundFrame() {
             var start = new Date();
-            try{
+            try {
                 ws.send(ws.nextSoundFrame.data.buffer);
-            }catch (e){
+            } catch (e) {
                 return;
             }
-            s.transactionRecord.getSoundCursor({sessionID:self.sessionID, startAt: ws.nextSoundFrame.createdAt}).next().then((soundFrame)=>{
-                log.debug('sound frame found: '+(soundFrame?soundFrame._id:null));
-                if(!soundFrame) {
+            s.transactionRecord.getSoundCursor({
+                sessionID: self.sessionID,
+                startAt: ws.nextSoundFrame.createdAt
+            }).next().then((soundFrame) => {
+                log.debug('sound frame found: ' + (soundFrame ? soundFrame._id : null));
+                if (!soundFrame) {
                     ws.nextSoundFrame = null;
                     return;
                 }
-                var delay = soundFrame.createdAt - ws.jumpRequestTime - (new Date()-ws.jumpRequestDate);
-                log.debug('schedule to send sound frame in '+delay);
+                var delay = soundFrame.createdAt - ws.jumpRequestTime - (new Date() - ws.jumpRequestDate);
+                log.debug('schedule to send sound frame in ' + delay);
                 ws.sendingTimer = setTimeout(sendSoundFrame, delay);
                 ws.nextSoundFrame = soundFrame;
-            }).catch((err)=>{
-                log.warning('encounter error during retrieving sound frame: '+err);
+            }).catch((err) => {
+                log.warning('encounter error during retrieving sound frame: ' + err);
             });
         }
 
         ws.on('message', function (message, flags) {
-            if(flags.binary){
+            if (flags.binary) {
                 //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
                 //log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
-                if(self.status == "ENDED") return;
-                s.transactionRecord.addSound({sessionID:self.sessionID, createdAt: new Date(), data: message});
+                if (self.status == "ENDED") return;
+                s.transactionRecord.addSound({sessionID: self.sessionID, createdAt: new Date(), data: message});
                 soundClients.forEach((client) => {
-                    if(client.nextSoundFrame) return; // client is in playback mode
-                    if(soundSpeaker.indexOf(client.userLoginInfo.userID) != -1) return; // this is a speaker
+                    if (client.nextSoundFrame) return; // client is in playback mode
+                    if (soundSpeaker.indexOf(client.userLoginInfo.userID) != -1) return; // this is a speaker
                     try {
                         client.send(message);
                     } catch (e) {
                         console.error(e);
                     }
                 });
-            }else{
-                try{
+            } else {
+                try {
                     message = JSON.parse(message);
-                }catch(e){
-                    log.warning(()=>{return 'message not valid from sound channel: '+message});
+                } catch (e) {
+                    log.warning(() => {
+                        return 'message not valid from sound channel: ' + message
+                    });
                     return false;
                 }
-                log.debug(()=>{return 'sound channel command receive: '+JSON.stringify(message)});
-                if(message.type == 'jump_to' && message.startAt){
+                log.debug(() => {
+                    return 'sound channel command receive: ' + JSON.stringify(message)
+                });
+                if (message.type == 'jump_to' && message.startAt) {
                     var startAt = new Date(message.startAt);
-                    s.transactionRecord.getSoundCursor({sessionID:self.sessionID, startAt}).next((err, soundFrame)=>{
-                        if(err) log.warning('encounter error during retrieving sound frame: '+err);
-                        log.debug('sound frame found during jump: '+(soundFrame?soundFrame._id:null));
-                        if(!soundFrame) {
+                    s.transactionRecord.getSoundCursor({sessionID: self.sessionID, startAt}).next((err, soundFrame) => {
+                        if (err) log.warning('encounter error during retrieving sound frame: ' + err);
+                        log.debug('sound frame found during jump: ' + (soundFrame ? soundFrame._id : null));
+                        if (!soundFrame) {
                             ws.nextSoundFrame = null;
-                            if(ws.sendingTimer) clearTimeout(ws.sendingTimer);
+                            if (ws.sendingTimer) clearTimeout(ws.sendingTimer);
                             return;
                         }
                         clearTimeout(ws.sendingTimer);
@@ -224,11 +232,11 @@ exports.session = function () {
                         ws.jumpRequestDate = new Date();
                         ws.jumpRequestTime = startAt;
                     });
-                }else if(message.type == 'jump_to' && !message.startAt){
+                } else if (message.type == 'jump_to' && !message.startAt) {
                     clearTimeout(ws.sendingTimer);
                     ws.nextSoundFrame = null;
-                }else{
-                    log.warning('receive invalid sound command: '+JSON.stringify(message));
+                } else {
+                    log.warning('receive invalid sound command: ' + JSON.stringify(message));
                 }
             }
         });
@@ -252,7 +260,7 @@ exports.session = function () {
         if (self.privilege[createdBy] != 'all' && self.privilege[createdBy].indexOf(module) == -1)// if sender has no priviledge
             return When.reject({reason: 2});
 
-        if(self.status == "ENDED")
+        if (self.status == "ENDED")
             return When.reject({reason: 10});
 
         transaction.sessionID = self.sessionID;
@@ -288,7 +296,7 @@ exports.session = function () {
 
             function getMore() {
                 cursor.next((err, result) => {
-                    try{
+                    try {
                         if (err) reject(err);
                         if (result) {
                             if (sendNext(result)) getMore();
@@ -296,7 +304,7 @@ exports.session = function () {
                             sendNext(null);
                             resolve();
                         }
-                    }catch (e) {
+                    } catch (e) {
                         log.error(e);
                         return reject(e);
                     }
@@ -326,7 +334,7 @@ exports.session = function () {
 
     function understandTransaction(transaction) {
         if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
-            transaction.description.speakerChange.forEach((tuple)=> {
+            transaction.description.speakerChange.forEach((tuple) => {
                 if (tuple[1] && soundSpeaker.indexOf(tuple[0]) < 0) { // speaker need to be removed
                     //soundSpeaker = []; // there is only one person can be speaker at this point
                     soundSpeaker.push(tuple[0]);
@@ -334,9 +342,23 @@ exports.session = function () {
                     soundSpeaker.splice(soundSpeaker.indexOf(tuple[0]), 1);
                 }
             });
-        } else if(transaction.module == 'admin' && transaction.description.command == "end_recitation"){
+        } else if (transaction.module == 'admin' && transaction.description.command == "end_recitation") {
             self.status = "ENDED";
             s.transactionRecord.setSessionState({sessionID: self.sessionID, status: "ENDED"});
+            Request({               //dispatch class after add recitation
+                method: 'POST',
+                url: "http" + (s.inProduction ? "s" : "") + "://recilive.stream/ajax/end-recitation",
+                json: {
+                    "recitationNumericId": self.sessionID,
+                    "status": "ENDED",
+                }
+            }, (error, response, body) => {
+                if (error) {
+                    console.error("end recitation request error");
+                    console.error(error);
+                    return false;
+                }
+            });
         } else {
             return false;
         }

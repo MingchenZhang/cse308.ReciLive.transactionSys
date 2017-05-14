@@ -7,7 +7,7 @@ exports.getRoute = function (s) {
     var jsonParser = BodyParser.json({limit: '10kb'});      //json parser parse the request before router run it's content
 
     router.post('/ajax/check-user', jsonParser, function (req, res, next) {     //check user has role for front end sign_up needed
-        if (req.userLoginInfo.record.role) {//TODO: double check record
+        if (req.userLoginInfo.record||req.userLoginInfo.record.role) {
             res.send({result: true, sign_up: false, redirect: '/course'});
         } else {
             res.send({result: true, sign_up: true});

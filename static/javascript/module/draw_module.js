@@ -82,7 +82,6 @@ function Draw(transactionSystem, div, controlPanel) {
      * @param changeCanvas indicate resize from user resize or new transaction
      */
     function resize(originHeight, changeCanvas) {
-        // TODO limit the max canvas zoom in
         scaleFactor = div.height() / originHeight;
 
         if (changeCanvas) {

@@ -8,11 +8,10 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     self.slideData = [];
     self.ignoreTransaction = {};
     self.currentSlidesNumber = -1;
-    //reset ignore slidelist and clean up canvas
     self.slidesName = null;
     self.slidesIndex = null;
     self.preload = 5; // how many slides will be preload
-    self.reset = function () {
+    self.reset = function () {    //reset ignore slidelist and clean up canvas
         self.ignoreTransaction = {};
         self.slidesIndex = null;
         self.slideData = [];
@@ -81,10 +80,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
     };
     function enrollEvent() {            //enroll　enable handler and disable handler
         document.addEventListener(events.switchToPlayBack.type, disableHandler);
-        document.addEventListener(events.switchToLive.type, enableHandler);
     }
 
-    function disableHandler() {
+    function disableHandler() {     //disable handler for students
         previousButton.hide();
         nextButton.hide();
     }
@@ -96,12 +94,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         })
     };
 
-    function enableHandler() {
-        previousButton.hide();
-        nextButton.hide();
-    }
-
-    function resourceChecker(resource) {
+    function resourceChecker(resource) {    //check if there is any slide resource
         if (!resource)return true;
         for (element in resource) {
             if (resource[element].type == "slide")return false;
@@ -109,17 +102,23 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         return true;
     }
 
+    /**
+     * load image in to slideData and return a promise obj
+     * @param slideIndex
+     * @param slidesNumber
+     * @returns Promise with
+     */
     function getImage(slideIndex, slidesNumber) {
         if (slidesNumber < 0 || slidesNumber >= self.slideData[slideIndex].imgDataList.length) {
             console.log("out of index for slidenumber");
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve, reject) {//return a resolved promise when out of index
                 resolve();
             });
         }
         var obj = self.slideData[slideIndex].imgDataList[slidesNumber];
         if (obj.then) {
             return obj;
-        } else {
+        } else {        //load slide and return a promise, which contain a slideobj
             return self.slideData[slideIndex].imgDataList[slidesNumber] = new Promise(function (resolve, reject) {
                 $("<img>", {src: obj.url, crossOrigin: 'anonymous', name: obj.name}).on('load', function () {
                     let canvas = document.createElement("canvas");
@@ -128,7 +127,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                     canvas.getContext('2d').drawImage(this, 0, 0);
                     resolve({slide64: canvas.toDataURL("image/png"), id: slidesNumber});
                     console.log('Load');
-                }).on('error', function (msg) {
+                }).on('error', function (msg) {     //load error slide
                     $("<img>", {src: '/static/img/img_load_error.jpg'}).on('load', function () {
                         let canvas = document.createElement("canvas");
                         canvas.width = this.width;
@@ -143,6 +142,13 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         }
     }
 
+    /**
+     * //load list of image and return a promiselist
+     * @param slideIndex
+     * @param slidesStart
+     * @param slidesEnd
+     * @returns {promise Array}
+     */
     function getImagePromiseList(slideIndex, slidesStart, slidesEnd) {
         if (slidesStart <= slidesEnd) {
             var PromiseList = [];
@@ -165,7 +171,11 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
         enrollEvent();
         if (transactionSystem.privilege.indexOf("admin") != -1) var asController = 1;       // admin get control
         if (asController) {
-            self.loadAllSlides = function () {              //download all slides url
+            /**
+             * download all slides url
+             * @returns {Array}
+             */
+            self.loadAllSlides = function () {
                 var promiseList = [];
                 resource.forEach(function (element) {
                     if (element.type == "slide") {
@@ -211,13 +221,13 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
             addHandler();
 
             Promise.all(self.loadAllSlides()).then(function (response) {
-                updateSelector();
+                updateSelector();       //load slide selector
                 if (self.currentSlidesNumber == -1) {
                     console.log("try send first slide");
                     self.slidesIndex = 0;
                     self.slidesName = self.slideData[self.slidesIndex].name;
                     getImage(self.slidesIndex, ++self.currentSlidesNumber).then(function (response) {
-                        self.newSlide(response);
+                        self.newSlide(response);    //show the first slide
                     });
                 } else {
                     console.log("reconnect to classroom and instructor and get previous slides");
@@ -231,6 +241,9 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
             })
         }
     };
+    /**
+     * add button handler for next and previous
+     */
     function addHandler() {
         previousButton.on('click', function () { //to precious slide
             if (self.currentSlidesNumber - 1 > -1) {

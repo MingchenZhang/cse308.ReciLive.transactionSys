@@ -215,6 +215,14 @@ exports.editRecitation = (recitationId, recitationInfo) => {
     });
 };
 
+exports.changeRecitation = (recitationNumericId, recitationInfo)=>{
+    return classDB.recitationColl.updateMany({numericID: recitationNumericId}, {
+        $set: {
+            status:recitationInfo.status
+        }
+    });
+};
+
 exports.setRecitationResource = (recitationID, resourcesObj) => {
     return classDB.recitationColl.updateMany({_id: recitationID}, {
         $set: {
@@ -256,4 +264,4 @@ exports.getRecitationParticipant = (recitationID) => {
 
 exports.getRecitationByNumericID=(numericID)=>{
     return classDB.recitationColl.findOne({numericID:numericID});
-}
+};
