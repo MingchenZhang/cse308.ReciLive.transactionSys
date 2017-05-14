@@ -71,7 +71,7 @@ exports.basicUserInfoRule = (obj) => {
 };
 
 exports.matchBasicUserInfoRule = (obj)=>{
-    return !!(obj.googleID && obj.email && obj.username);
+    return !!(obj.googleID && obj.email && obj.username && obj.photo);
 };
 
 exports.addSession = (userID)=>{

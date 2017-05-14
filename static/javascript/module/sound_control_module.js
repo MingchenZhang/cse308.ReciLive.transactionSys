@@ -92,7 +92,7 @@ function SoundControl(transactionSystem) {
         for(var userID in transactionSystem.userList){
             userList.push({
                 id:userID,
-                name: transactionSystem.userList[userID].name,
+                name: transactionSystem.userList[userID].name || transactionSystem.userList[userID].email,
                 role: self.speakerList[userID]?'speaker':'non-speaker'
             });
         }
