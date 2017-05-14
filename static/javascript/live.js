@@ -87,14 +87,15 @@ function addReplies(div, message) {
 }
 
 function newPost(message, posx, posy, color, id) {
-    var inputId = Math.floor(Math.random()*300);
+    var inputId = Math.floor(Math.random() * 300);
 
-    var $newdiv = $("<div class='post'><h4>" + message + "</h4><div class='replies-drop-down-container'><input data-id='#"+inputId+"' id='"+inputId+"'/></div></div>").css({
+    var $newdiv = $("<div class='post'><h4>" + message + "</h4><div class='replies-drop-down-container'><input data-id='#" + inputId + "' id='" + inputId + "'/></div></div>").css({
         'background-color': color
     });
 
-    $("#"+inputId).on('change', function() {
-      discussionBoardModule.newReply($('#'+inputId).val(), id);
+    var replyButton = $newdiv.find("#" + inputId);
+    replyButton.on('change', function () {
+        discussionBoardModule.newReply(replyButton.val(), id);
     });
 
     $newdiv.css({
@@ -104,7 +105,7 @@ function newPost(message, posx, posy, color, id) {
         'display': 'none'
     }).appendTo('.col-md-4').fadeIn(100, function () {
     });
-    $("#info-post").val('');
+    replyButton.val('');
     return $newdiv;
 }
 

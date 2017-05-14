@@ -50,7 +50,7 @@ exports.getRoute = function (s) {
                     };
                     s.classConn.getStudentsByClass(req.body.class).then((response) => {
                         response.forEach((student) => {
-                            privilege[student.user] = [];
+                            privilege[student.user] = ['discussion_board'];
                         });
                         s.tools.listPromise(response, (student) => {
                             return s.userConn.getUserByMongoID(student.user).then((userInfo) => {
