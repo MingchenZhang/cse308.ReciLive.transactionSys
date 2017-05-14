@@ -43,7 +43,7 @@ exports.getRoute = function (s) {
                 if (recitation) {
                     var privilege = {};
                     var userList = {};
-                    privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control", 'draw'];
+                    privilege[req.userLoginInfo.record._id] = ["admin", "slides", "sound_control", 'draw', 'discussion_board'];
                     userList[req.userLoginInfo.record._id] = {
                         'name': req.userLoginInfo.username,
                         'email': req.userLoginInfo.record.email

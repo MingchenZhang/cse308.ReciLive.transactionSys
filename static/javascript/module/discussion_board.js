@@ -1,18 +1,23 @@
-function DiscussionBoard(transactionSystem, newThreadFunc, , sendText) {
+function DiscussionBoard(transactionSystem, newPost, addReplies) {
     var self = this;
     this.moduleName = 'discussion_board';
     var ignoreTransaction = {};
-    var threads = {};
+    var threads = {}; // map for div of threads
 
     this.newThread = function (message, options) {
         var threadID = guid();
         ignoreTransaction[threadID] = true;
+
+        var posx = Math.random();
+        var posy = Math.random();
+
+        var color = selectPostColor();
+
         return transactionSystem.newTransaction(self.moduleName, {
             type: 'new_thread',
             id: threadID
-        }, {type: 'new_thread', message: message}).then(function (result) {
-            threads[threadID] = {};
-            // TODO: code to create thread ui
+        }, {type: 'new_thread', message, posx, posy, color, id: threadID}).then(function (result) {
+            threads[threadID] = {div: newPost(message, posx, posy, color, threadID)};
         }).catch(function (err) {
             console.error('fail to create thread transaction');
             console.error(err);
@@ -21,15 +26,15 @@ function DiscussionBoard(transactionSystem, newThreadFunc, , sendText) {
         });
     };
 
-    this.newReply = function (message, replyTo, options) {
+    this.newReply = function (message, replyTo) {
         console.assert(threads[replyTo]);
         var replyID = guid();
         ignoreTransaction[replyID] = true;
         return transactionSystem.newTransaction(self.moduleName, {
             type: 'new_thread_reply',
             id: replyID
-        }, {type: 'new_thread_reply', replyTo: replyTo, message: message}).then(function (result) {
-            // TODO: code to create reply ui
+        }, {type: 'new_thread_reply', replyTo, message}).then(function (result) {
+            addReplies(threads[replyTo].div, message);
         }).catch(function (err) {
             console.error('fail to create thread reply transaction');
             console.error(err);
@@ -44,19 +49,23 @@ function DiscussionBoard(transactionSystem, newThreadFunc, , sendText) {
             return;
         }
         if(payload.type == 'new_thread'){
-            // TODO: code to create thread ui
+            threads[payload.id] = {div: newPost(payload.message, payload.posx, payload.posy, payload.color, payload.id)};
         }else if(payload.type == 'new_thread_reply'){
             console.assert(threads[payload.replyTo]);
-            // TODO: code to create reply ui
+            addReplies(threads[payload.replyTo].div, payload.message);
         }else{
             console.assert(false, 'unknown transaction');
             console.error(payload);
         }
     };
     this.reset = function () {
+      for (var key in threads) {
+        if (threads.hasOwnProperty(key)) {
+          $(threads[key]).remove();
+        }
+      }
         ignoreTransaction = {};
         threads = {};
-        // TODO: clear ui
     };
 
     function guid() {

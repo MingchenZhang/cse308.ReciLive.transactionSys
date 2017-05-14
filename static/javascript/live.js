@@ -39,6 +39,9 @@ $(document).ready(function () {
         outDuration: 225
       }
     );
+    $("#info-post").on('change', function() {
+      discussionBoardModule.newThread($("#info-post").val());
+    });
 });
 
 function viewStudentList() {
@@ -79,34 +82,30 @@ function selectPostColor() {
   return choices[index];
 }
 
-function addReplies(id) {
-  $(id).parent().append("<a>"+id.value+"</a>");
-  id.value = '';
+function addReplies(div, message) {
+  $(div).children(".replies-drop-down-container").append("<a>"+message+"</a>");
 }
 
-function newPost(message) {
-    var post = message;
-    var color = selectPostColor();
-    var id = Math.floor(Math.random() * 30);
+function newPost(message, posx, posy, color, id) {
+    var inputId = Math.floor(Math.random()*300);
 
-    var $newdiv = $("<div onclick='viewReplies()' class='post' id='"+id+"'><h4>" + post + "</h4><div class='replies-drop-down-container'><input onchange='addReplies(this)'/></div></div>").css({
+    var $newdiv = $("<div class='post'><h4>" + message + "</h4><div class='replies-drop-down-container'><input data-id='#"+inputId+"' id='"+inputId+"'/></div></div>").css({
         'background-color': color
     });
 
-    var divxsize = ($newdiv.width()).toFixed();
-    var divysize = ($newdiv.height()).toFixed();
-    var posx = (Math.random() * ($(".col-md-4").width() - $newdiv.width()));
-    var posy = (Math.random() * ($(".col-md-4").height() - divysize));
+    $("#"+inputId).on('change', function() {
+      discussionBoardModule.newReply($('#'+inputId).val(), id);
+    });
 
     $newdiv.css({
         'position': 'absolute',
-        'left': posx + 'px',
-        'top': posy + 'px',
+        'left': posx + '%',
+        'top': posy + '%',
         'display': 'none'
     }).appendTo('.col-md-4').fadeIn(100, function () {
     });
-    $newdiv.draggable();
     $("#info-post").val('');
+    return $newdiv;
 }
 
 transactionSystem = new TransactionSystem("/room/" + classroomNumber + "/transaction");
@@ -117,11 +116,12 @@ viewManager = new ViewManager($('.stage-view'));
 chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
 slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'), $('#slides-selector'));
 drawModule = new Draw(transactionSystem, viewManager.getDiv(), $('#draw'));
-discussionBoardModule = new DiscussionBoard();
+discussionBoardModule = new DiscussionBoard(transactionSystem, newPost, addReplies);
 transactionSystem.registerModule(chatModule.moduleName, chatModule);
 transactionSystem.registerModule(slideModule.moduleName, slideModule);
 transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
 transactionSystem.registerModule(drawModule.moduleName, drawModule);
+transactionSystem.registerModule(discussionBoardModule.moduleName, discussionBoardModule);
 sliderController = new replayController(soundSystem, transactionSystem, $('.slider__range'), $('#slider-div'));
 $('.ending-controller').click(transactionSystem.endRecitation);
 document.addEventListener(events.endRecitation.type, (e) => {
