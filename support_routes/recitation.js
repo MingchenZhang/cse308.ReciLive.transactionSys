@@ -11,7 +11,11 @@ exports.getRoute = function (s) {
       s.classConn.getRecitationsByClass(req.params.classId).then((response) => {
             let recitations = [];
             response.forEach(function (element) {
-              recitations.push({roomid: element.numericID, name:element.name, mongoid:element._id});
+                var recitation = {roomid: element.numericID, name: element.name, mongoid: element._id};
+                if(element.status == "ENDED"){
+                    recitation.nameAppend = " (ENDED)";
+                }
+                recitations.push(recitation);
             });
             if (req.userLoginInfo.record.role == "Instructor") {
                 res.render("recitation.ejs",{

@@ -107,7 +107,7 @@
             <% recitations.forEach(function(recitation) { %>
             <div class="col s6 m3">
                 <div class="recitation">
-                    <h4><%= recitation.name %></h4>
+                    <h4><%= recitation.name %><%= recitation.nameAppend %></h4>
                     <div class="dropdown-course-content">
                         <a target="_blank" href="https://room.recilive.stream/room/<%= recitation.roomid %>">Enter</a>
                         <a href="#<%= recitation.mongoid %>">More</a>

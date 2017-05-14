@@ -180,6 +180,7 @@ exports.addRecitation = function (name, startDate, endDate, parentClass) {
         endDate: new Date(endDate),
         createdAt: new Date(),
         parentClass: s.mongodb.ObjectID(parentClass),
+        status: "LIVE"
     };
     return classDB.recitationColl.insertOne(insert).then(() => {
         return insert
