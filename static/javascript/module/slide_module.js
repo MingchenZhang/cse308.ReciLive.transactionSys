@@ -40,6 +40,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
             var slidesOption = $('<div class="slides element" index="' + (i++) + '" value="' + element.name + '">' + element.name + '</div>');
             slidesOption.on('click', function () {
                 self.slidesName = $(this).attr('value');
+                self.slidesIndex = $(this).attr('index');
                 self.currentSlidesNumber = 0;
                 self.slideData[self.slidesIndex].imgDataList[0].then(function(slideObj){
                     self.newSlide(slideObj);
