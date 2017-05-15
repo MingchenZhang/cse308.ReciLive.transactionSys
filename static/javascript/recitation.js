@@ -40,6 +40,16 @@ function initDateForRec() {
     checkRecitationDate(startDate, endDate);
 }
 
+function searchRec() {
+  $('.recitation').show();
+  var name = $("#search-rec").val();
+  $('.recitation').each(function(i, element) {
+    if(!element.innerText.includes(name)) {
+      $(this).hide();
+    }
+  });
+}
+
 function checkRecitationDate(startDate, endDate) {
     $('#rec-date-start')
         .datepicker()

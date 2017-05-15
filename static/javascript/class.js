@@ -85,9 +85,13 @@ function initClassModal() {
 }
 
 function searchClass() {
+  $('.class').show();
   var name = $("#search-class").val();
-  $("#search-class").val('');
-  window.location.href = window.location.origin + '/searchClass?name='+name;
+  $('.class').each(function(i, element) {
+    if(!element.innerText.includes(name)) {
+      $(this).hide();
+    }
+  });
 }
 function addClass() {
   var name = $(".class-name").val();

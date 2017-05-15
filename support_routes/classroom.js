@@ -160,31 +160,6 @@ exports.getRoute = function (s) {
         });
     });
 
-    router.get('/searchClass', jsonParser, (req, res, next) => {   //delete class with all the recitation and resource
-      if(!req.userLoginInfo) {
-        return res.render("error.ejs", {
-          message: 'please login first'
-        });
-      }
-        s.classConn.searchOtherClass(req.query.name, req.userLoginInfo.userID).then((clazz) => {
-          let classes = [];
-          clazz.forEach(function (element) {
-              classes.push({id: element._id, name: element.name});
-          });
-          res.render("course.ejs",{
-            username: req.userLoginInfo.record.photo,
-            instructor: false,
-            classes: classes
-          });
-        }).catch((e) => {
-              res.render("error.ejs", {
-                message: e.message ? e.message : 'get classes by instructor error'
-              });
-            }
-        );
-    });
-
-
     return router;
 }
 ;
