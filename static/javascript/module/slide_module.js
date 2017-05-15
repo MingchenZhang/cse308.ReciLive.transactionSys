@@ -235,6 +235,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                 }
             });
         } else {
+            $('.fa.fa-window-restore.fa-2x.slides').hide();
             return new Promise(function (resolve, reject) {     //don't have control for slides
                 nextButton.remove();
                 previousButton.remove();

@@ -188,6 +188,8 @@ Promise.all(promiseList).then(function (result) {
     sliderController.presetEvent();
     slideModule.presetEvent();
     drawModule.presetMethod();
+    if(transactionSystem.privilege.indexOf('admin')==-1)
+        $('.fa.fa-power-off.fa-3x.ending-controller').hide();
 }).then(transactionSystem.init).then(function () {
     if (!transactionSystem.firstTransactionTime()) {
         // no transaction posted

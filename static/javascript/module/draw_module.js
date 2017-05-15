@@ -8,8 +8,6 @@ function Draw(transactionSystem, div, controlPanel) {
     var ignoreTransaction = {};  //Instructor ignore the draw transaction that himself made
     var fabricCanvas = null;     //fabric canvas from fabricjs lib
     var pen = null,      //init all the button
-        undo = null,
-        redo = null,
         eraser = null,
         clear = null,
         colorPicker = null,
@@ -38,8 +36,6 @@ function Draw(transactionSystem, div, controlPanel) {
      */
     this.init = function () {
         pen = controlPanel.find('#pencil-box'),      //init all the button
-            undo = controlPanel.find('#undo-box'),
-            redo = controlPanel.find('#repeat-box'),
             eraser = controlPanel.find('#eraser-box'),
             clear = controlPanel.find('#clear-box'),
             colorPicker = controlPanel.find('#draw-color-picker'),
@@ -49,8 +45,8 @@ function Draw(transactionSystem, div, controlPanel) {
         canvas.setHeight(div.height());
         canvas.isDrawingMode = false;
         canvas.freeDrawingBrush.color = colorPicker.val();
-        canvas.freeDrawingBrush.width = 20;
-        drawingLineWidthDisplay.val(20);
+        canvas.freeDrawingBrush.width = 7;
+        drawingLineWidthDisplay.val(7);
         canvas.setWidth(div.width());
         lastHeight = div.height();
         if (transactionSystem.privilege.indexOf("admin") != -1) {       //admin will get right for send new draw transaction and attach UI handler
@@ -157,34 +153,6 @@ function Draw(transactionSystem, div, controlPanel) {
         pen.click(function () {
             canvas.off();
             canvas.isDrawingMode = true;
-            newStrokeListener();
-        });
-
-        /**
-         * undo to previous draw
-         */
-        undo.click(function () {
-            canvas.off();
-            if (currentIndex > 0) {
-                canvas.clear();
-                canvas.loadFromJSON(drawList[--currentIndex]);
-                canvas.renderAll();
-                self.newStroke(JSON.stringify(canvas));
-            }
-            newStrokeListener();
-        });
-
-        /**
-         * redo a draw
-         */
-        redo.click(function () {
-            canvas.off();
-            if (currentIndex < drawList.length - 1) {
-                canvas.clear();
-                canvas.loadFromJSON(drawList[++currentIndex]);
-                canvas.renderAll();
-                self.newStroke(JSON.stringify(canvas));
-            }
             newStrokeListener();
         });
     };

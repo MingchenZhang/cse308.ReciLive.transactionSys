@@ -10,12 +10,12 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         var updateInternvarSecond = 1000;
         var classEnd = null;
 
-    /**
-     * if the class is in live then update total time
-     * O.W. do nothing
-     * @returns {*|Promise.<TResult>|Promise}
-     */
-    function totalTimeInitAndServerTimeUpdater() {
+        /**
+         * if the class is in live then update total time
+         * O.W. do nothing
+         * @returns {*|Promise.<TResult>|Promise}
+         */
+        function totalTimeInitAndServerTimeUpdater() {
             return $.ajax({
                 url: '/current_time',
                 type: "POST",
@@ -30,9 +30,9 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             });
         }
 
-    /**
-     * cal every update Internar second
-     */
+        /**
+         * cal every update Internar second
+         */
         function sliderUpdater() {
             if (!startTime && !transactionSystem.firstTransactionTime()) {
                 //there isn't any transaction system first transaction
@@ -96,18 +96,18 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             }
         }
 
-    /**
-     * preset event before init
-     */
-    self.presetEvent = function () {
+        /**
+         * preset event before init
+         */
+        self.presetEvent = function () {
             document.addEventListener(events.endRecitation.type, function () {
                 classEnd = true;
             })
         };
-    /**
-     * enroll event endRecitation
-     */
-    function enrollEvent() {
+        /**
+         * enroll event endRecitation
+         */
+        function enrollEvent() {
             document.addEventListener(events.endRecitation.type, classEndFunc);
         }
 
@@ -123,9 +123,9 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             }
         }
 
-    /**
-     * admin finish class and init every thing again
-     */
+        /**
+         * admin finish class and init every thing again
+         */
         function adiminReInit() {
             // admin end from live mode
             slider.show();
@@ -146,9 +146,9 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
             }
         }
 
-    /**
-     * general init for every role
-     */
+        /**
+         * general init for every role
+         */
         self.init = function () {
 
             if (!classEnd) {
@@ -188,11 +188,11 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
 
             }
         };
-    /**
-     * attach slider listener
-     * @param slider
-     */
-    function attachListener(slider) {
+        /**
+         * attach slider listener
+         * @param slider
+         */
+        function attachListener(slider) {
             slider.change('change', function () {
                 //user change time
                 //slider.val will get int
@@ -219,11 +219,11 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
                         div.find('.thumb').remove();
                     }, 1000);
                     setTimeout(function () {
-                        var showTime = playedTime.getTime() -  startTime.getTime();
+                        var showTime = new Date(playedTime.getTime() - startTime.getTime());
                         div.find('.value').html(
-                            show.getMinutes() + ":" + show.getSeconds()
+                            showTime.getMinutes() + ":" + showTime.getSeconds()
                         );
-                    },50);
+                    }, 50);
 
                 }
             });
