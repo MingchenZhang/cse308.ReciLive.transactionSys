@@ -84,6 +84,11 @@ function initClassModal() {
   $(".save-class").attr("onclick","addClass()");
 }
 
+function searchClass() {
+  var name = $("#search-class").val();
+  $("#search-class").val('');
+  window.location.href = window.location.origin + '/searchClass?name='+name;
+}
 function addClass() {
   var name = $(".class-name").val();
   var startDate = $("#class-date-start-display").text();

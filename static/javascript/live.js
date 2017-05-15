@@ -93,6 +93,9 @@ function newPost(message, posx, posy, color, id) {
         'background-color': color
     });
 
+    posx = posx * 100;
+    posy = posy * 100;
+
     var replyButton = $newdiv.find("#" + inputId);
     replyButton.on('change', function () {
         discussionBoardModule.newReply(replyButton.val(), id);

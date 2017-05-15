@@ -66,14 +66,22 @@ exports.getClassByMongoID = (classID) => {
     })
 };
 
+// /**
+//  * @param class name
+//  * @returns {Promise.<TResult>|Promise}
+//  */
+// exports.searchYourClass = (name, owner) => {
+//   return classDB.classesColl.find({ name: {$regex:name}, owner}).then((clazz) => {
+//     return clazz;
+//   })
+// };
+
 /**
  * @param class name
  * @returns {Promise.<TResult>|Promise}
  */
-exports.searchClass = (name) => {
-  return classDB.classesColl.find({ name: {$regex:name}}).then((clazz) => {
-    return clazz;
-  })
+exports.searchOtherClass = (name, owner) => {
+  return classDB.classesColl.find({ name: {$regex:name}, owner: {$ne:owner}}).sort({'createdAt': -1}).toArray();
 };
 
 /**
