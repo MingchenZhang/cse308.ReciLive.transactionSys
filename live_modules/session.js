@@ -210,7 +210,7 @@ exports.session = function () {
 
         ws.on('message', function (message, flags) {
             if (flags.binary) {
-                //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return; TODO: re-enable privilege check
+                //if (soundSpeaker.indexOf(ws.userLoginInfo.userID) <0) return;
                 //log.debug('receive sound from userid: ' + ws.userLoginInfo.userID);
                 if (self.status == "ENDED") return;
                 s.transactionRecord.addSound({sessionID: self.sessionID, createdAt: new Date(), data: message});
@@ -356,7 +356,7 @@ exports.session = function () {
             new When.Promise((resolve, reject) => {
                 s.wsHandler.removeRoute("/room/" + self.sessionID);
                 resolve();
-            })// TO_DO: close all ws connection
+            })// For later development: close all ws connection
         ];
         return When.all(finish);
     };

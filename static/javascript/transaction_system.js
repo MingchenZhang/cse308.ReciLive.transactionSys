@@ -12,7 +12,6 @@ function TransactionSystem(path) {
     var pastaTime = null;// user chosen time in transaction record
     var currentTime = null;// current time when user click on replay or review button
     var currentPlayedIndex = -1;
-    //TODO: change current time to relative time soon™
     self.liveFlag = true;
     self.privilege = null; // assign by outside
     self.userList = null; // assign by outside
@@ -94,7 +93,6 @@ function TransactionSystem(path) {
         }
         currentPlayedIndex = i - 1;
         console.log('replay session is over (UI is needed)');
-        // TODO: Added vex dialog
         clearInterval(watchdog);
     }
 
@@ -114,13 +112,13 @@ function TransactionSystem(path) {
                 }
                 return -1;
             } else {
-                return 0; // TODO: find transaction
+                return 0; // For later development: find transaction
             }
         }
 
         //check time param
         if (!time && live)return;
-        //TODO: time greater than latest transaction
+        //For later development: time greater than latest transaction
         if (!time) {
             // switch to live
             live = true;
@@ -217,7 +215,7 @@ function TransactionSystem(path) {
             console.error('transaction receive out of order');
             connection.reset();
         }
-        // TODO: process error message
+        // For later development: process error message
     }
 
     /**

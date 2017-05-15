@@ -45,7 +45,7 @@ exports.transactionPush = function (req) {
         typeof req.index == 'number' &&
         typeof req.module == 'string'
     );
-    // TODO: check object safety
+    // For later development: check object safety
 };
 
 exports.getResource = function (req) {
