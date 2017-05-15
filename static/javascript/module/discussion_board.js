@@ -59,11 +59,12 @@ function DiscussionBoard(transactionSystem, newPost, addReplies) {
         }
     };
     this.reset = function () {
-      for (var key in threads) {
-        if (threads.hasOwnProperty(key)) {
-          $(threads[key]).remove();
+        for (var key in threads) {
+            if (threads.hasOwnProperty(key)) {
+                $(threads[key].div).remove();
+                delete threads[key];
+            }
         }
-      }
         ignoreTransaction = {};
         threads = {};
     };
