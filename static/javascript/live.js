@@ -91,13 +91,18 @@ function selectPostColor() {
 }
 
 function addReplies(div, message) {
-    $(div).children(".replies-drop-down-container").append("<a>" + message + "</a>");
+    var repliesContainer = $(div).children(".replies-container");
+    var dropContainer = $(div).children(".replies-drop-down-container");
+    repliesContainer.prepend("<p>" + message + "</p>");
+    while(repliesContainer.children().length > 2){
+        $(repliesContainer.children()[2]).prependTo(dropContainer);
+    }
 }
 
 function newPost(message, posx, posy, color, id) {
     var inputId = Math.floor(Math.random() * 300);
 
-    var $newdiv = $("<div class='post'><h4>" + message + "</h4><div class='replies-drop-down-container'><input data-id='#" + inputId + "' id='" + inputId + "'/></div></div>").css({
+    var $newdiv = $("<div class='post'><h4>" + message + "</h4><span>reply:</span><span><input data-id='#" + inputId + "' id='" + inputId + "'/></span><div class='replies-container'></div><div class='replies-drop-down-container'></div></div>").css({
         'background-color': color
     });
 
@@ -116,8 +121,11 @@ function newPost(message, posx, posy, color, id) {
         'position': 'absolute',
         'left': posx + '%',
         'top': posy + '%',
-        'display': 'none'
-    }).appendTo('.col-md-4').fadeIn(100, function () {
+        'display': 'none',
+        'padding': '5px'
+    }).appendTo('#info-board').fadeIn(500, function () {});
+    $newdiv.find('span').css({
+        display: 'inline-block'
     });
     $('#info-post').val('');
     return $newdiv;
