@@ -39,7 +39,7 @@ exports.getRoute = function (s) {
                         gs().getPageNumber(filePath + '.pdf',
                             (pageNumber) => {
                                 if (!pageNumber.success) {        // couldn't get page number
-                                    return reject();
+                                    return reject(new Error("couldn't get page number"));
                                 }
                                 var pages = parseInt(pageNumber.data);      //get page number for gs
                                 gs().batch()
@@ -52,6 +52,8 @@ exports.getRoute = function (s) {
                                     });
                             });
                     });
+                }).catch((error)=>{
+                    console.error(error);
                 });
             } else {
                 var fileID = s.mongodb.ObjectID();
@@ -62,7 +64,7 @@ exports.getRoute = function (s) {
                         writeError(400, 'file is too large');
                         uploadStream.abort(function () {
                         });
-                        return reject();
+                        return reject(new Error("error in file on limit"));
                     });
                     file.pipe(uploadStream).once('finish', function () {
                         fields.attachmentList.push({name: filename, id: fileID});
