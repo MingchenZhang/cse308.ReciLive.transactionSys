@@ -75,7 +75,7 @@
                 </div>
                 <div id="<%= element.id %>" class="modal bottom-sheet">
                     <div class="modal-content class-option">
-                        <a onclick="viewClassInfo('<%= element.id %>')" href="#class-detail">Edit <%= element.name %></a>
+                        <a onclick="viewClassInfo('<%= element.id %>')" href="#class-detail">View <%= element.name %></a>
                         <% if(instructor) { %>
                           <a href="" onclick="deleteClass('<%= element.id %>')">Delete <%= element.name %></a>
                         <% } %>

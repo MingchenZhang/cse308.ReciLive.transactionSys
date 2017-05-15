@@ -135,7 +135,11 @@ function viewClassInfo(current_class_id) {
       dataType: 'json'
   }).done(function (data) {
       if(data.result === true) {
-        if(data.result4classInfo) {
+        // if(data.result4classInfo) {
+        //
+        // }else {
+        //   console.error(data.reason);
+        // }
           $(".class-name").val(data.classInfo.name);
           $('#class-date-alert').hide();
           var startDate = new Date(data.classInfo.startDate);
@@ -150,9 +154,6 @@ function viewClassInfo(current_class_id) {
           $('#class-date-end-display').text($('#class-date-end').data('date'));
           checkClassDate(startDate, endDate);
           $("#save-class").attr("disabled",true);
-        }else {
-          console.error(data.reason);
-        }
         if(data.result4Privilege) {
           $(".student-list").empty();
           display_students(data.privilegeList);
