@@ -102,6 +102,7 @@ body {
 #info-post {
   font-size: 20px;
   color: #ffffff;
+  width: auto;
 }
 
 .replies-drop-down-container {

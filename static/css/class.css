@@ -62,6 +62,10 @@ nav {
 .class-info h2 {
   color: #e05038;
 }
+.class-info .input-field {
+  width: 80%;
+  margin: 0 auto;
+}
 .class {
   overflow: hidden;
   width: 100%;
