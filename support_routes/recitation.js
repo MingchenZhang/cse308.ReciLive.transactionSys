@@ -7,6 +7,7 @@ exports.getRoute = function (s) {
 
     var jsonParser = BodyParser.json({limit: '100kb'});
 
+    // render recitation page
     router.get('/course/:classId', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
         s.classConn.getRecitationsByClass(req.params.classId).then((response) => {
                 let recitations = [];
@@ -37,6 +38,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // add a recitation
     router.post('/ajax/add-recitation', jsonParser, (req, res, next) => {       //add recitation to class db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         else {
@@ -91,6 +93,7 @@ exports.getRoute = function (s) {
         }
     });
 
+    // get info for a recitation
     router.post('/ajax/get-recitation-info', jsonParser, (req, res, next) => {            //give recitation info for edit or view
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
@@ -107,6 +110,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // edit recitation information
     router.post('/ajax/edit-recitation', jsonParser, (req, res, next) => {
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
@@ -124,6 +128,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // end a recitation, called by live system
     router.post('/ajax/end-recitation', jsonParser, (req, res, next) => {
         s.classConn.changeRecitation((req.body.recitationNumericId), {
             status: req.body.status,
@@ -134,6 +139,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // delete a recitation
     router.post('/ajax/delete-recitation', jsonParser, (req, res, next) => {        //delete recitation with recitation id
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.body.recitationId)).then((peopleList) => {
@@ -147,6 +153,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // set resources for recitation
     router.post('/ajax/set-recitation-resource', jsonParser, (req, res, next) => {           //save the recitation resource metadata in db
         if (!req.userLoginInfo) res.send({result: false, reason: "please login first"});
         s.classConn.getRecitationParticipant(s.mongodb.ObjectID(req.query.recitationID)).then((peopleList) => {
@@ -164,11 +171,14 @@ exports.getRoute = function (s) {
 
     });
 
+    // get resources for recitation (CORS options)
     router.options('/ajax/get-recitation-resource', (req, res, next) => {
         res.setHeader('Access-Control-Allow-Origin', 'https://room.recilive.stream');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.send('');
     });
+
+    // get resources for recitation
     router.get('/ajax/get-recitation-resource', jsonParser, (req, res, next) => {       //get the recitation resource metadata in db
         var recitationID = req.query.recitationID;
         var numericID = parseInt(req.query.numericID);

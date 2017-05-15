@@ -6,6 +6,7 @@ exports.getRoute = function (s) {
     var router = Express.Router();              //return all the parsere
     var jsonParser = BodyParser.json({limit: '10kb'});
 
+    // course page
     router.get('/course', jsonParser, function (req, res, next) {       //redirect to course page depend on the role
         if (!req.userLoginInfo) {
             return res.render("error.ejs", {
@@ -53,6 +54,7 @@ exports.getRoute = function (s) {
         }
     });
 
+    // add a class
     router.post('/ajax/add-class', jsonParser, function (req, res, next) {      //add class room to database
         s.classConn.addClass(req.body.name, req.body.startDate, req.body.endDate, req.userLoginInfo.record._id).then((clazz) => {       //return a premise
             return s.tools.listPromise(req.body.students, (email) => {
@@ -74,6 +76,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // get class info
     router.post('/ajax/get-edit-class-info', jsonParser, (req, res, next) => {           //edit mode get class information
         var response = {};
         var promiseList = [];
@@ -91,7 +94,7 @@ exports.getRoute = function (s) {
         }).catch((err) => {
             response.result4privilege = false;
             response.reason4privilege = err || "error in get privilege list";
-        })
+        });
         When.all(promiseList).then(() => {
             if (response.reason4classInfo || response.reason4privilege) {
                 response.result = false;
@@ -107,6 +110,7 @@ exports.getRoute = function (s) {
         })
     });
 
+    // edit class info
     router.post('/ajax/edit-class', jsonParser, (req, res, next) => {           //response the edit class button
             s.classConn.getClassByMongoID(s.mongodb.ObjectID(req.body.classId)).then((clazz) => {
                 if (clazz.owner.toString() != req.userLoginInfo.record._id.toString()) {
@@ -146,6 +150,7 @@ exports.getRoute = function (s) {
         }
     );
 
+    // delete class
     router.post('/ajax/delete-class', jsonParser, (req, res, next) => {   //delete class with all the recitation and resource
         s.classConn.getClassByMongoID(s.mongodb.ObjectID(req.body.classId)).then((clazz) => {
             if (clazz.owner.toString() != req.userLoginInfo.record._id.toString()) {

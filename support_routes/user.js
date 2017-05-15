@@ -6,6 +6,7 @@ exports.getRoute = function (s) {
     var router = Express.Router();                          //create a new router later on will add in the app.js
     var jsonParser = BodyParser.json({limit: '10kb'});      //json parser parse the request before router run it's content
 
+    // check user is in the database
     router.post('/ajax/check-user', jsonParser, function (req, res, next) {     //check user has role for front end sign_up needed
         if (req.userLoginInfo.record||req.userLoginInfo.record.role) {
             res.send({result: true, sign_up: false, redirect: '/course'});
@@ -14,6 +15,7 @@ exports.getRoute = function (s) {
         }
     });
 
+    // login user, may write user info to database if needed
     router.post('/ajax/login', jsonParser, function (req, res, next) {　//login ajax post
         if(!req.body.IDToken){
             return res.status(400).send({result: false, reason: 'format error'});
@@ -52,6 +54,7 @@ exports.getRoute = function (s) {
             res.status(403).send("google login failed: "+(err.message?err.message:"unknown error"));
         });
     });
+
 
     router.post('/ajax/sign-up', jsonParser, (req, res, next) => {          //new user sign_up
         if(!req.userLoginInfo) return res.status(403).send('login first');
