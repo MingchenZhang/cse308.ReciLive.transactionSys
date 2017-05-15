@@ -35,12 +35,20 @@ $(document).ready(function () {
     $('#draw-color-picker').colorPicker({pickerDefault: "ffffff"});
     $('.student-list').hide();
     $('.dropdown-button').dropdown({
-        inDuration: 300,
-        outDuration: 225
-      }
+            inDuration: 300,
+            outDuration: 225
+        }
     );
-    $("#info-post").on('change', function() {
-      discussionBoardModule.newThread($("#info-post").val());
+    $("#info-post").keyup(function (event) {
+        if (event.keyCode == 13&&$("#info-post").val()!="") {
+            discussionBoardModule.newThread($("#info-post").val());
+        }
+    });
+
+    $("#post-submit").click(function (event) {
+        if ($("#info-post").val()!="") {
+            discussionBoardModule.newThread($("#info-post").val());
+        }
     });
 });
 
@@ -77,13 +85,13 @@ function selectUser(student) {
 }
 
 function selectPostColor() {
-  var choices = ['#f2b632', '#428bca', '#c5e9b8', '#cd5c5c'];
-  var index = Math.floor(Math.random() * choices.length);
-  return choices[index];
+    var choices = ['#f2b632', '#428bca', '#c5e9b8', '#cd5c5c'];
+    var index = Math.floor(Math.random() * choices.length);
+    return choices[index];
 }
 
 function addReplies(div, message) {
-  $(div).children(".replies-drop-down-container").append("<a>"+message+"</a>");
+    $(div).children(".replies-drop-down-container").append("<a>" + message + "</a>");
 }
 
 function newPost(message, posx, posy, color, id) {
@@ -93,13 +101,15 @@ function newPost(message, posx, posy, color, id) {
         'background-color': color
     });
 
-    posx = (posx/10*8) * 100;
-    posy = (posy/10*8) * 100;
+    posx = (posx / 10 * 8) * 100;
+    posy = (posy / 10 * 8) * 100;
 
     var replyButton = $newdiv.find("#" + inputId);
-    replyButton.on('change', function () {
-        discussionBoardModule.newReply(replyButton.val(), id);
-        replyButton.val('');
+    replyButton.keyup(function (event) {
+        if (event.keyCode == 13&&replyButton.val()!="") {
+            discussionBoardModule.newReply(replyButton.val(), id);
+            replyButton.val('');
+        }
     });
 
     $newdiv.css({
@@ -118,11 +128,9 @@ transactionSystem.roomNumber = classroomNumber;
 transactionSystem.userID = userID;
 soundControlSystem = new SoundControl(transactionSystem);
 viewManager = new ViewManager($('.stage-view'));
-chatModule = new Chat(transactionSystem, $('#info-board'), $('#submit'), $('#send'));
 slideModule = new Slide(transactionSystem, viewManager.getDiv(), $('#previous-slide'), $('#next-slide'), $('#slides-selector'));
 drawModule = new Draw(transactionSystem, viewManager.getDiv(), $('#draw'));
 discussionBoardModule = new DiscussionBoard(transactionSystem, newPost, addReplies);
-transactionSystem.registerModule(chatModule.moduleName, chatModule);
 transactionSystem.registerModule(slideModule.moduleName, slideModule);
 transactionSystem.registerModule(soundControlSystem.moduleName, soundControlSystem);
 transactionSystem.registerModule(drawModule.moduleName, drawModule);
@@ -148,7 +156,7 @@ var promiseList = [$.ajax({
     type: 'get',
     dataType: 'json',
 }), $.ajax({
-    url: 'https://recilive.stream/ajax/get-recitation-resource?numericID='+encodeURIComponent(classroomNumber),
+    url: 'https://recilive.stream/ajax/get-recitation-resource?numericID=' + encodeURIComponent(classroomNumber),
     type: 'get',
     dataType: 'json',
     xhrFields: {withCredentials: true},
@@ -284,27 +292,27 @@ function activateSound() {
 
 // attach handler to change speaker role
 document.addEventListener(events.switchToSpeaker.type, activateSound, false);
-document.addEventListener(events.switchToSpeaker.type, (e)=>{
-    if(e.changed){
-        toastr.success('You are in speaking now','',{timeOut: 2000, progressBar:true});
+document.addEventListener(events.switchToSpeaker.type, (e) => {
+    if (e.changed) {
+        toastr.success('You are in speaking now', '', {timeOut: 2000, progressBar: true});
     }
 }, false);
 document.addEventListener(events.switchToListener.type, activateSound, false);
-document.addEventListener(events.switchToListener.type, (e)=>{
-    if(e.changed){
-        toastr.info('You speaking is ended','',{timeOut: 2000, progressBar:true});
+document.addEventListener(events.switchToListener.type, (e) => {
+    if (e.changed) {
+        toastr.info('You speaking is ended', '', {timeOut: 2000, progressBar: true});
     }
 }, false);
 
-document.addEventListener(events.newSpeakers.type, (e)=>{
+document.addEventListener(events.newSpeakers.type, (e) => {
     var userNameList = [];
-    e.newSpeakers.forEach((userID)=>{
+    e.newSpeakers.forEach((userID) => {
         var userInfo = transactionSystem.userList[userID];
         userNameList.push(userInfo.name || userInfo.email);
     });
-    toastr.info(userNameList.join(', ')+' is now speaking','',{timeOut: 2000, progressBar:true});
+    toastr.info(userNameList.join(', ') + ' is now speaking', '', {timeOut: 2000, progressBar: true});
 }, false);
 
 document.addEventListener(events.endRecitation.type, (e) => {
-    toastr.success('Class is ended','',{timeOut: 10000, progressBar:true});
+    toastr.success('Class is ended', '', {timeOut: 10000, progressBar: true});
 }, false);
