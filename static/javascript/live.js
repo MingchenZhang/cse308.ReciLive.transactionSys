@@ -99,6 +99,7 @@ function newPost(message, posx, posy, color, id) {
     var replyButton = $newdiv.find("#" + inputId);
     replyButton.on('change', function () {
         discussionBoardModule.newReply(replyButton.val(), id);
+        replyButton.val('');
     });
 
     $newdiv.css({
@@ -108,7 +109,7 @@ function newPost(message, posx, posy, color, id) {
         'display': 'none'
     }).appendTo('.col-md-4').fadeIn(100, function () {
     });
-    replyButton.val('');
+    $('#info-post').val('');
     return $newdiv;
 }
 
