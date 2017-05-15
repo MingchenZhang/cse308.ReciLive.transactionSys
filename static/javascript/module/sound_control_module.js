@@ -12,7 +12,7 @@ function SoundControl(transactionSystem) {
      */
     self.init = function(){
         self.inited = true;
-        if(self.asSpeaker || self.asListener) {
+        if((self.asSpeaker || self.asListener) && transactionSystem.liveFlag) {
             if(self.asSpeaker) document.dispatchEvent(events.switchToSpeaker());
             if(self.asListener) document.dispatchEvent(events.switchToListener());
         }else{ // if no transaction about sound control has been made
@@ -36,7 +36,7 @@ function SoundControl(transactionSystem) {
                     changed = true;
                 self.asSpeaker = changeTuple[1];
                 self.asListener = !changeTuple[1];
-                if(self.inited){
+                if(self.inited && transactionSystem.liveFlag){
                     if(self.asSpeaker) document.dispatchEvent(events.switchToSpeaker({changed}));
                     if(self.asListener) document.dispatchEvent(events.switchToListener({changed}));
                 }
