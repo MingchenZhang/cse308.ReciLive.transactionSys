@@ -41,6 +41,7 @@
             <img src="<%= username %>">
             <div class="logout">LOGOUT</div>
         </a>
+        <div class="back" onclick="goBack()">Back</div>
     </div>
     <% if(instructor) { %>
     <div class="nav-content">
@@ -174,6 +175,9 @@
 </div>
 
 <script>
+    function goBack() {
+        window.history.back();
+    }
     (function () {
 
         var reGenerateView = (slides) => {
@@ -238,6 +242,10 @@
             });
             return result;
         };
+
+        function goBack() {
+            window.history.back();
+        }
 
         var showUploadWindow = (fileDiv) => {
             var uploadDialog;
