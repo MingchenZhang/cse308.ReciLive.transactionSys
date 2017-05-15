@@ -108,7 +108,7 @@
         <div class="row class-list">
             <% recitations.forEach(function(recitation) { %>
             <div class="col s6 m3">
-                <div class="recitation">
+                <div class="recitation <%if(recitation.lightColor){ %> lighter-recitation <% } %>">
                     <h4><%= recitation.name %><%= recitation.nameAppend %></h4>
                     <div class="dropdown-course-content">
                         <a target="_blank" href="https://room.recilive.stream/room/<%= recitation.roomid %>">Enter</a>

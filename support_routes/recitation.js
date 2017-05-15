@@ -14,6 +14,7 @@ exports.getRoute = function (s) {
                     var recitation = {roomid: element.numericID, name: element.name, mongoid: element._id};
                     if (element.status == "ENDED") {
                         recitation.nameAppend = " 🔚";
+                        recitation.lightColor = true;
                     }
                     recitations.push(recitation);
                 });
@@ -23,7 +24,7 @@ exports.getRoute = function (s) {
                             recitations: recitations,
                             classId: req.params.classId,
                             username: req.userLoginInfo.record.photo,
-                            instructor: req.userLoginInfo.record.role == "Instructor"?true:false,
+                            instructor: req.userLoginInfo.record.role == "Instructor",
                             className: classInfo.name
                         });
                     }else {
@@ -120,6 +121,16 @@ exports.getRoute = function (s) {
             }).catch((err) => {
                 res.send({result: false, reason: err.message || "error in edit recitation"});
             });
+        });
+    });
+
+    router.post('/ajax/end-recitation', jsonParser, (req, res, next) => {
+        s.classConn.changeRecitation((req.body.recitationNumericId), {
+            status: req.body.status,
+        }).then(() => {
+            res.send({result: true});
+        }).catch((err) => {
+            res.send({result: false, reason: err.message || "error in end recitation"});
         });
     });
 
