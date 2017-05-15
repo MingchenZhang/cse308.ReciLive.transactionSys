@@ -69,8 +69,13 @@ body {
 .student-list {
   min-width: 150px;
   background-color: #3fb0ac;
+  display: table;
+  height: 100%;
 }
 .student-list h4 {
+  padding-left: 5px;
+}
+.student-list h4 i {
   padding-left: 5px;
 }
 .student-microphone {
