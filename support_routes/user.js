@@ -55,7 +55,7 @@ exports.getRoute = function (s) {
         });
     });
 
-
+    // sign up and update the role of the user
     router.post('/ajax/sign-up', jsonParser, (req, res, next) => {          //new user sign_up
         if(!req.userLoginInfo) return res.status(403).send('login first');
         s.userConn.setUserInfo(req.userLoginInfo.record._id,{role:req.body.role}).then(() => {
@@ -65,6 +65,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // get user info
     router.get('/ajax/live-get-user-info', jsonParser, (req, res, next) => {     //live send mongo id and get all user info
         s.userConn.getUserInfoBySession(req.query.session).then((userInfo) => {
             res.send(userInfo);
@@ -73,6 +74,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // log out and clear cookie
     router.all('/ajax/logout', (req, res, next)=>{      //get and post for logout
         s.userConn.removeSession(req.cookies.login_session);
         res.clearCookie('login_session', {domain: '.recilive.stream'});
