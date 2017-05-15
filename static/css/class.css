@@ -62,6 +62,11 @@ nav {
 .class-info h2 {
   color: #e05038;
 }
+.back2class {
+  width: 40px;
+  cursor: pointer;
+  font-size: 35px;
+}
 .class-info .input-field {
   width: 80%;
   margin: 0 auto;

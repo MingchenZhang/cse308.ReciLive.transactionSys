@@ -41,7 +41,6 @@
             <img src="<%= username %>">
             <div class="logout">LOGOUT</div>
         </a>
-        <div class="back" onclick="goBack()">Back</div>
     </div>
     <% if(instructor) { %>
     <div class="nav-content">
@@ -94,7 +93,7 @@
 </div>
 <!-- End Modal for Recitation -->
 <section class="class-info">
-    <h2>Class Name: <span id="class-Name"><%= className %></span></h2>
+    <h2>Class Name: <span id="class-Name"><%= className %></span><i class="material-icons back2class" onclick="goBack()">exit_to_app</i></h2>
     <h2>Recitation List</h2>
     <br>
     <div class="input-field col s6">
