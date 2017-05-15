@@ -34,7 +34,7 @@ exports.getRoute = function (s) {
             s.classConn.getClassesByStudent(req.userLoginInfo.record._id).then((r) => {
                 let classes = [];
                 r.forEach(function (element) {
-                    classes.push({id: element._id, name: element.name});
+                    classes.push({id: element._id, name: element.name, editable: req.userLoginInfo.record._id == element.owner});
                 });
                 res.render("course.ejs", {
                     username: req.userLoginInfo.record.photo,

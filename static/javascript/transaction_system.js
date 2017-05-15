@@ -190,7 +190,8 @@ function TransactionSystem(path) {
                                 transactions[j].payload);
                         }
                     }
-                    console.assert(j == transactions.length, "you are too fasssssst");
+                    if(j == transactions.length) console.warn("you are too fasssssst");
+                    currentPlayedIndex = j - 1;
                 }
             }
             clearInterval(watchdog);
