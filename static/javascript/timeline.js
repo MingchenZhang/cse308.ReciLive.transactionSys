@@ -112,7 +112,6 @@ var replayController = function (soundTransactionSystem, transactionSystem, slid
         }
 
         function classEndFunc(e) {
-            //TODO: need maek sure last transaction be set up before this function called
             e.target.removeEventListener(e.type, arguments.callee);
             classEnd = true;
             //no one should change total time after this

@@ -38,9 +38,9 @@ exports.getRoute = function (s) {
                     return userInfo._id;
                 });
             }
-        }).then((userID)=>{
+        }).then((userID)=>{ //add session
             return s.userConn.addSession(userID);
-        }).then((session)=>{
+        }).then((session)=>{    // add cookie
             res.cookie('login_session', session, {
                 httpOnly: true,
                 secure: !!s.inProduction,
