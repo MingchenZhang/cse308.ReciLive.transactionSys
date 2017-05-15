@@ -1,2 +1,4 @@
-- name: install mongodb
-  command: apt-get install ghostscript
+- name: install ghostscript
+  apt:
+    name: ghostscript
+    update_cache: yes
