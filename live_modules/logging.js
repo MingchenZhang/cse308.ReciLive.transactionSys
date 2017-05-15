@@ -1,3 +1,5 @@
+// some logging utility
+
 exports.debug = function (message) {
     if(s.inProduction) return;
     if(typeof message == "function")

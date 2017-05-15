@@ -20,6 +20,11 @@ exports.session = function () {
     var soundClients = [];
     var soundSpeaker = [];
 
+    /**
+     * create a new session, called after the object instantiation.
+     * @param param options for the new recitation
+     * @returns {Promise} to add a recitation
+     */
     this.newSession = function (param) {
         if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
 
@@ -45,6 +50,12 @@ exports.session = function () {
             return value;
         });
     };
+
+    /**
+     * resume a session (recitation) from database
+     * @param param options for the existed recitation
+     * @returns {Promise} to add a recitation
+     */
     this.resumeSession = function (param) {
         if (self.sessionID >= 0) return When.reject({reason: "reinitialization of session:" + self.sessionID});
 
@@ -72,6 +83,10 @@ exports.session = function () {
             });
     };
 
+    /**
+     * handle a new transaction websocket channel
+     * @param ws ws library object, an incoming connection
+     */
     this.wsHandleTransaction = function (ws) {
         log.debug('start transaction wsHandler for ' + self.sessionID);
         ws.roomSession = self;
@@ -154,6 +169,10 @@ exports.session = function () {
         });
     };
 
+    /**
+     * handle a new sound websocket channel
+     * @param ws ws library object, an incoming connection
+     */
     this.wsHandleSound = function (ws) {
         ws.nextSoundFrame = null; // the sound object to denote the next sound tobe send, null if live
         ws.jumpRequestDate = null; // date the request was given
@@ -248,6 +267,11 @@ exports.session = function () {
         });
     };
 
+    /**
+     * create a new transaction
+     * @param transaction info about the new transaction
+     * @returns {Promise} to create a transaction
+     */
     this.addTransaction = function (transaction) {
         var index = transaction.index;
         var module = transaction.module;
@@ -290,6 +314,12 @@ exports.session = function () {
         return s.transactionRecord.addTransaction(transaction);
     };
 
+    /**
+     * list all transaction in this session so far
+     * @param startAt index to indicate where to start (inclusive)
+     * @param sendNext {Function} to handle a transaction extracted
+     * @returns {Promise} to get all transaction handled
+     */
     this.listTransaction = function (startAt, sendNext) {
         return new Promise((resolve, reject) => {
             var cursor = s.transactionRecord.getTransactionCursor({sessionID: self.sessionID, startAt: startAt});
@@ -314,6 +344,11 @@ exports.session = function () {
             getMore();
         });
     };
+
+    /**
+     * close this session and delete it from database.
+     * @returns {Promise}
+     */
     this.close = function () {
         var finish = [
             s.transactionRecord.deleteSession({sessionID: self.sessionID}),
@@ -321,17 +356,25 @@ exports.session = function () {
             new When.Promise((resolve, reject) => {
                 s.wsHandler.removeRoute("/room/" + self.sessionID);
                 resolve();
-            })// TODO: close all ws connection
+            })// TO_DO: close all ws connection
         ];
         return When.all(finish);
     };
+
+    /**
+     * check user is in this session
+     * @param userID {string} user id
+     * @returns {boolean} true if user in this session.
+     */
     this.userInSession = function (userID) {
         return userID in self.privilege;
     };
-    this.userEditable = function (userID, module) {
-        return self.privilege[userID].indexOf(module) != -1;
-    };
 
+    /**
+     * handle this transaction by live system. take corresponding actions
+     * @param transaction a transaction object
+     * @returns {boolean} true if  it is successfully handled
+     */
     function understandTransaction(transaction) {
         if (transaction.module == 'sound_control' && transaction.description.speakerChange) {
             transaction.description.speakerChange.forEach((tuple) => {

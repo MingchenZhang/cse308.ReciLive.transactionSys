@@ -4,6 +4,10 @@ var When = require('when');
 var classroomList = {};
 var s = global.s;
 
+/**
+ * start creating session from database
+ * @returns {Promise|Promise.<TResult>} to read and create all sessions
+ */
 exports.initSession = function () {
     let sessionListPromise = s.transactionRecord.getSession();
     var sessionInitPromise = [];
@@ -18,14 +22,13 @@ exports.initSession = function () {
             })
         }
     }).then(When.all(sessionInitPromise));
-
 };
 
-exports.addSessionDummy = function () {
-    classroomList[1] = {"sessionID": 1, "privilege": {123: "all", 234: "all", 345: "all"}, name: "dummy Session name"};
-    return s.transactionRecord.addSession(1, {123: "all", 234: "all", 345: "all"}, "dummy Session name", "", "", '',0);
-};
-
+/**
+ * add a new session to the session pool, and write it to the database
+ * @param param info to create a new session
+ * @returns {Promise} to create this session
+ */
 exports.addSession = function (param) {
     var sessionID = param.sessionID;
     var privilege = param.privilege;
@@ -43,7 +46,10 @@ exports.addSession = function (param) {
     return classroomList[sessionID].newSession({sessionID, privilege, userList, name, startDate, endDate, status,slidesNumber});
 };
 
-//deletesSession return a promise
+/**
+ * delete a session
+ * @param param contain the sessionID tobe deleted
+ */
 exports.deleteSession = function (param) {
     var sessionID = param.sessionID;
 
@@ -54,6 +60,11 @@ exports.deleteSession = function (param) {
     }
 };
 
+/**
+ * get a session from session pool
+ * @param sessionID
+ * @returns {*}
+ */
 exports.getSession = function (sessionID) {
     return classroomList[sessionID];
 };

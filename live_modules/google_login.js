@@ -7,10 +7,6 @@ var client = null;
 
 exports.getUserInfo = function (tokenID) {
     if(!client) client = new auth.OAuth2(s.googleLoginClientID, '', '');
-    //dummy user info
-    if (tokenID == "123")  return new When.resolve({userID: 123, name: "instructor", email:'test@test'});
-    if (tokenID == "234")  return new When.resolve({userID: 234, name: "studentA"});
-    if (tokenID == "345")  return new When.resolve({userID: 345, name: "studentB"});
     return new When.promise((resolve, reject)=> {
         client.verifyIdToken(tokenID,
             s.googleLoginClientID,
@@ -31,6 +27,7 @@ exports.getUserInfo = function (tokenID) {
     });
 };
 
+// method used by live to get user information from support system
 exports.liveGetUserInfo = (session)=>{
     return new When.Promise((resolve, reject)=>{
         Request({

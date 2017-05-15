@@ -11,6 +11,7 @@ exports.getRoute = function (s) {
 
     var jsonParser = BodyParser.json({limit: '10kb'});
 
+    // used by support to push new recitation info to live system
     router.post(['/dispatch_classroom'], jsonParser, function (req, res, next) {
         if (!Checker.dispatchRequest(req.body)) return res.send({status: "error", reason: 5});
         s.sessionManager.addSession({
@@ -28,6 +29,7 @@ exports.getRoute = function (s) {
         });
     });
 
+    // user's page in the recitation
     router.use('/room/:classroomNumber', function (req, res, next) {
         req.classroomNumber = parseInt(req.params.classroomNumber);
         req.classroomSession = s.sessionManager.getSession(req.classroomNumber);
@@ -43,20 +45,7 @@ exports.getRoute = function (s) {
         }
     }, Classroom.getRoute(s));
 
-    router.post('/give_cookie', jsonParser, function (req, res, next) {
-        for (var key in req.body) {
-            if (!req.body.hasOwnProperty(key)) continue;
-            res.cookie(key, req.body[key], {});
-        }
-        res.send({status: "ok"});
-    });
-    router.get('/give_cookie', jsonParser, function (req, res, next) {
-        for (var key in req.query) {
-            if (!req.query.hasOwnProperty(key)) continue;
-            res.cookie(key, req.query[key], {});
-        }
-        res.send({status: "ok"});
-    });
+    // get current time of the server, used in timeline
     router.all('/current_time', jsonParser, (req, res, next) => {   //send end time if there is one
         res.send({status:"ok",time:(new Date()).toISOString()});
     });

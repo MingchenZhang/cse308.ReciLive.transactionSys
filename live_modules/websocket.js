@@ -2,9 +2,17 @@ var Cookie = require('cookie');
 var Login = require('./google_login');
 const Url = require('url');
 
+/**
+ * create a websocket router
+ * @constructor
+ */
 exports.WSHandler = function () {
     var subhandlerMap = {};
 
+    /**
+     * handle an incoming ws websocket connection
+     * @param ws ws library object
+     */
     this.handle = function (ws) {
         var location = Url.parse(ws.upgradeReq.url, true);
         var cookies = Cookie.parse(ws.upgradeReq.headers.cookie || '');
@@ -36,11 +44,20 @@ exports.WSHandler = function () {
         });
     };
 
+    /**
+     * add a new route to handle a ws request
+     * @param path URL for the request
+     * @param handler
+     */
     this.addRoute = function (path, handler) {
         log.debug('ws route "' + path + '" added');
         subhandlerMap[path] = handler;
     };
 
+    /**
+     * remove a route
+     * @param path URL to be removed
+     */
     this.removeRoute = function (path) {
         log.debug('ws route "' + path + '" removed');
         subhandlerMap[path] = undefined;

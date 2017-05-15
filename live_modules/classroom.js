@@ -19,17 +19,20 @@ exports.getRoute = function (s) {
         });
     });
 
+    // controller for pushing new transaction to remote
     router.post('/transaction_post', jsonParser, function (req, res, next) {
         var index = req.body.index;
         var module = req.body.module;
         var description = MongoEscape(req.body.description);
         var payload = MongoEscape(req.body.payload);
 
+        // format check
         if (!ParameterChecker.transactionPush(req.body))
             return res.status(400).send({status: 'error', reason: 5});
 
         var createdBy = req.userLoginInfo.userID;
 
+        // push the transaction to next layer (session)
         req.classroomSession.addTransaction({
             index,
             module,
@@ -47,52 +50,22 @@ exports.getRoute = function (s) {
         });
     });
 
+    // return user's privilege in the recitation
     router.get('/my_privilege', function (req, res, next) {
         var privilege = req.classroomSession.privilege[req.userLoginInfo.userID];
         if (privilege) return res.send({status: 'ok', privilege: privilege});
         else return res.send({status: 'error', reason: 2});
     });
 
+    // user list and their information
     router.get('/user_list', function(req, res, next){
         var userList = req.classroomSession.userList;
         if (userList) return res.send({status: 'ok', userList});
         else return res.send({status: 'error', reason: 2});
     });
 
+    // get the resources list for this recitation
     router.get('/get_resource', function (req, res, next) {
-        // return res.send({
-        //     "resources": [
-        //         {
-        //             "type": "slide",
-        //             "content": [
-        //                 {
-        //                     "name": "first slide",
-        //                     "pages": [
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac3"},
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac4"},
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac5"},
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c3fa0a9785420051ac6"}
-        //                     ]
-        //                 },
-        //                 {
-        //                     "name": "second slide",
-        //                     "pages": [
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acb"},
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051acd"},
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c70a0a9785420051ad0"}
-        //                     ]
-        //                 }, {
-        //                     "name": "third slide",
-        //                     "pages": [
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad4"},
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad5"},
-        //                         {"url": "https://recilive.stream/get_resource?id=59062c9da0a9785420051ad6"}
-        //                     ]
-        //                 },
-        //             ]
-        //         }
-        //     ]
-        // });
         Request({
             method: 'POST',
             url:"https://recilive.stream/get_resource",

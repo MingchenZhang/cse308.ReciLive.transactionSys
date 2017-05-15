@@ -10,6 +10,7 @@ var rimraf = require('rimraf');             //remove after
 exports.getRoute = function (s) {
     var router = Express.Router();
 
+    // add some resouces to database
     router.post('/add_resources', function (req, res, next) {
         var ended = false; // flag for output finish
         function writeError(status, err) {
@@ -130,6 +131,7 @@ exports.getRoute = function (s) {
         }
     });
 
+    // get a resource from database
     router.get('/get_resource', function (req, res, next) {
         try {
             var id = s.mongodb.ObjectID(req.query.id);
