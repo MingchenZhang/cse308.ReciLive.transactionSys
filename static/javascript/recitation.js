@@ -131,19 +131,20 @@ function deleteRecitation(recID, classId) {
 
 function addRecitation(currentClassId) {
     var name = $(".recitation-name").val();
-    var startDate = $('#rec-date-start-display').text();
-    var endDate = $('#rec-date-end-display').text();
+    //var startDate = $('#rec-date-start-display').text();
+    //var endDate = $('#rec-date-end-display').text();
     var add_button = $('#save-recitation');
     add_button.html("adding...");
     add_button.attr('disabled',true);
+
     $.ajax({
         type: "POST",
         url: "/ajax/add-recitation",
         data: JSON.stringify({
             class: currentClassId,
             name: name,
-            startDate: new Date(startDate),
-            endDate: new Date(endDate)
+            startDate: new Date(),
+            endDate: new Date()
         }),
         success: function (data) {
             if (data.result === true) {

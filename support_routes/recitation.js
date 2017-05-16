@@ -25,7 +25,7 @@ exports.getRoute = function (s) {
                             recitations: recitations,
                             classId: req.params.classId,
                             username: req.userLoginInfo.record.photo,
-                            instructor: req.userLoginInfo.record.role == "Instructor",
+                            instructor: req.userLoginInfo.record._id.toString() == classInfo.owner,
                             className: classInfo.name
                         });
                     }else {
