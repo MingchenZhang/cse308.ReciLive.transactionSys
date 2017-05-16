@@ -13,45 +13,27 @@ exports.getRoute = function (s) {
                 message: 'please login first'
             });
         }
-        if (req.userLoginInfo.record.role == "Instructor") {
-            s.classConn.getClassesByOwner(req.userLoginInfo.record._id).then((r) => {
-                let classes = [];
-                r.forEach(function (element) {
-                    classes.push({id: element._id, name: element.name, editable: req.userLoginInfo.record._id.toString() == element.owner});
-                });
-                res.render("course.ejs", {
-                    username: req.userLoginInfo.record.photo,
-                    instructor: true,
-                    classes: classes
-                });
-            }).catch((e) => {
-                    res.render("error.ejs", {
-                        message: e.message ? e.message : 'get classes by instructor error'
-                    });
-                }
-            );
-        } else if (req.userLoginInfo.record.role == "Student") {
-            s.classConn.getClassesByStudent(req.userLoginInfo.record._id).then((r) => {
-                let classes = [];
-                r.forEach(function (element) {
-                    classes.push({id: element._id, name: element.name, editable: req.userLoginInfo.record._id.toString() == element.owner});
-                });
-                res.render("course.ejs", {
-                    username: req.userLoginInfo.record.photo,
-                    instructor: false,
-                    classes: classes
-                });
-            }).catch((e) => {
-                    res.render("error.ejs", {
-                        message: e.message || 'get classes by student error'
-                    });
-                }
-            );
-        } else {
-            res.render("error.ejs", {
-                message: 'no such role'
+        let classes = [];
+        s.classConn.getClassesByOwner(req.userLoginInfo.record._id).then((r) => {
+            r.forEach(function (element) {
+                classes.push({id: element._id, name: element.name, editable: req.userLoginInfo.record._id.toString() == element.owner});
             });
-        }
+            return s.classConn.getClassesByOwner(req.userLoginInfo.record._id);
+        }).then((r)=>{
+            r.forEach(function (element) {
+                classes.push({id: element._id, name: element.name, editable: req.userLoginInfo.record._id.toString() == element.owner});
+            });
+            res.render("course.ejs", {
+                username: req.userLoginInfo.record.photo,
+                instructor: req.userLoginInfo.record.role == "Instructor",
+                classes: classes
+            });
+        }).catch((e) => {
+                res.render("error.ejs", {
+                    message: e.message ? e.message : 'get classes by instructor error'
+                });
+            }
+        );
     });
 
     // add a class
