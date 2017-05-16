@@ -18,7 +18,7 @@ exports.getRoute = function (s) {
             r.forEach(function (element) {
                 classes.push({id: element._id, name: element.name, editable: req.userLoginInfo.record._id.toString() == element.owner});
             });
-            return s.classConn.getClassesByOwner(req.userLoginInfo.record._id);
+            return s.classConn.getClassesByStudent(req.userLoginInfo.record._id);
         }).then((r)=>{
             r.forEach(function (element) {
                 classes.push({id: element._id, name: element.name, editable: req.userLoginInfo.record._id.toString() == element.owner});
