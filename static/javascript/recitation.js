@@ -132,10 +132,10 @@ function deleteRecitation(recID, classId) {
 function addRecitation(currentClassId) {
     var name = $(".recitation-name").val();
     var startDate = $('#rec-date-start-display').text();
-    ;
     var endDate = $('#rec-date-end-display').text();
-    ;
-
+    var add_button = $('#save-recitation');
+    add_button.html("adding...");
+    add_button.attr('disabled',true);
     $.ajax({
         type: "POST",
         url: "/ajax/add-recitation",
@@ -149,12 +149,15 @@ function addRecitation(currentClassId) {
             if (data.result === true) {
                 $('#recitation-detail').modal('close');
                 location.reload();
+                add_button.html("done");
             } else {
                 console.error(data.reason);
             }
         },
         error: function (ts) {
             console.log(ts.responseText);
+            add_button.html("try again");
+            add_button.removeAttr('disabled');
         },
         dataType: "json",
         contentType: "application/json"

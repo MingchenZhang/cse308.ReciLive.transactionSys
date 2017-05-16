@@ -94,10 +94,13 @@ function searchClass() {
     });
 }
 function addClass() {
+    var add_button = $('#save-class');
     var name = $(".class-name").val();
     var startDate = $("#class-date-start-display").text();
     var endDate = $("#class-date-end-display").text();
     var students = [];
+    add_button.html("adding");
+    add_button.attr('disabled',true);
     $('.student-email').each(function () {
         if ($(this).val() !== '') {
             students.push($(this).val());
@@ -123,6 +126,8 @@ function addClass() {
         },
         error: function (ts) {
             console.log(ts.responseText);
+            add_button.html("try again");
+            add_button.removeAttr('disabled');
         },
         dataType: "json",
         contentType: "application/json"

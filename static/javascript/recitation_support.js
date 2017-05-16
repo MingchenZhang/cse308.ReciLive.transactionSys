@@ -83,6 +83,8 @@ function goBack() {
                     type: 'button',
                     className: 'vex-dialog-button-primary',
                     click: function (data) {
+                        this.form.getElementsByClassName('vex-first')[0].disabled = true;
+                        this.form.getElementsByClassName('vex-first')[0].firstChild.data="UPLOADING";
                         var request = {
                             type: 'POST',
                             url: '/add_resources',
@@ -97,6 +99,8 @@ function goBack() {
                             });
                         }).catch((err) => {
                             reject(err);
+                            this.form.getElementsByClassName('vex-first')[0].disabled = false;
+                            this.form.getElementsByClassName('vex-first')[0].firstChild.data="Try Again";
                         });
                     }
                 }, {

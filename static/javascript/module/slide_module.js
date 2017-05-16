@@ -129,7 +129,7 @@ function Slide(transactionSystem, showDiv, previousButton, nextButton, selectorD
                     resolve({slide64: canvas.toDataURL("image/png"), id: slidesNumber});
                     console.log('Load');
                 }).on('error', function (msg) {     //load error slide
-                    $("<img>", {src: '/static/img/img_load_error.jpg'}).on('load', function () {
+                    $("<img>", {src: '/static/img/img_load_error.png'}).on('load', function () {
                         let canvas = document.createElement("canvas");
                         canvas.width = this.width;
                         canvas.height = this.height;

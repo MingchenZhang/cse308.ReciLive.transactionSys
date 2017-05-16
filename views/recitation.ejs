@@ -68,11 +68,11 @@
                 <tr>
                     <th>
                         Start date
-                        <a href="#!" class="btn" id="rec-date-start" data-date-format="yyyy-mm-dd">Change</a>
+                        <a href="#!" class="btn" id="rec-date-start" data-date-format="yyyy-mm-dd:hh">Change</a>
                     </th>
                     <th>
                         End date
-                        <a href="#!" class="btn" id="rec-date-end" data-date-format="yyyy-mm-dd">Change</a>
+                        <a href="#!" class="btn" id="rec-date-end" data-date-format="yyyy-mm-dd:hh">Change</a>
                     </th>
                 </tr>
                 </thead>
@@ -85,7 +85,7 @@
             </table>
             <% if(instructor) { %>
             <div class="modal-footer">
-                <button type="button" class="btn save-recitaiton" onclick="addRecitation()">Save</button>
+                <button type="button" class="btn save-recitaiton" id="save-recitation" onclick="addRecitation()">Save</button>
             </div>
             <% } %>
         </div>
@@ -110,7 +110,7 @@
                 <div class="recitation <%if(recitation.lightColor){ %> lighter-recitation <% } %>">
                     <h4><%= recitation.name %><%= recitation.nameAppend %></h4>
                     <div class="dropdown-course-content">
-                        <a target="_blank" href="https://room.recilive.stream/room/<%= recitation.roomid %>">Enter</a>
+                        <a target="_blank" href="https://room.recilive.stream/room/<%= recitation.roomid %>">Go to Recitation Room</a>
                         <a href="#<%= recitation.mongoid %>">More</a>
                     </div>
                 </div>
