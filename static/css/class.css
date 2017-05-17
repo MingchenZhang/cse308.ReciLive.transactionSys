@@ -66,7 +66,13 @@ nav {
 .back2class {
   width: 40px;
   cursor: pointer;
-  font-size: 35px;
+  font-size: 40px;
+  -webkit-animation: bounce 2s infinite ease-in-out;
+}
+@-webkit-keyframes bounce {
+	0%, 20%, 60%, 100%  { -webkit-transform: translateX(0); }
+    40%  { -webkit-transform: translateX(-20px); }
+	80% { -webkit-transform: translateX(-10px); }
 }
 .class-info .input-field {
   width: 80%;
