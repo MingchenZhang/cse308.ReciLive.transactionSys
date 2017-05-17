@@ -140,7 +140,8 @@
       <div class="modal-footer">
           <a href="#!" class="btn save-class" id="save-class" onclick="addClass()" disabled>Save</a>
           <label class="btn">Bulk Import Students<input type="file" class="bulk-import-student" style="display: none;" onchange="import_student()"></label>
-          <button type="button" class="btn" onclick="add_student()">Add</button>
+          <button type="button" class="btn tooltipped" data-position="bottom" onclick="add_student()"
+                  data-tooltip="Please upload a file containing a list of email. One email per line. ">Add</button>
       </div>
       <% } %>
     </div>
