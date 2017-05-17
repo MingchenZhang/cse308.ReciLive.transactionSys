@@ -40,14 +40,18 @@ $(document).ready(function () {
         }
     );
     $("#info-post").keyup(function (event) {
-        if (event.keyCode == 13&&$("#info-post").val()!="") {
-            discussionBoardModule.newThread($("#info-post").val());
+        var userInput = $("#info-post").val();
+        if (event.keyCode == 13 && userInput != "") {
+            $("#info-post").val('');
+            discussionBoardModule.newThread(userInput);
         }
     });
 
     $("#post-submit").click(function (event) {
-        if ($("#info-post").val()!="") {
-            discussionBoardModule.newThread($("#info-post").val());
+        var userInput = $("#info-post").val();
+        if (event.keyCode == 13 && userInput != "") {
+            $("#info-post").val('');
+            discussionBoardModule.newThread(userInput);
         }
     });
 });
@@ -127,7 +131,7 @@ function newPost(message, posx, posy, color, id) {
     $newdiv.find('span').css({
         display: 'inline-block'
     });
-    $('#info-post').val('');
+    //$('#info-post').val('');
     return $newdiv;
 }
 
