@@ -73,7 +73,7 @@ exports.getRoute = function (s) {
                                     "userList": userList                //for the change mic
                                 }
                             }, (error, response, body) => {
-                                if (error || body.status != 'ok') return res.status(500).send({
+                                if (error || JSON.parse(body).status != 'ok') return res.status(500).send({
                                     result: false,
                                     error,
                                     statusCode: (response) ? response.statusCode : 0
