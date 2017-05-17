@@ -63,6 +63,9 @@ nav {
 .class-info h2 {
   color: #e05038;
 }
+#class-Name {
+  cursor: pointer;
+}
 .back2class {
   width: 40px;
   cursor: pointer;
@@ -71,7 +74,7 @@ nav {
 }
 @-webkit-keyframes bounce {
 	0%, 20%, 60%, 100%  { -webkit-transform: translateX(0); }
-    40%  { -webkit-transform: translateX(-20px); }
+    40%  { -webkit-transform: translateX(-15px); }
 	80% { -webkit-transform: translateX(-10px); }
 }
 .class-info .input-field {
