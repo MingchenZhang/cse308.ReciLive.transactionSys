@@ -12,7 +12,8 @@ exports.getRoute = function (s) {
     var jsonParser = BodyParser.json({limit: '10kb'});
 
     // used by support to push new recitation info to live system
-    router.post(['/dispatch_classroom'], jsonParser, function (req, res, next) {
+    router.post('/dispatch_classroom', jsonParser, function (req, res, next) {
+        console.log('trying to dispatch classroom: '+JSON.stringify(req.body));
         if (!Checker.dispatchRequest(req.body)) return res.send({status: "error", reason: 5});
         s.sessionManager.addSession({
             sessionID: req.body.classNumber,
