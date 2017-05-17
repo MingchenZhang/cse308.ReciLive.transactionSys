@@ -76,7 +76,8 @@ exports.getRoute = function (s) {
                                 if (error || JSON.parse(body).status != 'ok') return res.status(500).send({
                                     result: false,
                                     error,
-                                    statusCode: (response) ? response.statusCode : 0
+                                    statusCode: (response) ? response.statusCode : 0,
+                                    body
                                 });
                                 return res.send({result: true, response, body});
                             });
