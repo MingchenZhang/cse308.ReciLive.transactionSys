@@ -73,7 +73,7 @@ exports.getRoute = function (s) {
                                     "userList": userList                //for the change mic
                                 }
                             }, (error, response, body) => {
-                                if (error || JSON.parse(body).status != 'ok') return res.status(500).send({
+                                if (error || s.tools.isJson(body) && JSON.parse(body).status != 'ok') return res.status(500).send({
                                     result: false,
                                     error,
                                     statusCode: (response) ? response.statusCode : 0,
@@ -81,6 +81,8 @@ exports.getRoute = function (s) {
                                 });
                                 return res.send({result: true, response, body});
                             });
+                        }).catch((e) => {
+                            res.send({result: false, reason: e.message || "error in request a new room"});
                         });
                     }).catch((e) => {
                         res.send({result: false, reason: e.message || "error in db get students list"});
