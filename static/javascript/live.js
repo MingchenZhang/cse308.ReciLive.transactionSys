@@ -49,7 +49,7 @@ $(document).ready(function () {
 
     $("#post-submit").click(function (event) {
         var userInput = $("#info-post").val();
-        if (event.keyCode == 13 && userInput != "") {
+        if (userInput != "") {
             $("#info-post").val('');
             discussionBoardModule.newThread(userInput);
         }
