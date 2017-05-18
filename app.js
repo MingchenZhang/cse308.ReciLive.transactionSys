@@ -82,6 +82,8 @@ if (Cluster.isMaster) {
     app.use((req, res, next)=> { // http redirection
         if (req.protocol == 'http' && s.inProduction) {
             res.redirect('https://recilive.stream')
+        }else if(req.headers.host == 'www.recilive.stream'){
+            res.redirect('https://recilive.stream')
         } else {
             next();
         }
